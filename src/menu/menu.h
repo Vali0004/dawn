@@ -4,8 +4,7 @@
 #include "menu/fonts.h"
 #include "menu/elements.h"
 
-inline void print_sc_data()
-{
+inline void print_sc_data() {
 	rage::rlPc& pc{ *cs::pointers::g_rlPc };
 	rage::rlTitleId& titleId{ *(*cs::pointers::g_rlTitleId) };
 
@@ -47,39 +46,30 @@ inline void print_sc_data()
 
 	LOG_NEWLINE();
 	LOG_TO_STREAM("const u8 rsa_key[" << titleId.m_RosTitleId.m_PublicRsaKeyLen << "] = {");
-	for (u32 i{}; i != titleId.m_RosTitleId.m_PublicRsaKeyLen; i += 4)
-	{
-		for (u32 j{}; j != 4; ++j)
-		{
+	for (u32 i{}; i != titleId.m_RosTitleId.m_PublicRsaKeyLen; i += 4) {
+		for (u32 j{}; j != 4; ++j) {
 			LOG_TO_STREAM_NO_IO_MANIP(HEX(titleId.m_RosTitleId.m_PublicRsaKey[i+j]) << ", ");
 		}
 		LOG_NEWLINE();
 	}
 	LOG_TO_STREAM("};");
 }
-namespace cs::renderer
-{
-	namespace gui
-	{
+namespace cs::renderer {
+	namespace gui {
 		inline bool g_open{};
-		inline bool is_open()
-		{
+		inline bool is_open() {
 			return g_open;
 		}
 
-		inline void flip_bit(bool trigger_flip = false)
-		{
-			if (trigger_flip)
-			{
+		inline void flip_bit(bool trigger_flip = false) {
+			if (trigger_flip) {
 				g_open ^= 1;
 			}
 		}
 	}
 
-	namespace menu
-	{
-		inline void init()
-		{
+	namespace menu {
+		inline void init() {
 			static auto&& io{ ImGui::GetIO() };
 			static auto&& style{ ImGui::GetStyle() };
 			static auto&& colors{ style.Colors };
@@ -157,10 +147,8 @@ namespace cs::renderer
 			fonts::g_font_mgr.add_font_to_atlas(io.Fonts, fonts::font(win_fonts / "arialbd.ttf", 19.f, cfg));
 		}
 
-		namespace main
-		{
-			inline void render_dummy()
-			{
+		namespace main {
+			inline void render_dummy() {
 				tab_bar("dummy_bar", [] {
 					tab_item("Dummy", [] {
 						text("This is a dummy menu! "); same_line();
@@ -171,8 +159,7 @@ namespace cs::renderer
 				});
 			}
 
-			inline void render_settings()
-			{
+			inline void render_settings() {
 				tab_bar("settings_bar", [] {
 					tab_item("Debug", [] {
 						button("Print SocialClub data", [] {
@@ -222,23 +209,20 @@ namespace cs::renderer
 				});
 			}
 
-			inline void render_bar()
-			{
+			inline void render_bar() {
 				tab_bar("main_bar", [] {
 					tab_item("Settings", &render_settings);
 				});
 			}
 
-			inline void render()
-			{
+			inline void render() {
 				primitive_window("Test", [] {
 					//tab_bar("main_bar", &render_bar);
 				});
 			}
 		}
 
-		inline void render()
-		{
+		inline void render() {
 			main::render();
 		}
 	}

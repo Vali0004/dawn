@@ -6,16 +6,12 @@
 #include "hooking/etc/detour.h"
 #include "hooking/renderer.h"
 
-namespace cs::exception::etc
-{
-	inline std::string determine_module(u64 addr)
-	{
+namespace cs::exception::etc {
+	inline std::string determine_module(u64 addr) {
 		HMODULE mod{};
-		if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(addr), &mod))
-		{
+		if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(addr), &mod)) {
 			char moduleName[MAX_PATH]{};
-			if (GetModuleFileNameA(mod, moduleName, MAX_PATH) > 0)
-			{
+			if (GetModuleFileNameA(mod, moduleName, MAX_PATH) > 0) {
 				std::string wideModuleName(moduleName);
 				return moduleName;
 			}
@@ -25,25 +21,21 @@ namespace cs::exception::etc
 		return "unknown";
 	}
 
-	class exception_data
-	{
+	class exception_data {
 	public:
 		exception_data(s64 t, std::string_view r)
 			: m_type(t), m_reason(r)
 		{}
 
-		std::string what()
-		{
+		std::string what() {
 			return m_reason.data();
 		}
 
-		s64 value()
-		{
+		s64 value() {
 			return m_type;
 		}
 
-		operator bool()
-		{
+		operator bool() {
 			return !what().empty();
 		}
 	protected:
@@ -51,8 +43,7 @@ namespace cs::exception::etc
 		std::string_view m_reason{};
 	};
 
-	class exception_context
-	{
+	class exception_context {
 	public:
 		exception_context(EXCEPTION_POINTERS* exception) :
 			m_record(*exception->ExceptionRecord),
@@ -64,8 +55,7 @@ namespace cs::exception::etc
 			m_exceptionAddress = (uint64_t)m_record.ExceptionAddress;
 		}
 
-		void print_registers()
-		{
+		void print_registers() {
 			LOG(Registers, "RAX: 0x{:X} || RSI: 0x{:X}", m_context.Rax, m_context.Rsi);
 			LOG(Registers, "RBX: 0x{:X} || RDI: 0x{:X}", m_context.Rbx, m_context.Rdi);
 			LOG(Registers, "RCX: 0x{:X} || RBP: 0x{:X}", m_context.Rcx, m_context.Rbp);
@@ -87,8 +77,7 @@ namespace cs::exception::etc
 
 	#define PAIR(v) exception_data(v, #v)
 
-	inline std::array<exception_data, 62> g_exception_types
-	{
+	inline std::array<exception_data, 62> g_exception_types {
 		PAIR(STATUS_WAIT_0),
 		PAIR(STATUS_ABANDONED_WAIT_0),
 		PAIR(STATUS_USER_APC),
@@ -153,34 +142,28 @@ namespace cs::exception::etc
 		PAIR(STATUS_SXS_INVALID_DEACTIVATION)
 	};
 
-	inline std::array<exception_data, 3> g_exception_error_reasons
-	{
+	inline std::array<exception_data, 3> g_exception_error_reasons {
 		exception_data(0, "a attempt to read an invalid address"),
 		exception_data(1, "a attempt to write to an invalid address"),
 		exception_data(8, "an data exception prevention (DEP)")
 	};
 
-	inline std::string get_exception_type(ULONG_PTR type)
-	{
-		if (g_exception_error_reasons[type])
-		{
+	inline std::string get_exception_type(ULONG_PTR type) {
+		if (g_exception_error_reasons[type]) {
 			return g_exception_error_reasons[type].what();
 		}
 
 		return "unknown";
 	}
 
-	inline u8 get_ins_length(u8* code)
-	{
+	inline u8 get_ins_length(u8* code) {
 		u8* start{ code };
 		hde64s hde{};
 
-		if (u8 len{ static_cast<u8>(hde64_disasm(reinterpret_cast<void*>(code), &hde)) })
-		{
+		if (u8 len{ static_cast<u8>(hde64_disasm(reinterpret_cast<void*>(code), &hde)) }) {
 			return len;
 		}
-		else if (x64::disassembleInstructionCode(code).isValid())
-		{
+		else if (x64::disassembleInstructionCode(code).isValid()) {
 			return static_cast<u8>(code - start);
 		}
 
@@ -188,16 +171,13 @@ namespace cs::exception::etc
 	}
 }
 
-namespace cs::exception
-{
+namespace cs::exception {
 	inline void* g_handle{};
 	inline LPTOP_LEVEL_EXCEPTION_FILTER g_filter_handle{};
 
-	inline bool attempt_stack_recovery(PEXCEPTION_POINTERS exceptionInfo)
-	{
+	inline bool attempt_stack_recovery(PEXCEPTION_POINTERS exceptionInfo) {
 		PCONTEXT ctx{ exceptionInfo->ContextRecord };
-		if (const auto len{ etc::get_ins_length(reinterpret_cast<u8*>(ctx->Rip)) })
-		{
+		if (const auto len{ etc::get_ins_length(reinterpret_cast<u8*>(ctx->Rip)) }) {
 			ctx->Rip += len;
 			return true;
 		}
@@ -205,12 +185,9 @@ namespace cs::exception
 		return false;
 	}
 
-	inline bool handle_module_exception(u32 status_code)
-	{
-		switch (status_code)
-		{
-			case STATUS_OOB_POINTER_ADDITIVE:
-			{
+	inline bool handle_module_exception(u32 status_code) {
+		switch (status_code) {
+			case STATUS_OOB_POINTER_ADDITIVE: {
 				LOG(Exception, "Exception caused by our module. Invalid pointer addtive (Out Of Bounds)");
 				g_running = false;
 				return true;
@@ -220,35 +197,28 @@ namespace cs::exception
 		return false;
 	}
 
-	inline LONG WINAPI handle_exception_inner(PEXCEPTION_POINTERS info)
-	{
+	inline LONG WINAPI handle_exception_inner(PEXCEPTION_POINTERS info) {
 		etc::exception_context ctx{ info };
 
-		if (!ctx.m_fileoffset.empty())
-		{
+		if (!ctx.m_fileoffset.empty()) {
 			std::string name{ etc::g_exception_types[ctx.m_code] ? etc::g_exception_types[ctx.m_code].what() : std::format("0x{:X}", ctx.m_code) };
 
-			switch (ctx.m_code)
-			{
+			switch (ctx.m_code) {
 				case CONTROL_C_EXIT:
 				case EXCEPTION_BREAKPOINT:
-				case EXCEPTION_SINGLE_STEP:
-				{
+				case EXCEPTION_SINGLE_STEP: {
 					LOG(Exception, "The game has suffered a non-fatal exception, you may disregard this message ({} at {})", name, ctx.m_fileoffset);
 					return EXCEPTION_CONTINUE_EXECUTION;
 				} break;
 
 				case EXCEPTION_GUARD_PAGE:
-				case EXCEPTION_ACCESS_VIOLATION:
-				{
+				case EXCEPTION_ACCESS_VIOLATION: {
 					std::string type{ etc::get_exception_type(ctx.m_type) };
 					LOG(Exception, "The game suffered an fatal exception, you may need to restart the game. ({} at {}, reason of {} was {}{})", name, ctx.m_fileoffset, name, type, ctx.m_type != 8 && name != "unknown" ? "" : std::format("0x{:X}", ctx.m_deathAddress));
 				} break;
 
-				default:
-				{
-					if (!handle_module_exception(ctx.m_code))
-					{
+				default: {
+					if (!handle_module_exception(ctx.m_code)) {
 						LOG(Exception, "The game suffered a exception of unknown severity, you may need to restart the game. ({} at {}, reason of exception is unknown)", name, ctx.m_fileoffset);
 					}
 				} break;
@@ -258,39 +228,32 @@ namespace cs::exception
 		//LOG(Exception, "Dumping registerss...");
 		//ctx.print_registers();
 
-		if (!attempt_stack_recovery(info))
-		{
+		if (!attempt_stack_recovery(info)) {
 			return EXCEPTION_CONTINUE_SEARCH;
 		}
 
 		return EXCEPTION_CONTINUE_EXECUTION;
 	}
 
-	inline LONG WINAPI handle_exception(PEXCEPTION_POINTERS info)
-	{
+	inline LONG WINAPI handle_exception(PEXCEPTION_POINTERS info) {
 		return handle_exception_inner(info);
 	}
 
-	inline LONG WINAPI handle_unhandled_exception(PEXCEPTION_POINTERS info)
-	{
+	inline LONG WINAPI handle_unhandled_exception(PEXCEPTION_POINTERS info) {
 		return handle_exception_inner(info);
 	}
 
-	inline void attach_handler()
-	{
+	inline void attach_handler() {
 		g_handle = AddVectoredExceptionHandler(FALSE, handle_exception);
 
 		g_filter_handle = SetUnhandledExceptionFilter(handle_unhandled_exception);
 	}
-	inline void detach_handler()
-	{
-		if (g_handle)
-		{
+	inline void detach_handler() {
+		if (g_handle) {
 			RemoveVectoredExceptionHandler(g_handle);
 		}
 
-		if (g_filter_handle)
-		{
+		if (g_filter_handle) {
 			SetUnhandledExceptionFilter(g_filter_handle);
 		}
 	}

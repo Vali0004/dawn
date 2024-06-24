@@ -2,8 +2,7 @@
 #include "memory/pointers.h"
 #include "menu/menu.h"
 
-namespace cs::renderer
-{
+namespace cs::renderer {
 	static rage::grcEffectTechnique s_DefaultLit{ rage::grcetNONE };
 	static rage::grcEffectTechnique s_DefaultUnlit{ rage::grcetNONE };
 	static rage::grcEffectTechnique s_DefaultLitSkinned{ rage::grcetNONE };
@@ -11,8 +10,7 @@ namespace cs::renderer
 	inline rage::grcEffect* g_DefaultEffect{};
 	inline rage::grcStateBlock::grcRasterizerStateHandle RS_WireFrame{};
 
-	inline void CreateHandles()
-	{
+	inline void CreateHandles() {
 		//g_DefaultEffect = pointers::g_grcEffectCreate("rage_im");
 		//LOG_TO_STREAM("Address of default effect: " << HEX((u64)g_DefaultEffect));
 		//s_DefaultLit = g_DefaultEffect->LookupTechnique("draw");
@@ -29,8 +27,7 @@ namespace cs::renderer
 		//LOG_TO_STREAM("Default Unit (Skinned): " << HEX((u64)s_DefaultUnlitSkinned));
 		LOG_TO_STREAM("RasterizerState WireFrame: " << HEX((u64)RS_WireFrame));
 	}
-	inline void DestroyHandles()
-	{
+	inline void DestroyHandles() {
 		g_DefaultEffect = NULL;
 		//pointers::g_grcStateBlockDestroyRasterizerState(RS_WireFrame);
 	}
@@ -38,20 +35,16 @@ namespace cs::renderer
 	class renderer;
 	inline std::unique_ptr<renderer> g_renderer{};
 
-	class renderer final
-	{
+	class renderer final {
 	public:
-		void create_ctx()
-		{
-			if (!ImGui::GetCurrentContext())
-			{
+		void create_ctx() {
+			if (!ImGui::GetCurrentContext()) {
 				ImGuiContext* ctx = ImGui::CreateContext();
 				ImGui::SetCurrentContext(ctx);
 			}
 		}
 
-		void create()
-		{
+		void create() {
 			m_wndproc = WNDPROC(SetWindowLongPtrA(pointers::g_hwnd, GWLP_WNDPROC, LONG_PTR(&wndproc)));
 			m_swapchain = *pointers::g_pSwapChain;
 
@@ -67,36 +60,31 @@ namespace cs::renderer
 			//CreateHandles();
 		}
 
-		void destroy()
-		{
+		void destroy() {
 			//DestroyHandles();
 			SetWindowLongPtrA(pointers::g_hwnd, GWLP_WNDPROC, LONG_PTR(m_wndproc));
 
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 
-			if (ImGui::GetCurrentContext())
-			{
+			if (ImGui::GetCurrentContext()) {
 				ImGui::DestroyContext();
 			}
 		}
 
-		static LRESULT wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-		{
+		static LRESULT wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			g_renderer->create_ctx();
 
 			gui::flip_bit(uMsg == WM_KEYUP && wParam == VK_INSERT);
 
-			if (ImGui::GetCurrentContext())
-			{
+			if (ImGui::GetCurrentContext()) {
 				ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 			}
 
 			return CallWindowProcA(g_renderer->m_wndproc, hWnd, uMsg, wParam, lParam);
 		}
 
-		void present()
-		{
+		void present() {
 			static ImGuiIO& io{ ImGui::GetIO() };
 			io.MouseDrawCursor = gui::g_open;
 			create_ctx();
@@ -107,8 +95,7 @@ namespace cs::renderer
 			fonts::g_font_mgr.update(io.Fonts);
 
 			ImGui::NewFrame();
-			if (gui::is_open())
-			{
+			if (gui::is_open()) {
 				menu::render();
 			}
 			ImGui::EndFrame();
@@ -124,19 +111,16 @@ namespace cs::renderer
 		WNDPROC m_wndproc{};
 	};
 
-	inline void create()
-	{
+	inline void create() {
 		g_renderer = std::make_unique<renderer>();
 		g_renderer->create();
 	}
 
-	inline renderer* get()
-	{
+	inline renderer* get() {
 		return g_renderer.get();
 	}
 
-	inline void destroy()
-	{
+	inline void destroy() {
 		g_renderer->destroy();
 		g_renderer.reset();
 	}

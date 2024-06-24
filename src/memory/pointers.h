@@ -4,8 +4,7 @@
 #include "memory/memory.h"
 #include "memory/types.h"
 
-namespace cs::pointers
-{
+namespace cs::pointers {
 	inline types::CLoadingScreensSetLoadingContextT g_CLoadingScreensSetLoadingContext{};
 	inline types::CLoadingScreensSetMovieContextT g_CLoadingScreensSetMovieContext{};
 	inline types::CLoadingScreensShutdownT g_CLoadingScreensShutdown{};
@@ -53,32 +52,27 @@ namespace cs::pointers
 	inline rage::rlPc* g_rlPc{};
 	inline HWND g_hwnd{};
 
-	inline void defeat_arx()
-	{
+	inline void defeat_arx() {
 		LOG_TO_STREAM("Defeating GuardIT algorithms...");
 		s32 jumpception_count{},
 			healers_count{};
 
-		for (auto& h : memory::get_all_results("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45"))
-		{
+		for (auto& h : memory::get_all_results("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45")) {
 			++jumpception_count, ++healers_count;
 			memset((void*)(h + 8), 0x90, 7);
 		}
 
-		if (!jumpception_count)
-		{
+		if (!jumpception_count) {
 			LOG_TO_STREAM("There are no GuardIT algorithms to defeat!");
 		}
-		else
-		{
+		else {
 			LOG_TO_STREAM("Defeated all algorithms!");
 			LOG_TO_STREAM("Number of times Jumpception was used: " << jumpception_count);
 			LOG_TO_STREAM("Number of times Jumpception (code healers) was used: " << (healers_count / 2) << " (t2, group_count:2)");
 		}
 	}
 
-	inline void trigger_scan(memory::pointer_manager& ptr_mgr)
-	{
+	inline void trigger_scan(memory::pointer_manager& ptr_mgr) {
 		ptr_mgr.run();
 		while (!ptr_mgr.finished())
 			std::this_thread::sleep_for(1ns);
@@ -88,31 +82,25 @@ namespace cs::pointers
 	}
 
 	using removeKeybaordHookT = fptr<void()>;
-	inline void remove_keyboard_hook()
-	{
+	inline void remove_keyboard_hook() {
 		removeKeybaordHookT remove_fn{};
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("RemoveKeyboardHook", remove_fn, "48 8B 0D ? ? ? ? 48 FF 25 ? ? ? ? C3");
 		trigger_scan(ptr_mgr);
 
-		if (remove_fn)
-		{
+		if (remove_fn) {
 			remove_fn();
 			LOG_TO_STREAM("Removed keyboard hook. (Windows key lockout)");
 		}
-		else
-		{
+		else {
 			LOG_TO_STREAM("There is no keyboard hook!");
 		}
 	}
 
-	inline void wait_for_rgsc()
-	{
-		if (g_was_injected_early)
-		{
+	inline void wait_for_rgsc() {
+		if (g_was_injected_early) {
 			int elapsed_time{};
-			while (!GetModuleHandleA("socialclub.dll"))
-			{
+			while (!GetModuleHandleA("socialclub.dll")) {
 				elapsed_time++;
 				std::this_thread::sleep_for(duration<double, std::pico>(900));
 			}
@@ -121,8 +109,7 @@ namespace cs::pointers
 		}
 	}
 
-	inline void rgsc_scan()
-	{
+	inline void rgsc_scan() {
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("rgsc::RgscRetailLog::RgscRetailMsg", g_RgscRetailLogRgscRetailMsg, "48 8B C4 48 89 58 ? 55 56 41 56", {}, {"socialclub.dll"});
 		ptr_mgr.add("rgsc::Rgsc::Init", g_RgscInit, "48 89 5C 24 ? 55 57 41 54 41 56", {}, { "socialclub.dll" });
@@ -135,7 +122,7 @@ namespace cs::pointers
 		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponse", g_rlRosHttpTaskProcessResponse, "48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 33 FF 4D 8B E0");	
 		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponseSc", g_rlRosHttpTaskProcessResponseSc, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 48 83 64 24", {}, { "socialclub.dll" });
 		ptr_mgr.add("rage::rlProfileStatsFlushTask::Configure", g_rlProfileStatsFlushTaskConfigure, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 DB 49 8B F9 48 8B F1 4D 85 C9 74 ? 41 83 39 ? 74 ? 48 39 99");
-		// This sig needs to be updated every time the game does, it's ARX protected.
+		// This sig needs to be updated every time the game does, it's ARX protected. // waa waaa waa fuck you idc
 		// Grab it from RsonReader::Init, func+random_loc "45 8B C8 45 33 C0 E9"
 		ptr_mgr.add("GameTransactionBaseHttpTask::ProcessResponse", g_GameTransactionBaseHttpTaskProcessResponse, "48 8D 64 24 ? 44 8B 04 24 48 8D 64 24 ? 48 8B 44 24");
 		ptr_mgr.add("rage::rlPc::g_rlPc", g_rlPc, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92", "qword");
@@ -143,8 +130,7 @@ namespace cs::pointers
 	}
 
 	inline bool g_game_speedup_scanned{};
-	inline void game_speedup_scan(memory::pointer_manager& ptr_mgr, bool scan = true)
-	{
+	inline void game_speedup_scan(memory::pointer_manager& ptr_mgr, bool scan = true) {
 		ptr_mgr.add("LoadingScreenContext", g_LoadingScreenContext, "8B 05 ? ? ? ? 33 ED 8B F2", "dword");
 		ptr_mgr.add("CLoadingScreens::SetLoadingContext", g_CLoadingScreensSetLoadingContext, "48 83 EC ? 3B 0D ? ? ? ? 74");
 		ptr_mgr.add("CLoadingScreens::SetMovieContext", g_CLoadingScreensSetMovieContext, "40 53 48 83 EC ? 8B D9 48 8D 0D ? ? ? ? E8 ? ? ? ? 84 C0 74 ? 8B 05");
@@ -156,8 +142,7 @@ namespace cs::pointers
 		g_game_speedup_scanned = true;
 	}
 
-	inline void early_scan()
-	{
+	inline void early_scan() {
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("rage::sysEpic::InitClass", g_sysEpicInitClass, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 33 DB 4D 8B F1");
 		ptr_mgr.add("rage::fiAssetManager::FullPath", g_fiAssetManagerFullPath, "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 48 8B FA 49 8B D1");
@@ -167,16 +152,14 @@ namespace cs::pointers
 
 		ptr_mgr.add("rage::grcEffect::Init", g_grcEffectInit, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D 68 ? 48 81 EC ? ? ? ? 48 8B F2 48 8B F9 E8");
 		ptr_mgr.add("rage::grcEffect::Create", g_grcEffectCreate, "48 89 5C 24 ? 57 48 83 EC ? 33 D2 48 8B F9 E8 ? ? ? ? 8B C8");
-		if (!g_game_speedup_scanned)
-		{
+		if (!g_game_speedup_scanned) {
 			// Just append onto early_scan, it'll make it faster by a good chunk.
 			game_speedup_scan(ptr_mgr, false);
 		}
 		trigger_scan(ptr_mgr);
 	}
 
-	inline void late_scan()
-	{
+	inline void late_scan() {
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("CExtraContentManager::LoadContent", g_CExtraContentManagerLoadContent, "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B F9 48 8D 4D");
 		ptr_mgr.add("CExtraContentManager::EndEnumerateContent", g_CExtraContentManagerEndEnumerateContent, "48 89 5C 24 ? 57 48 83 EC ? 80 A1 ? ? ? ? ? 41 8A D8");
@@ -205,19 +188,15 @@ namespace cs::pointers
 		g_hwnd = FindWindowA("grcWindow", NULL);
 	}
 
-	inline void scan_all()
-	{
+	inline void scan_all() {
 		early_scan();
 		late_scan();
 	}
 }
 
-namespace rage
-{
-	namespace sysObfuscatedTypes
-	{
-		inline u32 obfRand()
-		{
+namespace rage {
+	namespace sysObfuscatedTypes {
+		inline u32 obfRand() {
 			u32& next = *cs::pointers::g_sysObfRandNext;
 			next = next * 214013 + 2531011;
 			return next;

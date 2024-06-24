@@ -9,7 +9,6 @@
 #define make_hook_vtbl(nm, vtbl, sz, ...) cs::hooking::g_##nm = new cs::hooking::etc::hook_vtbl(#nm, vtbl, sz); [](cs::hooking::etc::hook_vtbl* _this)##__VA_ARGS__##(cs::hooking::g_##nm); (cs::hooking::g_##nm)->create()
 #define make_hook_time_critical(nm, fn) cs::hooking::g_##fn = new cs::hooking::etc::hook<cs::pointers::types::fn##T>(nm, cs::pointers::g_##fn, &cs::hooking::##fn, false)
 
-namespace cs::hooks
-{
+namespace cs::hooks {
 
 }

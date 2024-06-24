@@ -6,10 +6,8 @@
 // Licensed under MIT
 // See https://github.com/calamity-inc/Soup/blob/senpai/LICENCE
 
-namespace x64
-{
-	enum x64Register : uint8_t
-	{
+namespace x64 {
+	enum x64Register : u8 {
 		RA = 0,
 		RC,
 		RB,
@@ -30,8 +28,7 @@ namespace x64
 		IMM,
 		DIS,
 	};
-	enum x64AccessType : uint8_t
-	{
+	enum x64AccessType : uint8_t {
 		ACCESS_64 = 64,
 		ACCESS_32 = 32,
 		ACCESS_16 = 16,
@@ -39,45 +36,36 @@ namespace x64
 		ACCESS_8_H = 0,
 	};
 #pragma pack(push, 1)
-	struct x64Operand
-	{
+	struct x64Operand {
 		x64Register m_reg;
-		union
-		{
-			struct //Register
-			{
+		union {
+			struct { //Register
 				x64AccessType m_accessType;
 				uint8_t m_derefSize;
 				int32_t m_derefOffset;
 			};
-			struct //Immediate
-			{
+			struct { //Immediate
 				uint64_t m_val;
 			};
-			struct //Displacement
-			{
+			struct { //Displacement
 				int64_t m_displacement;
 			};
 		};
-		void reset()
-		{
+		void reset() {
 			m_val = 0;
 		}
-		void decode(bool rex, uint8_t size, uint8_t reg, bool x)
-		{
+		void decode(bool rex, uint8_t size, uint8_t reg, bool x) {
 			reg |= (x << 3);
 			m_reg = x64Register(reg);
 			m_accessType = x64AccessType(size);
-			if (reg >= SP && reg <= DI && !rex && size != 64)
-			{
+			if (reg >= SP && reg <= DI && !rex && size != 64) {
 				m_reg = x64Register(m_reg - 4);
 				m_accessType = ACCESS_8_H;
 			}
 		}
 	};
 #pragma pack(pop)
-	enum x64OperandEncoding : uint16_t
-	{
+	enum x64OperandEncoding : uint16_t {
 		ZO = NULL,
 		O = 0b001,
 		M = 0b010,
@@ -94,29 +82,20 @@ namespace x64
 		AI = A | (I << BITS_PER_OPERAND),
 		RMI = R | (M << BITS_PER_OPERAND) | (I << (BITS_PER_OPERAND * 2)),
 	};
-	struct x64Operation
-	{
+	struct x64Operation {
 		const char* m_name;
 		uint16_t m_opcode;
 		x64OperandEncoding m_operandEncoding;
 		uint8_t m_operandSize;
 		uint8_t m_distinguish;
 		static constexpr uint8_t m_maxOperands = 3;
-		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding)
-			: x64Operation(name, opcode, operandEncoding, 0, 8)
-		{}
-		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding, uint8_t operandSize)
-			: x64Operation(name, opcode, operandEncoding, operandSize, 8)
-		{}
-		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding, uint8_t operandSize, uint8_t distinguish)
-			: m_name(name), m_opcode(opcode), m_operandEncoding(operandEncoding), m_operandSize(operandSize), m_distinguish(distinguish)
-		{}
-		uint16_t getUniqueId()
-		{
+		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding) : x64Operation(name, opcode, operandEncoding, 0, 8) {}
+		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding, uint8_t operandSize) : x64Operation(name, opcode, operandEncoding, operandSize, 8) {}
+		x64Operation(const char* name, uint16_t opcode, x64OperandEncoding operandEncoding, uint8_t operandSize, uint8_t distinguish) : m_name(name), m_opcode(opcode), m_operandEncoding(operandEncoding), m_operandSize(operandSize), m_distinguish(distinguish) {}
+		uint16_t getUniqueId() {
 			return m_distinguish == 8 ? m_opcode : (m_opcode << 3) | m_distinguish;
 		}
-		bool matches(const uint8_t* code)
-		{
+		bool matches(const uint8_t* code) {
 			uint16_t b = *code;
 			if (b == 0xF)
 				++code, b <<= 8, b |= *code;
@@ -124,23 +103,19 @@ namespace x64
 				b &= ~7;
 			return m_opcode == b && (m_distinguish == 8 || ((code[1] >> 3) & 7) == m_distinguish);
 		}
-		x64OperandEncoding getOprEncoding(uint8_t i)
-		{
+		x64OperandEncoding getOprEncoding(uint8_t i) {
 			return x64OperandEncoding((m_operandEncoding >> (BITS_PER_OPERAND * i)) & OPERAND_MASK);
 		}
-		uint8_t getNumOperands()
-		{
+		uint8_t getNumOperands() {
 			uint8_t i{};
-			while (i != m_maxOperands)
-			{
+			while (i != m_maxOperands) {
 				if (getOprEncoding(i) == ZO)
 					break;
 				++i;
 			}
 			return i;
 		}
-		uint8_t getNumModrmOperands()
-		{
+		uint8_t getNumModrmOperands() {
 			uint8_t count{};
 			for (uint8_t i{}; i != m_maxOperands; ++i)
 				if (x64OperandEncoding enc = getOprEncoding(i); enc == M || enc == R)
@@ -148,8 +123,7 @@ namespace x64
 			return count;
 		}
 	};
-	inline static x64Operation m_operations[]
-	{
+	inline static x64Operation m_operations[] = {
 		{ "mov", 0x88, MR, 8 },
 		{ "mov", 0x89, MR },
 		{ "mov", 0x8A, RM, 8 },
@@ -184,32 +158,27 @@ namespace x64
 		{ "movzx", 0x0FB6, RM, 8 },
 		{ "movzx", 0x0FB7, RM, 16 },
 		{ "imul", 0x69, RMI, 32 },
-		{ "nop", 0x90, ZO }
+		{ "nop", 0x90, ZO },
 	};
-	struct x64Instruction
-	{
+	struct x64Instruction {
 		x64Operation* m_operation = nullptr;
 		x64Operand m_operands[x64Operation::m_maxOperands];
-		bool isValid()
-		{
+		bool isValid() {
 			return m_operation != nullptr;
 		}
-		void reset()
-		{
+		void reset() {
 			m_operation = nullptr;
 			for (auto& opr : m_operands)
 				opr.reset();
 		}
-		std::string toBytecode()
-		{
+		std::string toBytecode() {
 			std::string res{};
 			if (m_operands[0].m_accessType == ACCESS_64)
 				res.push_back('\x48'); //REX.W
 			if ((m_operation->m_opcode >> 8) & 0xFF)
 				res.push_back((m_operation->m_opcode >> 8) & 0xFF);
 			res.push_back(m_operation->m_opcode & 0xFF);
-			if (m_operation->getNumModrmOperands() != NULL)
-			{
+			if (m_operation->getNumModrmOperands() != NULL) {
 				uint8_t modrm{};
 				modrm |= (0b11 << 6); // direct
 				modrm |= (m_operands[1].m_reg << 3); // reg
@@ -220,16 +189,14 @@ namespace x64
 		}
 	};
 	template <typename T = uint64_t>
-	inline static void getImmediate(T& val, uint8_t* code, uint8_t immBytes)
-	{
+	inline static void getImmediate(T& val, uint8_t* code, uint8_t immBytes) {
 		++code;
 		val = 0;
 		for (uint8_t i{ immBytes }; i; --i)
 			val <<= 8, val |= code[i];
 		code += (immBytes - 1);
 	}
-	inline x64Instruction disassembleInstructionCode(uint8_t*& code)
-	{
+	inline x64Instruction disassembleInstructionCode(uint8_t* code) {
 		bool operandSizeOverride = false;
 		bool addressSizeOverride = false;
 		bool rex = false;
@@ -240,8 +207,7 @@ namespace x64
 			operandSizeOverride = true, ++code;
 		if (*code == 0x67)
 			addressSizeOverride = true, ++code;
-		if ((*code >> 4) == 4)
-		{
+		if ((*code >> 4) == 4) {
 			rex = true;
 			if ((*code >> 3) & 1)
 				defaultOperandSize = false;
@@ -251,15 +217,12 @@ namespace x64
 		}
 		//Opcodes
 		x64Instruction res{};
-		for (auto& op : m_operations)
-		{
-			if (op.matches(code))
-			{
+		for (auto& op : m_operations) {
+			if (op.matches(code)) {
 				if (*code == 0x0F)
 					++code;
 				res.m_operation = &op;
-				if (op.m_operandEncoding != ZO)
-				{
+				if (op.m_operandEncoding != ZO) {
 					uint8_t operandSize{};
 					uint8_t immediateSize{};
 					if (operandSizeOverride)
@@ -276,42 +239,37 @@ namespace x64
 					bool modrmRead{ false };
 					uint8_t modrm{};
 					uint8_t sib{};
-					for (uint8_t oprEnc; oprEnc = ((op.m_operandEncoding >> (oprI * BITS_PER_OPERAND)) & OPERAND_MASK), oprEnc != ZO;)
-					{
+					for (uint8_t oprEnc; oprEnc = ((op.m_operandEncoding >> (oprI * BITS_PER_OPERAND)) & OPERAND_MASK), oprEnc != ZO;) {
 						x64Operand& opr = res.m_operands[oprI];
 						if (oprEnc == O) {
 							opr.decode(rex, operandSize, opcode & 7, rmX);
 						}
-						else if (oprEnc == M || oprEnc == R)
-						{
+						else if (oprEnc == M || oprEnc == R) {
 							if (!modrmRead)
 								modrmRead = true, modrm = *++code;
 							const bool direct = ((modrm >> 6) == 3);
-							if (oprEnc == M)
-							{
+							if (oprEnc == M) {
 								opr.decode(rex || !direct, operandSize, modrm & 7, rmX);
-								if (!direct)
-								{
+								if (!direct) {
 									opr.m_accessType = (addressSizeOverride ? ACCESS_32 : ACCESS_64);
 									opr.m_derefSize = ((numModrmOprs == 2) ? 1 : operandSize); //Hiding pointer type when other operand makes it apparent
 									if (opr.m_reg == SP)
 										sib = *++code;
-									switch (modrm >> 6)
-									{
-										case 0: {
-											//Absolute address
-											if (opr.m_reg == SP && sib == 0x25)
-												opr.m_reg = IMM, getImmediate(opr.m_val, code, 4);
-											//Read as RIP-relative
-											else if (opr.m_reg == BP)
-												opr.m_reg = IP, getImmediate(opr.m_derefOffset, code, 4);
-										} break;
-										case 1: {
-											opr.m_derefOffset = (int8_t) * ++code;
-										} break;
-										case 2: {
-											getImmediate(opr.m_derefOffset, code, 4);
-										} break;
+									switch (modrm >> 6) {
+									case 0: {
+										//Absolute address
+										if (opr.m_reg == SP && sib == 0x25)
+											opr.m_reg = IMM, getImmediate(opr.m_val, code, 4);
+										//Read as RIP-relative
+										else if (opr.m_reg == BP)
+											opr.m_reg = IP, getImmediate(opr.m_derefOffset, code, 4);
+									} break;
+									case 1: {
+										opr.m_derefOffset = (int8_t) * ++code;
+									} break;
+									case 2: {
+										getImmediate(opr.m_derefOffset, code, 4);
+									} break;
 									}
 								}
 							}
@@ -320,8 +278,7 @@ namespace x64
 						}
 						else if (oprEnc == I)
 							opr.m_reg = IMM, getImmediate(opr.m_val, code, immediateSize / 8);
-						else if (oprEnc == D)
-						{
+						else if (oprEnc == D) {
 							opr.m_reg = DIS;
 							getImmediate(opr.m_val, code, immediateSize / 8);
 							if (immediateSize == 8)

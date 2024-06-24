@@ -32,8 +32,7 @@ namespace rage {
     //////////////////////////////////////////////////////////////////////////
     //  Rson
     //////////////////////////////////////////////////////////////////////////
-    bool
-        Rson::IsReserved(const char c) {
+    bool Rson::IsReserved(const char c) {
         static const char RESERVED_CHARS[] = { "{}[]=,:" };
         return (NULL != strchr(RESERVED_CHARS, c));
     }

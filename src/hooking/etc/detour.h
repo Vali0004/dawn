@@ -3,20 +3,16 @@
 #include "minhook/MinHook.h"
 #include "common/persistent.h"
 
-namespace cs::hooking::etc::helpers
-{
-	inline u8* find_jump(const void* code)
-	{
+namespace cs::hooking::etc::helpers {
+	inline u8* find_jump(const void* code) {
 		u8* byte = (u8*)code;
-		while (*(u8*)byte != 0xE8 && *(u8*)byte != 0xE9)
-		{
+		while (*(u8*)byte != 0xE8 && *(u8*)byte != 0xE9) {
 			byte++;
 		}
 		return byte;
 	}
 
-	inline volatile const void* follow_jump_near(const void* code)
-	{
+	inline volatile const void* follow_jump_near(const void* code) {
 		const u8* jmp = find_jump(code);
 		u32 relativeOffset = *(u32*)(jmp + 1);
 		u64 baseAddress = (u64)(jmp + 5);
@@ -25,25 +21,20 @@ namespace cs::hooking::etc::helpers
 		return ret;
 	}
 }
-namespace cs::hooking::etc
-{
-	class persist_mh : public persist_impl
-	{
+namespace cs::hooking::etc {
+	class persist_mh : public persist_impl {
 	public:
 		persist_mh()
 			: persist_impl(init, uninit)
 		{}
-		static void apply_queued()
-		{
+		static void apply_queued() {
 			MH_ApplyQueued();
 		}
 	private:
-		static void init()
-		{
+		static void init() {
 			MH_Initialize();
 		}
-		static void uninit()
-		{
+		static void uninit() {
 			MH_Uninitialize();
 		}
 	} persist_mh{};
@@ -51,41 +42,34 @@ namespace cs::hooking::etc
 	class hook_impl;
 	inline std::map<std::string, hook_impl> g_hooks{};
 	inline std::vector<hook_vtbl*> g_vtbl_hooks{};
-	class hook_impl final
-	{
+	class hook_impl final {
 	public:
 		hook_impl(const std::string& name, void* target, void* function)
 			: m_name(name), m_target(target), m_original(target), m_function(function) {}
 		hook_impl()
 		{}
 
-		void correct_target()
-		{
+		void correct_target() {
 			volatile const void* func = helpers::follow_jump_near(m_target);
 			m_target = reinterpret_cast<void*>((u64)func);
 		}
 
-		void* target()
-		{
+		void* target() {
 			return m_target;
 		}
 
-		void* fn()
-		{
+		void* fn() {
 			return m_function;
 		}
 
-		void* original()
-		{
+		void* original() {
 			return m_original;
 		}
-		void** og()
-		{
+		void** og() {
 			return &m_original;
 		}
 
-		const std::string& name()
-		{
+		const std::string& name() {
 			return m_name;
 		}
 	protected:
@@ -96,8 +80,7 @@ namespace cs::hooking::etc
 		void* m_original{};
 	};
 
-	class hook_vtbl
-	{
+	class hook_vtbl {
 	public:
 		hook_vtbl(const std::string& id, void* vtable, u64 num_funcs)
 			: m_vtable(reinterpret_cast<u64**>(vtable)),
@@ -108,33 +91,27 @@ namespace cs::hooking::etc
 			std::copy_n(m_original, m_num_funcs, m_vtable_new.get());
 			g_vtbl_hooks.push_back(this);
 		}
-		~hook_vtbl()
-		{
+		~hook_vtbl() {
 			remove();
 		}
 
 		template <typename T>
-		T original(u64 index)
-		{
+		T original(u64 index) {
 			return reinterpret_cast<T>(m_original[index]);
 		}
 
 		template <typename T>
-		void set_func(u64 index, T function)
-		{
+		void set_func(u64 index, T function) {
 			m_vtable_new[index] = (u64)function;
 		}
-		void restore_func(u64 index)
-		{
+		void restore_func(u64 index) {
 			m_vtable_new[index] = m_original[index];
 		}
 
-		void create()
-		{
+		void create() {
 			*m_vtable = m_vtable_new.get();
 		}
-		void remove()
-		{
+		void remove() {
 			*m_vtable = m_original;
 		}
 
@@ -146,57 +123,47 @@ namespace cs::hooking::etc
 		u64 m_num_funcs;
 	};
 
-	inline int handle_mh_status(MH_STATUS& status, hook_impl& hook)
-	{
-		switch (status)
-		{
-			case MH_ERROR_NOT_INITIALIZED:
-			{
+	inline int handle_mh_status(MH_STATUS& status, hook_impl& hook) {
+		switch (status) {
+			case MH_ERROR_NOT_INITIALIZED: {
 				MH_Initialize();
 				return 1;
 			} break;
 
 			case MH_ERROR_UNSUPPORTED_FUNCTION:
-			case MH_ERROR_NOT_EXECUTABLE:
-			{
+			case MH_ERROR_NOT_EXECUTABLE: {
 				hook.correct_target();
 				status = MH_CreateHook(hook.target(), hook.fn(), hook.og());
 				return handle_mh_status(status, hook);
 			} break;
 
-			case MH_ERROR_ALREADY_CREATED:
-			{
+			case MH_ERROR_ALREADY_CREATED: {
 				return -1;
 			} break;
 
-			case MH_ERROR_NOT_CREATED:
-			{
+			case MH_ERROR_NOT_CREATED: {
 				MH_CreateHook(hook.target(), hook.fn(), hook.og());
 				return handle_mh_status(status, hook);
 			} break;
 
-			case MH_ERROR_ENABLED:
-			{
+			case MH_ERROR_ENABLED: {
 				return -1;
 			} break;
 
 			default:
-			case MH_OK:
-			{
+			case MH_OK: {
 				return 0;
 			} break;
 		}
 	}
 
-	inline void create_impl(hook_impl& hook, bool queue)
-	{
+	inline void create_impl(hook_impl& hook, bool queue) {
 		g_hooks.insert({ hook.name(), hook });
 
 		MH_STATUS status = MH_CreateHook(hook.target(), hook.fn(), hook.og());
 		//handle_mh_status(status, hook);
 
-		if (queue)
-		{
+		if (queue) {
 			MH_QueueEnableHook(hook.target());
 			return;
 		}
@@ -205,30 +172,24 @@ namespace cs::hooking::etc
 		//handle_mh_status(status, hook);
 	}
 
-	inline void remove_impl(hook_impl& hook)
-	{
+	inline void remove_impl(hook_impl& hook) {
 		g_hooks.erase(hook.name());
 
-		if (hook.target())
-		{
+		if (hook.target()) {
 			MH_DisableHook(hook.target());
 			MH_RemoveHook(hook.target());
 		}
 	}
 
-	inline void remove_all()
-	{
-		if (!g_hooks.empty())
-		{
+	inline void remove_all() {
+		if (!g_hooks.empty()) {
 			MH_DisableHook(MH_ALL_HOOKS);
 			MH_RemoveHook(MH_ALL_HOOKS);
 			g_hooks.clear();
 		}
 
-		if (!g_hooks.empty())
-		{
-			for (auto& h : g_vtbl_hooks)
-			{
+		if (!g_hooks.empty()) {
+			for (auto& h : g_vtbl_hooks) {
 				h->remove();
 			}
 			g_vtbl_hooks.clear();
@@ -236,39 +197,32 @@ namespace cs::hooking::etc
 	}
 
 	template <typename T>
-	class hook
-	{
+	class hook {
 	public:
 		hook(const std::string& id, T target, T function, bool queued = false)
 			: m_hook(id, (void*)target, (void*)function), m_queued(queued)
 		{
 			create();
 		}
-		~hook()
-		{
+		~hook() {
 			remove();
-			if (this)
-			{
+			if (this) {
 				delete reinterpret_cast<hook*>(this);
 			}
 		}
 
-		T original()
-		{
+		T original() {
 			return (T)m_hook.original();
 		}
 
-		hook_impl& get_impl()
-		{
+		hook_impl& get_impl() {
 			return m_hook;
 		}
 
-		void create()
-		{
+		void create() {
 			create_impl(m_hook, m_queued);
 		}
-		void remove()
-		{
+		void remove() {
 			remove_impl(m_hook);
 		}
 	private:

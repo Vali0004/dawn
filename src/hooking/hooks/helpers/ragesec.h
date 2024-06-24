@@ -2,10 +2,8 @@
 #include "pch/pch.h"
 #include "common/joaat.h"
 
-namespace cs::ragesec
-{
-	inline constexpr std::array<u32, 5> g_name_hash
-	{
+namespace cs::ragesec {
+	inline constexpr std::array<u32, 5> g_name_hash {
 		"fwClothMeshing"_j,
 		"CCreditsText"_j,
 		"rageSecEngine"_j,
@@ -13,12 +11,9 @@ namespace cs::ragesec
 		"TamperActions"_j
 	};
 
-	inline constexpr bool invalid_hash(u32 hash)
-	{
-		for (auto& nh : g_name_hash)
-		{
-			if (nh == hash)
-			{
+	inline constexpr bool invalid_hash(u32 hash) {
+		for (auto& nh : g_name_hash) {
+			if (nh == hash) {
 				return true;
 			}
 		}

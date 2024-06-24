@@ -6,25 +6,21 @@
 #include "hooks/http_process_response.h"
 #include "hooks/aes.h"
 
-namespace cs::hooking
-{
+namespace cs::hooking {
 	inline etc::hook<pointers::types::sysEpicInitClassT>* g_sysEpicInitClass{};
-	inline bool sysEpicInitClass(void* _This, const char* epicProductName, char* epicProductVersion, const char* epicProductId, const char* epicSandboxId, const char* epicClientId, const char* epicClientSecret, const char* epicDeploymentId)
-	{
+	inline bool sysEpicInitClass(void* _This, const char* epicProductName, char* epicProductVersion, const char* epicProductId, const char* epicSandboxId, const char* epicClientId, const char* epicClientSecret, const char* epicDeploymentId) {
 		//return false;
 		return g_sysEpicInitClass->original()(_This, epicProductName, epicProductVersion, epicProductId, epicSandboxId, epicClientId, epicClientSecret, epicDeploymentId);
 	}
 
 	inline etc::hook<pointers::types::entitlementManagerInitT>* g_entitlementManagerInit{};
-	inline void entitlementManagerInit(u32 v)
-	{
+	inline void entitlementManagerInit(u32 v) {
 		//return;
 		return g_entitlementManagerInit->original()(v);
 	}
 
 	inline etc::hook<pointers::types::fiAssetManagerFullPathT>* g_fiAssetManagerFullPath{};
-	inline void fiAssetManagerFullPath(void* _This, char* dest, int maxLen, const char* b, const char* ext, int pathIndex)
-	{
+	inline void fiAssetManagerFullPath(void* _This, char* dest, int maxLen, const char* b, const char* ext, int pathIndex) {
 		/*std::string base{b};
 		if (!strcmp(ext, "fxc")) {
 			LOG_TO_STREAM("Loading shader " << base);
@@ -37,29 +33,25 @@ namespace cs::hooking
 	}
 
 	inline etc::hook<pointers::types::grcEffectInitT>* g_grcEffectInit{};
-	inline bool grcEffectInit(rage::grcEffect* _This, const char* path)
-	{
+	inline bool grcEffectInit(rage::grcEffect* _This, const char* path) {
 		LOG_TO_STREAM("Effect doesn't already exist.");
 		return g_grcEffectInit->original()(_This, path);
 	}
 
 	inline etc::hook<pointers::types::CommandShouldWarnOfSimpleModCheckT>* g_CommandShouldWarnOfSimpleModCheck{};
-	inline bool CommandShouldWarnOfSimpleModCheck()
-	{
+	inline bool CommandShouldWarnOfSimpleModCheck() {
 		return false;
 	}
 
 	inline etc::hook<pointers::types::rlProfileStatsFlushTaskConfigureT>* g_rlProfileStatsFlushTaskConfigure{};
-	inline bool rlProfileStatsFlushTaskConfigure(rage::rlProfileStatsFlushTask* task, rage::rlProfileStatsClient* ctx, rage::rlProfileStatsDirtyIterator* flushIt, rage::netStatus* status)
-	{
+	inline bool rlProfileStatsFlushTaskConfigure(rage::rlProfileStatsFlushTask* task, rage::rlProfileStatsClient* ctx, rage::rlProfileStatsDirtyIterator* flushIt, rage::netStatus* status) {
 		ctx->m_SubmitCompressed = false;
 
 		return g_rlProfileStatsFlushTaskConfigure->original()(task, ctx, flushIt, status);
 	}
 
 	inline bool g_early_hook{};
-	inline void hook_rgsc()
-	{
+	inline void hook_rgsc() {
 		//make_hook_time_critical("RgscRetailLog::RgscRetailMsg", RgscRetailLogRgscRetailMsg);
 		make_hook_time_critical("Rgsc::Init", RgscInit);
 		//make_hook_time_critical("rlHttpTask::BuildUrl", rlHttpTaskBuildUrl);
@@ -75,10 +67,8 @@ namespace cs::hooking
 	}
 
 	inline etc::hook<pointers::types::GetProcAddressT>* g_GetProcAddress{};
-	inline FARPROC GetProcAddress(HMODULE hModule, LPCSTR lpProcName)
-	{
-		if (lpProcName == (LPCSTR)1)
-		{
+	inline FARPROC GetProcAddress(HMODULE hModule, LPCSTR lpProcName) {
+		if (lpProcName == (LPCSTR)1) {
 			LOG_TO_STREAM("Scanning pointers...");
 			pointers::rgsc_scan();
 
@@ -94,53 +84,43 @@ namespace cs::hooking
 	}
 
 	inline etc::hook_vtbl* g_grcSwapChain{};
-	inline HRESULT grcSwapChainPresent(rage::grcSwapChain* current, u32 syncInterval, u32 flags)
-	{
-		if (renderer::get())
-		{
+	inline HRESULT grcSwapChainPresent(rage::grcSwapChain* current, u32 syncInterval, u32 flags) {
+		if (renderer::get()) {
 			renderer::get()->present();
 		}
 
 		return g_grcSwapChain->original<pointers::types::grcSwapChainPresentT>(8)(current, syncInterval, flags);
 	}
 
-	inline HRESULT grcSwapChainResizeBuffers(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags)
-	{
+	inline HRESULT grcSwapChainResizeBuffers(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags) {
 		HRESULT result{};
 		ImGui_ImplDX11_InvalidateDeviceObjects();
 		result = g_grcSwapChain->original<pointers::types::grcSwapChainResizeBuffersT>(13)(current, bufferCount, width, height, newFormat, swapChainFlags);
-		if (SUCCEEDED(result))
-		{
+		if (SUCCEEDED(result)) {
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}
 
 		return result;
 	}
 
-	inline void spawn_loading_screen_wait_thread(LoadingScreenContext ctx, fptr<void()> callback)
-	{
-		if (*pointers::g_LoadingScreenContext != ctx)
-		{
+	inline void spawn_loading_screen_wait_thread(LoadingScreenContext ctx, fptr<void()> callback) {
+		if (*pointers::g_LoadingScreenContext != ctx) {
 			LOG_TO_STREAM("Loading screen state is not what we desire, spawning thread to wait for execution...");
 			std::thread([ctx, callback] {
-				while (*pointers::g_LoadingScreenContext != ctx)
-				{
+				while (*pointers::g_LoadingScreenContext != ctx) {
 					std::this_thread::sleep_for(1ms);
 				}
 
 				LOG_TO_STREAM("Passed loading screen state, triggering callback...");
-				if (callback)
-				{
+				if (callback) {
 					callback();
 				}
 			}).detach();
 		}
 	}
 
-	inline void spawn_delayed_create()
-	{
-		if (!g_early_hook)
-		{
+	inline void spawn_delayed_create() {
+		if (!g_early_hook) {
 			std::this_thread::sleep_for(100ms);
 			LOG_TO_STREAM("Scanning pointers...");
 			pointers::rgsc_scan();
@@ -151,8 +131,7 @@ namespace cs::hooking
 		pointers::late_scan();
 		LOG_TO_STREAM("Finished scanning pointers.");
 
-		make_hook_vtbl(grcSwapChain, *pointers::g_pSwapChain, 19,
-		{
+		make_hook_vtbl(grcSwapChain, *pointers::g_pSwapChain, 19, {
 			LOG_TO_STREAM("Hooking SwapChain");
 			_this->set_func(8, grcSwapChainPresent);
 			_this->set_func(13, grcSwapChainResizeBuffers);
@@ -174,8 +153,7 @@ namespace cs::hooking
 		});*/
 	}
 
-	inline void create()
-	{
+	inline void create() {
 		pointers::wait_for_rgsc();
 		pointers::early_scan();
 
@@ -189,10 +167,8 @@ namespace cs::hooking
 		std::thread(&spawn_delayed_create).detach();
 	}
 
-	inline void remove()
-	{
-		if (renderer::get())
-		{
+	inline void remove() {
+		if (renderer::get()) {
 			renderer::destroy();
 		}
 

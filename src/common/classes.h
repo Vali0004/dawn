@@ -26,8 +26,7 @@
 #define Assert(x)
 #define AssertMsg(x, m)
 
-enum LoadingScreenMovieContext : std::uint32_t
-{
+enum LoadingScreenMovieContext : std::uint32_t {
 	LOADINGSCREEN_SCALEFORM_CTX_BLANK,				// Blank Screen ( default value in the scaleform movie)
 	LOADINGSCREEN_SCALEFORM_CTX_LEGAL,				// Legal Screen ( With the spinner icons and descriptions )
 	LOADINGSCREEN_SCALEFORM_CTX_INSTALL,			// Installer Screen ( Uses a progress bar )
@@ -35,8 +34,7 @@ enum LoadingScreenMovieContext : std::uint32_t
 	LOADINGSCREEN_SCALEFORM_CTX_GAMELOAD_NEWS,		// Game loading (with network connectivity to retrieve rockstar news stories)
 	LOADINGSCREEN_SCALEFORM_CTX_LANDING				// PC & Gen9 Landing Context (with network connectivity to retrieve rockstar news stories, but does not cycle backgrounds automatically)
 };
-enum LoadingScreenContext : std::uint32_t
-{
+enum LoadingScreenContext : std::uint32_t {
 	LOADINGSCREEN_CONTEXT_NONE,
 	LOADINGSCREEN_CONTEXT_INTRO_MOVIE,				// renders the bink intro movie
 	LOADINGSCREEN_CONTEXT_LEGALSPLASH,				// Legal non-scaleform splash screen. ( Startup context, can be passed in ::Init() )
