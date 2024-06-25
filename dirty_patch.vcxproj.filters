@@ -130,6 +130,7 @@
     <ClInclude Include="src\hooking\hooks\http_process_response.h" />
     <ClInclude Include="src\hooking\hooks\aes.h" />
     <ClInclude Include="src\memory\types.h" />
+    <ClInclude Include="src\common\hatelist.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">
