@@ -42,6 +42,8 @@ namespace cs::pointers
 	inline u8* g_StateblockDirty{};
 	inline rage::gameSkeleton* g_gameSkeleton{};
 	inline rage::scrCommandHash<rage::scrCmd>* g_sCommandHash{};
+	inline rage::atArray<rage::scrThread*>* g_smThreads{};
+	inline const char** g_iVersionId{};
 	inline CNetworkAssetVerifier** g_CNetworkAssetVerifiersmInstance{};
 	inline rage::rlTitleId** g_rlTitleId{};
 	inline LoadingScreenContext* g_LoadingScreenContext{};
@@ -178,6 +180,8 @@ namespace cs::pointers
 		
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");
 		ptr_mgr.add("rage::s_CommandHash", g_sCommandHash, "48 8D 0D ? ? ? ? 48 8B 14 FA", "qword");
+		ptr_mgr.add("rage::scrThread::sm_Threads", g_smThreads, "48 8B 05 ? ? ? ? 8B CF 48 8B 1C C8 39 6B", "qword");
+		ptr_mgr.add("CDebug::m_iVersionId", g_iVersionId, "48 8D 2D ? ? ? ? 48 85 C0 0F 84", "qword");
 		ptr_mgr.add("CNetworkAssetVerifier::sm_Instance", g_CNetworkAssetVerifiersmInstance, "48 8B 0D ? ? ? ? E8 ? ? ? ? B1", "qword");
 		ptr_mgr.add("rage::grcDevice::sm_pSwapChain", g_pSwapChain, "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", "qword");
 		ptr_mgr.add("rage::sysObfuscatedTypes::obfRand::next", g_sysObfRandNext, "8B 0D ? ? ? ? BA ? ? ? ? 69 C9", "dword");

@@ -103,6 +103,7 @@ namespace cs::renderer
 			//fonts::g_font_mgr.update(io.Fonts);
 
 			ImGui::NewFrame();
+			callbacks::run();
 			if (gui::is_open())
 			{
 				menu::render();

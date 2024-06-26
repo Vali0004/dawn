@@ -1,8 +1,10 @@
 #pragma once
 #include "memory/pointers.h"
-#include "crossmap.h"
 #include "menu/fonts.h"
 #include "menu/elements.h"
+#include "commands/list.h"
+#include "commands/cmd_util.h"
+#include "util.h"
 
 inline void print_sc_data()
 {
@@ -160,13 +162,14 @@ namespace cs::renderer
 			//fonts::g_font_mgr.add_font_to_atlas(io.Fonts, fonts::font(win_fonts / "arialbd.ttf", 19.f, cfg));
 		}
 
+		int g_current_player{};
 		namespace main
 		{
 			inline void render_dummy()
 			{
 				tab_bar("dummy_bar", [] {
 					tab_item("Dummy", [] {
-						text("This is a dummy menu! "); same_line();
+						text("This is a dummy menu!"); same_line();
 						//font("arialbd.ttf", [] {
 							text("Please choose a different tab.");
 						//});
@@ -174,15 +177,70 @@ namespace cs::renderer
 				});
 			}
 
+			inline void render_network()
+			{
+				tab_bar("network_bar", [] {
+					tab_item("Players", [] {
+						list_box("##player_listbox", ImVec2(200.f, 220.f), [] {
+							for (int i{}; i != NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(); ++i)
+							{
+								if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
+								{
+									selectable(PLAYER::GET_PLAYER_NAME(i), g_current_player == i, [i] {
+										g_current_player = i;
+									});
+								}
+							}
+						});
+					});
+				});
+			}
+
 			inline void render_settings()
 			{
 				tab_bar("settings_bar", [] {
+					tab_item("Command tests", [] {
+						button("Spawn a adder", [] {
+							rage::run_as_thread("main_persistent"_j, [] {
+								u32 hash{ "adder"_j };
+
+								for (int i{}; i != 200 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
+								{
+									STREAMING::REQUEST_MODEL(hash);
+								}
+
+								if (!STREAMING::HAS_MODEL_LOADED(hash))
+								{
+									LOG_TO_STREAM("Model failed to load.");
+								}
+
+								Ped ped{ PLAYER::PLAYER_PED_ID() };
+								Vector3 pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
+								LOG_TO_STREAM(std::format("Entity coords: X{}, Y{}, Z{}", pos.x, pos.y, pos.z));
+								Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
+								LOG_TO_STREAM(std::format("Vehicle ID: {}", vehicle));
+
+								if (NETWORK::NETWORK_IS_SESSION_STARTED())
+								{
+									DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+								}
+
+								PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+
+								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+							});
+						});
+					});
 					tab_item("Debug", [] {
 						button("Attempt to force load the game", [] {
-							LoadingScreenContext& value = *cs::pointers::g_LoadingScreenContext;
-							cs::pointers::g_CLoadingScreensSetLoadingContext(LOADINGSCREEN_CONTEXT_LOADLEVEL);
-							cs::pointers::g_CLoadingScreensSetMovieContext(LOADINGSCREEN_SCALEFORM_CTX_BLANK);
-							pointers::g_CLoadingScreensShutdown(0);
+							std::vector<std::string> strings;
+							strings.push_back("Are you sure you want to do this?\n");
+							callback_yesno_popup("Force load", strings, [] {
+								LoadingScreenContext& value = *pointers::g_LoadingScreenContext;
+								pointers::g_CLoadingScreensSetLoadingContext(LOADINGSCREEN_CONTEXT_LOADLEVEL);
+								pointers::g_CLoadingScreensSetMovieContext(LOADINGSCREEN_SCALEFORM_CTX_BLANK);
+								pointers::g_CLoadingScreensShutdown(0);
+							});
 						});
 						button("Enable WireFrame test", [] {
 							SetWireframeOverride(true);
@@ -239,6 +297,7 @@ namespace cs::renderer
 			inline void render_bar()
 			{
 				tab_item("Dummy", &render_dummy);
+				tab_item("Network", &render_network);
 				tab_item("Settings", &render_settings);
 				tab_button("Exit game", [] {
 					exit(0);
@@ -259,6 +318,7 @@ namespace cs::renderer
 
 		inline void render()
 		{
+			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
 			set_next_window({ 50.f, 50.f, 650.f-15.f, 410.f }, ImGuiCond_Once);
 			main::render();
 		}

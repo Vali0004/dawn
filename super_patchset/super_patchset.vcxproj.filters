@@ -117,7 +117,7 @@
     <ClInclude Include="src\common\data\rson.h" />
     <ClInclude Include="src\hooking\renderer.h" />
     <ClInclude Include="src\build_number.h" />
-    <ClInclude Include="src\crossmap.h" />
+    <ClInclude Include="src\commands\crossmap.h" />
     <ClInclude Include="src\menu\menu.h" />
     <ClInclude Include="src\menu\fonts.h" />
     <ClInclude Include="src\menu\elements.h" />
@@ -134,6 +134,12 @@
     <ClInclude Include="src\simdjson\simdjson.h" />
     <ClInclude Include="src\hooking\etc\base.h" />
     <ClInclude Include="src\hooking\hooks\swapchain.h" />
+    <ClInclude Include="src\common\hatelist.h" />
+    <ClInclude Include="src\commands\invoker.h" />
+    <ClInclude Include="src\commands\list.h" />
+    <ClInclude Include="src\commands\types.h" />
+    <ClInclude Include="src\commands\cmd_util.h" />
+    <ClInclude Include="src\util.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

@@ -4767,19 +4767,27 @@ namespace rage {
 	enum scrThreadId : int {
 		THREAD_INVALID = 0,
 	};
-	#pragma optimize("", off)
-	__declspec(align(16)) class scrVector {
+	class scrVector {
 	public:
 		scrVector() {}
 		scrVector(float x, float y, float z) : x(x), y(y), z(z) {}
+		scrVector(const Vector3& v) : x(v.x), y(v.y), z(v.z) {}
+
 		void set(float sx, float sy, float sz) {
 			x = sx;
 			y = sy;
 			z = sz;
 		}
-		float x{}, y{}, z{};
+		scrVector& operator=(const Vector3& v) {
+			x = v.x; y = v.y; z = v.z;
+			return *this;
+		}
+		operator Vector3() const {
+			return Vector3(x, y, z);
+		}
+
+		float x, xPad, y, yPad, z, zPad;
 	};
-	#pragma optimize("", on)
 	#define MAX_CALLSTACK 16
 	class scrThread {
 	public:
@@ -4829,10 +4837,11 @@ namespace rage {
 				Buffer[BufferCount].set(v[0].Float, v[1].Float, v[2].Float);
 			}
 			void CopyReferencedParametersOut() {
-				while (BufferCount--) {
-					Orig[BufferCount][0].Float = Buffer[BufferCount].x;
-					Orig[BufferCount][1].Float = Buffer[BufferCount].y;
-					Orig[BufferCount][2].Float = Buffer[BufferCount].z;
+				int bc = BufferCount;
+				while (bc--) {
+					Orig[bc][0].Float = Buffer[bc].x;
+					Orig[bc][1].Float = Buffer[bc].y;
+					Orig[bc][2].Float = Buffer[bc].z;
 				}
 			}
 		};
@@ -4855,7 +4864,7 @@ namespace rage {
 		u32 m_ScriptNameHash;
 		char m_ScriptName[64];
 	};
-	typedef void(*scrCmd)(scrThread::Info&);
+	typedef void(*scrCmd)(scrThread::Info*);
 	template <typename T>
 	class scrCommandHash {
 	private:
@@ -4903,6 +4912,26 @@ namespace rage {
 		Bucket* m_Buckets[ToplevelSize];
 		int m_Occupancy;
 		bool m_bRegistrationComplete;
+	};
+	class tlsContext {
+	public:
+		char gap0[180];
+		std::uint8_t m_unk_byte; // 0xB4
+		char gapB5[3];
+		sysMemAllocator* m_allocator; // 0xB8
+		sysMemAllocator* m_allocator2; // 0xC0 - Same as 0xB8
+		sysMemAllocator*m_allocator3; // 0xC8 - Same as 0xB8
+		uint32_t m_console_smth; // 0xD0
+		char gapD4[188];
+		uint64_t m_unk; // 0x190
+		char gap198[1728];
+		scrThread* m_script_thread; // 0x858
+		bool m_is_script_thread_active; // 0x860
+
+		static tlsContext* get() {
+			constexpr std::uint32_t TlsIndex = 0x0;
+			return *reinterpret_cast<tlsContext**>(__readgsqword(0x58) + TlsIndex);
+		}
 	};
 }
 class CExtraContentManager : public rage::datBase {
