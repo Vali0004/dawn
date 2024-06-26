@@ -73,7 +73,7 @@ void routine()
 	g_was_injected_early = cs::memory::hmodule("socialclub.dll").exists(); //TODO: Fix
 	if (g_was_injected_early)
 	{
-		std::this_thread::sleep_for(1000ms);
+		std::this_thread::sleep_for(3000ms);
 		//std::thread(&game_speedup).detach();
 	}
 

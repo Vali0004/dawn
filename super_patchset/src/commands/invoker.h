@@ -42,7 +42,7 @@ namespace rage
 
 		if constexpr (!std::is_same_v<T, void>)
 		{
-			return *reinterpret_cast<T*>(&result.Any);
+			return *reinterpret_cast<T*>(inf.ResultPtr);
 		}
 	}
 }
