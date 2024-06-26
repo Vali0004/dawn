@@ -797,7 +797,7 @@ namespace ENTITY
 	static float GET_ENTITY_ANIM_TOTAL_TIME(Entity entity, const char* animDict, const char* animName) { return rage::Invoke<float>(0x50BD2730B191E360, entity, animDict, animName); } // 0x50BD2730B191E360 0x433A9D18 b323
 	static float GET_ANIM_DURATION(const char* animDict, const char* animName) { return rage::Invoke<float>(0xFEDDF04D62B8D790, animDict, animName); } // 0xFEDDF04D62B8D790 0x8B5E3E3D b323
 	static Entity GET_ENTITY_ATTACHED_TO(Entity entity) { return rage::Invoke<Entity>(0x48C2BED9180FE123, entity); } // 0x48C2BED9180FE123 0xFE1589F9 b323
-	static rage::scrVector GET_ENTITY_COORDS(Entity entity, BOOL alive) { return rage::Invoke<Vector3>(0x3FEF770D40960D5A, entity, alive); } // 0x3FEF770D40960D5A 0x1647F1CB b323
+	static rage::scrVector GET_ENTITY_COORDS(Entity entity, BOOL alive) { return rage::Invoke<scrVector>(0x3FEF770D40960D5A, entity, alive); } // 0x3FEF770D40960D5A 0x1647F1CB b323
 	static rage::scrVector GET_ENTITY_FORWARD_VECTOR(Entity entity) { return rage::Invoke<Vector3>(0x0A794A5A57F8DF91, entity); } // 0x0A794A5A57F8DF91 0x84DCECBF b323
 	static float GET_ENTITY_FORWARD_X(Entity entity) { return rage::Invoke<float>(0x8BB4EF4214E0E6D5, entity); } // 0x8BB4EF4214E0E6D5 0x49FAE914 b323
 	static float GET_ENTITY_FORWARD_Y(Entity entity) { return rage::Invoke<float>(0x866A4A5FAE349510, entity); } // 0x866A4A5FAE349510 0x9E2F917C b323
@@ -5838,7 +5838,7 @@ namespace TASK
 
 namespace VEHICLE
 {
-	static Vehicle CREATE_VEHICLE(Hash modelHash, Vector3 vec, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) { return rage::Invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, vec.x, vec.y, vec.z, heading, isNetwork, bScriptHostVeh, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
+	static Vehicle CREATE_VEHICLE(Hash modelHash, scrVector vec, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) { return rage::Invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, vec.x, vec.y, vec.z, heading, isNetwork, bScriptHostVeh, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
 	static void DELETE_VEHICLE(Vehicle* vehicle) { rage::Invoke<void>(0xEA386986E786A54F, vehicle); } // 0xEA386986E786A54F 0x9803AF60 b323
 	static void SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(Vehicle vehicle, BOOL toggle, BOOL p2) { rage::Invoke<void>(0x7D6F9A3EF26136A0, vehicle, toggle, p2); } // 0x7D6F9A3EF26136A0 0xBB54ECCA b323
 	static void SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON_SYNCED(Vehicle vehicle, BOOL canBeLockedOn, BOOL p2) { rage::Invoke<void>(0x1DDA078D12879EEE, vehicle, canBeLockedOn, p2); } // 0x1DDA078D12879EEE  b463

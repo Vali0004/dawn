@@ -215,7 +215,7 @@ namespace cs::renderer
 								}
 
 								Ped ped{ PLAYER::PLAYER_PED_ID() };
-								Vector3 pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
+								scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
 								LOG_TO_STREAM(std::format("Entity coords: X{}, Y{}, Z{}", pos.x, pos.y, pos.z));
 								Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
 								LOG_TO_STREAM(std::format("Vehicle ID: {}", vehicle));
