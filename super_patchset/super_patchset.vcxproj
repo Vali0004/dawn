@@ -123,6 +123,7 @@
     <ClInclude Include="src\common\data\rson.h" />
     <ClInclude Include="src\common\data\types.h" />
     <ClInclude Include="src\common\data\endian.h" />
+    <ClInclude Include="src\common\hatelist.h" />
     <ClInclude Include="src\common\joaat.h" />
     <ClInclude Include="src\common\macros.h" />
     <ClInclude Include="src\common\persistent.h" />
