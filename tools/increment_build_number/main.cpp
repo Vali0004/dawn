@@ -5,90 +5,112 @@
 #include <string>
 #include <filesystem>
 
-inline std::string read_line(std::filesystem::path path, std::string search) {
-    std::ifstream ifile{ path };
-    std::string line{};
+inline std::string read_line(std::filesystem::path path, std::string search)
+{
+	std::ifstream ifile{ path };
+	std::string line{};
 
-    while (std::getline(ifile, line)) {
-        if (line.find(search) != std::string::npos || !line.compare(search)) {
-            return line;
-        }
-    }
-    
-    return {};
+	while (std::getline(ifile, line))
+	{
+		if (line.find(search) != std::string::npos || !line.compare(search))
+		{
+			return line;
+		}
+	}
+
+	return {};
 }
 
-inline void overwrite_line(std::filesystem::path path, std::string search, std::string value) {
-    std::ifstream ifile{ path };
-    std::vector<std::string> lines{};
-    std::string line{};
+inline void overwrite_line(std::filesystem::path path, std::string search, std::string value)
+{
+	std::ifstream ifile{ path };
+	std::vector<std::string> lines{};
+	std::string line{};
 
-    while (std::getline(ifile, line)) {
-        if (line.find(search) != std::string::npos || !line.compare(search)) {
-            line = value;
-        }
+	while (std::getline(ifile, line))
+	{
+		if (line.find(search) != std::string::npos || !line.compare(search))
+		{
+			line = value;
+		}
 
-        lines.push_back(line);
-    }
+		lines.push_back(line);
+	}
 
-    ifile.close();
+	ifile.close();
 
-    std::ofstream ofile{ path };
+	std::ofstream ofile{ path };
 
-    for (auto& l : lines) {
-        ofile << l << std::endl;
-    }
+	for (auto& l : lines)
+	{
+		ofile << l << std::endl;
+	}
 
-    ofile.close();
+	ofile.close();
 }
 
-std::filesystem::path interpret_path(std::string path, std::string relative_path) {
-    try {
-        std::filesystem::path base_path{ path };
-        std::filesystem::path rel_path{ relative_path };
-        return std::filesystem::canonical(base_path / rel_path);
-    }
-    catch (const std::filesystem::filesystem_error& ex) {
-        std::cerr << "Filesystem error: " << ex.what() << std::endl;
-    }
-    return {};
+std::filesystem::path interpret_path(std::string path, std::string relative_path)
+{
+	std::filesystem::path base_path{ path };
+	if (base_path.has_extension() || base_path.has_filename() || !base_path.is_absolute())
+	{
+		base_path = base_path.parent_path();
+	}
+
+	try
+	{
+		std::filesystem::path rel_path{ relative_path };
+		return std::filesystem::canonical(base_path / rel_path);
+	}
+	catch (const std::filesystem::filesystem_error& ex)
+	{
+		std::cerr << "Filesystem error: " << ex.what() << std::endl;
+	}
+
+	return {};
 }
 
-int main(int argc, char** argv) {
-    std::filesystem::path file_path{ interpret_path(argv[0], "../../../../src/build_number.h") };
-    if (!std::filesystem::exists(file_path)) {
-        std::cerr << "Error getting canonical path or path does not exist." << std::endl;
-        return 1;
-    }
+int main(int argc, char** argv)
+{
+	std::filesystem::path file_path{ interpret_path(argv[0], "../../../super_patchset/src/build_number.h") };
+	if (!std::filesystem::exists(file_path))
+	{
+		std::cerr << "Error getting canonical path or path does not exist." << std::endl;
+		return 1;
+	}
 
-    std::ifstream file_in{ file_path.string() };
-    if (!file_in) {
-        std::ofstream file_out{ file_path.string() };
-        file_out << "#pragma once\n";
-        file_out << "#define BUILD \"b0001\"\n";
-        file_out << "\n";
-    }
-    file_in.close();
+	std::cout << "Path: " << file_path.string() << std::endl;
 
-    int build_num{};
+	std::ifstream file_in{ file_path.string() };
+	if (!file_in)
+	{
+		std::ofstream file_out{ file_path.string() };
+		file_out << "#pragma once\n";
+		file_out << "#define BUILD \"b0001\"\n";
+		file_out << "\n";
+	}
+	file_in.close();
 
-    std::string search{ "#define BUILD \"b" };
-    std::string replacement{ search };
-    std::string str{ read_line(file_path, search) };
+	int build_num{};
 
-    if (str.empty()) {
-        std::cerr << "Error opening file for reading." << std::endl;
-        return 1;
-    }
+	std::string search{ "#define BUILD \"b" };
+	std::string replacement{ search };
+	std::string str{ read_line(file_path, search) };
 
-    std::string build_num_str{ str.substr(search.length()) };
-    build_num = std::stoi(build_num_str);
+	if (str.empty())
+	{
+		std::cerr << "Error opening file for reading." << std::endl;
+		return 1;
+	}
 
-    std::cout << "Previous build number: " << build_num << std::endl;
-    build_num += 1;
-    replacement += std::to_string(build_num) + "\"";
-    std::cout << "Current build number: " << build_num << std::endl;
-    overwrite_line(file_path, search, replacement);
+	std::string build_num_str{ str.substr(search.length()) };
+	build_num = std::stoi(build_num_str);
 
-    return 0;
+	std::cout << "Previous build number: " << build_num << std::endl;
+	build_num += 1;
+	replacement += std::to_string(build_num) + "\"";
+	std::cout << "Current build number: " << build_num << std::endl;
+	overwrite_line(file_path, search, replacement);
+
+	return 0;
 }
