@@ -79,8 +79,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	std::cout << "Path: " << file_path.string() << std::endl;
-
 	std::ifstream file_in{ file_path.string() };
 	if (!file_in)
 	{

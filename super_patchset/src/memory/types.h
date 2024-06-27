@@ -7,11 +7,8 @@ namespace cs::pointers::types
 	using CLoadingScreensSetLoadingContextT = fptr<void(LoadingScreenContext eContext)>;
 	using CLoadingScreensSetMovieContextT = fptr<void(LoadingScreenMovieContext iMovieContext)>;
 	using CLoadingScreensShutdownT = fptr<void(u32 shutdownMode)>;
+	using scrThreadRunT = fptr<rage::scrThread::State(rage::scrValue* stack, rage::scrValue* globals, rage::scrProgram* pt, rage::scrThread::Serialized* ser)>;
 	using CommandShouldWarnOfSimpleModCheckT = fptr<bool()>;
-	using grcStateBlockCreateRasterizerStateT = fptr<rage::grcStateBlock::grcRasterizerStateHandle(const rage::grcStateBlock::grcRasterizerStateDesc* state, const char*)>;
-	using grcStateBlockDestroyRasterizerStateT = fptr<void(rage::grcStateBlock::grcRasterizerStateHandleEnum state)>;
-	using grcStateBlockSetRasterizerStateT = fptr<void(rage::grcStateBlock::grcRasterizerStateHandle newState)>;
-	using grcStateBlockFlushRasterizerStateT = fptr<void(rage::grcStateBlock::grcRasterizerStateHandle newState)>;
 	using grcSwapChainPresentT = fptr<HRESULT(rage::grcSwapChain* current, u32 syncInterval, u32 flags)>;
 	using grcSwapChainResizeBuffersT = fptr<HRESULT(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags)>;
 	using RgscRetailLogRgscRetailMsgT = fptr<void(bool utf8, int severity, const char* fmt, char* args)>;
@@ -33,4 +30,5 @@ namespace cs::pointers::types
 	using AESTransformITDecryptT = fptr<void(u32 selector, void* data, u32 size)>;
 	using AESDecryptT = fptr<void(u32 keyId, u32 selector, void* data, u32 size)>;
 	using AESisTransformITKeyT = fptr<bool(u32 keyId)>;
+	using fiPackfileReInitT = fptr<bool(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)>;
 }

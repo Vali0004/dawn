@@ -367,8 +367,8 @@ namespace CAM
 	static BOOL IS_CAM_ACTIVE(Cam cam) { return rage::Invoke<BOOL>(0xDFB2B516207D3534, cam); } // 0xDFB2B516207D3534 0x4B58F177 b323
 	static BOOL IS_CAM_RENDERING(Cam cam) { return rage::Invoke<BOOL>(0x02EC0AF5C5A49B7A, cam); } // 0x02EC0AF5C5A49B7A 0x6EC6B5B2 b323
 	static Cam GET_RENDERING_CAM() { return rage::Invoke<Cam>(0x5234F9F10919EABA); } // 0x5234F9F10919EABA 0x0FCF4DF1 b323
-	static rage::scrVector GET_CAM_COORD(Cam cam) { return rage::Invoke<Vector3>(0xBAC038F7459AE5AE, cam); } // 0xBAC038F7459AE5AE 0x7C40F09C b323
-	static rage::scrVector GET_CAM_ROT(Cam cam, int rotationOrder) { return rage::Invoke<Vector3>(0x7D304C1C955E3E12, cam, rotationOrder); } // 0x7D304C1C955E3E12 0xDAC84C9F b323
+	static rage::scrVector GET_CAM_COORD(Cam cam) { return rage::Invoke<rage::scrVector>(0xBAC038F7459AE5AE, cam); } // 0xBAC038F7459AE5AE 0x7C40F09C b323
+	static rage::scrVector GET_CAM_ROT(Cam cam, int rotationOrder) { return rage::Invoke<rage::scrVector>(0x7D304C1C955E3E12, cam, rotationOrder); } // 0x7D304C1C955E3E12 0xDAC84C9F b323
 	static float GET_CAM_FOV(Cam cam) { return rage::Invoke<float>(0xC3330A45CCCDB26A, cam); } // 0xC3330A45CCCDB26A 0xD6E9FCF5 b323
 	static float GET_CAM_NEAR_CLIP(Cam cam) { return rage::Invoke<float>(0xC520A34DAFBF24B1, cam); } // 0xC520A34DAFBF24B1 0xCFCD35EE b323
 	static float GET_CAM_FAR_CLIP(Cam cam) { return rage::Invoke<float>(0xB60A9CFEB21CA6AA, cam); } // 0xB60A9CFEB21CA6AA 0x09F119B8 b323
@@ -462,8 +462,8 @@ namespace CAM
 	static void DO_SCREEN_FADE_OUT(int duration) { rage::Invoke<void>(0x891B5B39AC6302AF, duration); } // 0x891B5B39AC6302AF 0x89D01805 b323
 	static void SET_WIDESCREEN_BORDERS(BOOL p0, int p1) { rage::Invoke<void>(0xDCD4EA924F42D01A, p0, p1); } // 0xDCD4EA924F42D01A 0x1A75DC9A b323
 	static BOOL ARE_WIDESCREEN_BORDERS_ACTIVE() { return rage::Invoke<BOOL>(0x4879E4FE39074CDF); } // 0x4879E4FE39074CDF  b372
-	static rage::scrVector GET_GAMEPLAY_CAM_COORD() { return rage::Invoke<Vector3>(0x14D6F5678D8F1B37); } // 0x14D6F5678D8F1B37 0x9388CF79 b323
-	static rage::scrVector GET_GAMEPLAY_CAM_ROT(int rotationOrder) { return rage::Invoke<Vector3>(0x837765A25378F0BB, rotationOrder); } // 0x837765A25378F0BB 0x13A010B5 b323
+	static rage::scrVector GET_GAMEPLAY_CAM_COORD() { return rage::Invoke<rage::scrVector>(0x14D6F5678D8F1B37); } // 0x14D6F5678D8F1B37 0x9388CF79 b323
+	static rage::scrVector GET_GAMEPLAY_CAM_ROT(int rotationOrder) { return rage::Invoke<rage::scrVector>(0x837765A25378F0BB, rotationOrder); } // 0x837765A25378F0BB 0x13A010B5 b323
 	static float GET_GAMEPLAY_CAM_FOV() { return rage::Invoke<float>(0x65019750A0324133); } // 0x65019750A0324133 0x4D6B3BFA b323
 	static void SET_GAMEPLAY_CAM_MOTION_BLUR_SCALING_THIS_UPDATE(float p0) { rage::Invoke<void>(0x487A82C650EB7799, p0); } // 0x487A82C650EB7799 0xA6E73135 b323
 	static void SET_GAMEPLAY_CAM_MAX_MOTION_BLUR_STRENGTH_THIS_UPDATE(float p0) { rage::Invoke<void>(0x0225778816FDC28C, p0); } // 0x0225778816FDC28C 0x1126E37C b323
@@ -539,9 +539,9 @@ namespace CAM
 	static void SET_THIRD_PERSON_AIM_CAM_NEAR_CLIP_THIS_UPDATE(float p0) { rage::Invoke<void>(0x42156508606DE65E, p0); } // 0x42156508606DE65E 0x71E9C63E b323
 	static void SET_ALLOW_CUSTOM_VEHICLE_DRIVE_BY_CAM_THIS_UPDATE(BOOL p0) { rage::Invoke<void>(0x4008EDF7D6E48175, p0); } // 0x4008EDF7D6E48175 0xD1EEBC45 b323
 	static void FORCE_TIGHTSPACE_CUSTOM_FRAMING_THIS_UPDATE() { rage::Invoke<void>(0x380B4968D1E09E55); } // 0x380B4968D1E09E55  b1290
-	static rage::scrVector GET_FINAL_RENDERED_CAM_COORD() { return rage::Invoke<Vector3>(0xA200EB1EE790F448); } // 0xA200EB1EE790F448 0x9C84BDA0 b323
-	static rage::scrVector GET_FINAL_RENDERED_CAM_ROT(int rotationOrder) { return rage::Invoke<Vector3>(0x5B4E4C817FCC2DFB, rotationOrder); } // 0x5B4E4C817FCC2DFB 0x1FFBEFC5 b323
-	static rage::scrVector GET_FINAL_RENDERED_REMOTE_PLAYER_CAM_ROT(Player player, int rotationOrder) { return rage::Invoke<Vector3>(0x26903D9CD1175F2C, player, rotationOrder); } // 0x26903D9CD1175F2C 0xACADF916 b323
+	static rage::scrVector GET_FINAL_RENDERED_CAM_COORD() { return rage::Invoke<rage::scrVector>(0xA200EB1EE790F448); } // 0xA200EB1EE790F448 0x9C84BDA0 b323
+	static rage::scrVector GET_FINAL_RENDERED_CAM_ROT(int rotationOrder) { return rage::Invoke<rage::scrVector>(0x5B4E4C817FCC2DFB, rotationOrder); } // 0x5B4E4C817FCC2DFB 0x1FFBEFC5 b323
+	static rage::scrVector GET_FINAL_RENDERED_REMOTE_PLAYER_CAM_ROT(Player player, int rotationOrder) { return rage::Invoke<rage::scrVector>(0x26903D9CD1175F2C, player, rotationOrder); } // 0x26903D9CD1175F2C 0xACADF916 b323
 	static float GET_FINAL_RENDERED_CAM_FOV() { return rage::Invoke<float>(0x80EC114669DAEFF4); } // 0x80EC114669DAEFF4 0x721B763B b323
 	static float GET_FINAL_RENDERED_REMOTE_PLAYER_CAM_FOV(Player player) { return rage::Invoke<float>(0x5F35F6732C3FBBA0, player); } // 0x5F35F6732C3FBBA0 0x23E3F106 b323
 	static float GET_FINAL_RENDERED_CAM_NEAR_CLIP() { return rage::Invoke<float>(0xD0082607100D7193); } // 0xD0082607100D7193 0x457AE195 b323
@@ -721,7 +721,7 @@ namespace DATAFILE
 	static int DATADICT_GET_INT(Any* objectData, const char* key) { return rage::Invoke<int>(0x78F06F6B1FB5A80C, objectData, key); } // 0x78F06F6B1FB5A80C 0xA6C68693 b323
 	static float DATADICT_GET_FLOAT(Any* objectData, const char* key) { return rage::Invoke<float>(0x06610343E73B9727, objectData, key); } // 0x06610343E73B9727 0xA92C1AF4 b323
 	static const char* DATADICT_GET_STRING(Any* objectData, const char* key) { return rage::Invoke<const char*>(0x3D2FD9E763B24472, objectData, key); } // 0x3D2FD9E763B24472 0x942160EC b323
-	static rage::scrVector DATADICT_GET_VECTOR(Any* objectData, const char* key) { return rage::Invoke<Vector3>(0x46CD3CB66E0825CC, objectData, key); } // 0x46CD3CB66E0825CC 0xE84A127A b323
+	static rage::scrVector DATADICT_GET_VECTOR(Any* objectData, const char* key) { return rage::Invoke<rage::scrVector>(0x46CD3CB66E0825CC, objectData, key); } // 0x46CD3CB66E0825CC 0xE84A127A b323
 	static Any* DATADICT_GET_DICT(Any* objectData, const char* key) { return rage::Invoke<Any*>(0xB6B9DDC412FCEEE2, objectData, key); } // 0xB6B9DDC412FCEEE2 0xC9C13D8D b323
 	static Any* DATADICT_GET_ARRAY(Any* objectData, const char* key) { return rage::Invoke<Any*>(0x7A983AA9DA2659ED, objectData, key); } // 0x7A983AA9DA2659ED 0x1F2F7D00 b323
 	static int DATADICT_GET_TYPE(Any* objectData, const char* key) { return rage::Invoke<int>(0x031C55ED33227371, objectData, key); } // 0x031C55ED33227371 0x2678342A b323
@@ -735,7 +735,7 @@ namespace DATAFILE
 	static int DATAARRAY_GET_INT(Any* arrayData, int arrayIndex) { return rage::Invoke<int>(0x3E5AE19425CD74BE, arrayData, arrayIndex); } // 0x3E5AE19425CD74BE 0xBB120CFC b323
 	static float DATAARRAY_GET_FLOAT(Any* arrayData, int arrayIndex) { return rage::Invoke<float>(0xC0C527B525D7CFB5, arrayData, arrayIndex); } // 0xC0C527B525D7CFB5 0x08AD2CC2 b323
 	static const char* DATAARRAY_GET_STRING(Any* arrayData, int arrayIndex) { return rage::Invoke<const char*>(0xD3F2FFEB8D836F52, arrayData, arrayIndex); } // 0xD3F2FFEB8D836F52 0x93F985A6 b323
-	static rage::scrVector DATAARRAY_GET_VECTOR(Any* arrayData, int arrayIndex) { return rage::Invoke<Vector3>(0x8D2064E5B64A628A, arrayData, arrayIndex); } // 0x8D2064E5B64A628A 0x80E3DA55 b323
+	static rage::scrVector DATAARRAY_GET_VECTOR(Any* arrayData, int arrayIndex) { return rage::Invoke<rage::scrVector>(0x8D2064E5B64A628A, arrayData, arrayIndex); } // 0x8D2064E5B64A628A 0x80E3DA55 b323
 	static Any* DATAARRAY_GET_DICT(Any* arrayData, int arrayIndex) { return rage::Invoke<Any*>(0x8B5FADCC4E3A145F, arrayData, arrayIndex); } // 0x8B5FADCC4E3A145F 0xECE81278 b323
 	static int DATAARRAY_GET_COUNT(Any* arrayData) { return rage::Invoke<int>(0x065DB281590CEA2D, arrayData); } // 0x065DB281590CEA2D 0xA8A21766 b323
 	static int DATAARRAY_GET_TYPE(Any* arrayData, int arrayIndex) { return rage::Invoke<int>(0x3A0014ADB172A3C5, arrayData, arrayIndex); } // 0x3A0014ADB172A3C5 0xFA2402C8 b323
@@ -791,14 +791,14 @@ namespace ENTITY
 	static BOOL HAS_ENTITY_COLLIDED_WITH_ANYTHING(Entity entity) { return rage::Invoke<BOOL>(0x8BAD02F0368D9E14, entity); } // 0x8BAD02F0368D9E14 0x662A2F41 b323
 	static Entity GET_LAST_ENTITY_HIT_BY_ENTITY_(Entity entity) { return rage::Invoke<Entity>(0xA75EE4F689B85391, entity); } // 0xA75EE4F689B85391  b2802
 	static Hash GET_LAST_MATERIAL_HIT_BY_ENTITY(Entity entity) { return rage::Invoke<Hash>(0x5C3D0A935F535C4C, entity); } // 0x5C3D0A935F535C4C 0xC0E3AA47 b323
-	static rage::scrVector GET_COLLISION_NORMAL_OF_LAST_HIT_FOR_ENTITY(Entity entity) { return rage::Invoke<Vector3>(0xE465D4AB7CA6AE72, entity); } // 0xE465D4AB7CA6AE72 0xAB415C07 b323
+	static rage::scrVector GET_COLLISION_NORMAL_OF_LAST_HIT_FOR_ENTITY(Entity entity) { return rage::Invoke<rage::scrVector>(0xE465D4AB7CA6AE72, entity); } // 0xE465D4AB7CA6AE72 0xAB415C07 b323
 	static void FORCE_ENTITY_AI_AND_ANIMATION_UPDATE(Entity entity) { rage::Invoke<void>(0x40FDEDB72F8293B2, entity); } // 0x40FDEDB72F8293B2 0x58D9775F b323
 	static float GET_ENTITY_ANIM_CURRENT_TIME(Entity entity, const char* animDict, const char* animName) { return rage::Invoke<float>(0x346D81500D088F42, entity, animDict, animName); } // 0x346D81500D088F42 0x83943F41 b323
 	static float GET_ENTITY_ANIM_TOTAL_TIME(Entity entity, const char* animDict, const char* animName) { return rage::Invoke<float>(0x50BD2730B191E360, entity, animDict, animName); } // 0x50BD2730B191E360 0x433A9D18 b323
 	static float GET_ANIM_DURATION(const char* animDict, const char* animName) { return rage::Invoke<float>(0xFEDDF04D62B8D790, animDict, animName); } // 0xFEDDF04D62B8D790 0x8B5E3E3D b323
 	static Entity GET_ENTITY_ATTACHED_TO(Entity entity) { return rage::Invoke<Entity>(0x48C2BED9180FE123, entity); } // 0x48C2BED9180FE123 0xFE1589F9 b323
-	static rage::scrVector GET_ENTITY_COORDS(Entity entity, BOOL alive) { return rage::Invoke<scrVector>(0x3FEF770D40960D5A, entity, alive); } // 0x3FEF770D40960D5A 0x1647F1CB b323
-	static rage::scrVector GET_ENTITY_FORWARD_VECTOR(Entity entity) { return rage::Invoke<Vector3>(0x0A794A5A57F8DF91, entity); } // 0x0A794A5A57F8DF91 0x84DCECBF b323
+	static rage::scrVector GET_ENTITY_COORDS(Entity entity, BOOL alive) { return rage::Invoke<rage::scrVector>(0x3FEF770D40960D5A, entity, alive); } // 0x3FEF770D40960D5A 0x1647F1CB b323
+	static rage::scrVector GET_ENTITY_FORWARD_VECTOR(Entity entity) { return rage::Invoke<rage::scrVector>(0x0A794A5A57F8DF91, entity); } // 0x0A794A5A57F8DF91 0x84DCECBF b323
 	static float GET_ENTITY_FORWARD_X(Entity entity) { return rage::Invoke<float>(0x8BB4EF4214E0E6D5, entity); } // 0x8BB4EF4214E0E6D5 0x49FAE914 b323
 	static float GET_ENTITY_FORWARD_Y(Entity entity) { return rage::Invoke<float>(0x866A4A5FAE349510, entity); } // 0x866A4A5FAE349510 0x9E2F917C b323
 	static float GET_ENTITY_HEADING(Entity entity) { return rage::Invoke<float>(0xE83D4F9BA2A38914, entity); } // 0xE83D4F9BA2A38914 0x972CC383 b323
@@ -810,22 +810,22 @@ namespace ENTITY
 	static float GET_ENTITY_HEIGHT_ABOVE_GROUND(Entity entity) { return rage::Invoke<float>(0x1DD55701034110E5, entity); } // 0x1DD55701034110E5 0x57F56A4D b323
 	static void GET_ENTITY_MATRIX(Entity entity, Vector3* forwardVector, Vector3* rightVector, Vector3* upVector, Vector3* position) { rage::Invoke<void>(0xECB2FC7235A7D137, entity, forwardVector, rightVector, upVector, position); } // 0xECB2FC7235A7D137 0xEB9EB001 b323
 	static Hash GET_ENTITY_MODEL(Entity entity) { return rage::Invoke<Hash>(0x9F47B058362C84B5, entity); } // 0x9F47B058362C84B5 0xDAFCB3EC b323
-	static rage::scrVector GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(Entity entity, Vector3 pos_) { return rage::Invoke<Vector3>(0x2274BC1C4885E333, entity, pos_.x, pos_.y, pos_.z); } // 0x2274BC1C4885E333 0x6477EC9E b323
-	static rage::scrVector GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Entity entity, Vector3 offset_) { return rage::Invoke<Vector3>(0x1899F328B0E12848, entity, offset_.x, offset_.y, offset_.z); } // 0x1899F328B0E12848 0xABCF043A b323
+	static rage::scrVector GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(Entity entity, Vector3 pos_) { return rage::Invoke<rage::scrVector>(0x2274BC1C4885E333, entity, pos_.x, pos_.y, pos_.z); } // 0x2274BC1C4885E333 0x6477EC9E b323
+	static rage::scrVector GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Entity entity, Vector3 offset_) { return rage::Invoke<rage::scrVector>(0x1899F328B0E12848, entity, offset_.x, offset_.y, offset_.z); } // 0x1899F328B0E12848 0xABCF043A b323
 	static float GET_ENTITY_PITCH(Entity entity) { return rage::Invoke<float>(0xD45DC2893621E1FE, entity); } // 0xD45DC2893621E1FE 0xFCE6ECE5 b323
 	static void GET_ENTITY_QUATERNION(Entity entity, float* x, float* y, float* z, float* w) { rage::Invoke<void>(0x7B3703D2D32DFA18, entity, x, y, z, w); } // 0x7B3703D2D32DFA18 0x5154EC90 b323
 	static float GET_ENTITY_ROLL(Entity entity) { return rage::Invoke<float>(0x831E0242595560DF, entity); } // 0x831E0242595560DF 0x36610842 b323
-	static rage::scrVector GET_ENTITY_ROTATION(Entity entity, int rotationOrder) { return rage::Invoke<Vector3>(0xAFBD61CC738D9EB9, entity, rotationOrder); } // 0xAFBD61CC738D9EB9 0x8FF45B04 b323
-	static rage::scrVector GET_ENTITY_ROTATION_VELOCITY(Entity entity) { return rage::Invoke<Vector3>(0x213B91045D09B983, entity); } // 0x213B91045D09B983 0x9BF8A73F b323
+	static rage::scrVector GET_ENTITY_ROTATION(Entity entity, int rotationOrder) { return rage::Invoke<rage::scrVector>(0xAFBD61CC738D9EB9, entity, rotationOrder); } // 0xAFBD61CC738D9EB9 0x8FF45B04 b323
+	static rage::scrVector GET_ENTITY_ROTATION_VELOCITY(Entity entity) { return rage::Invoke<rage::scrVector>(0x213B91045D09B983, entity); } // 0x213B91045D09B983 0x9BF8A73F b323
 	static const char* GET_ENTITY_SCRIPT(Entity entity, ScrHandle* script) { return rage::Invoke<const char*>(0xA6E9C38DB51D7748, entity, script); } // 0xA6E9C38DB51D7748 0xB7F70784 b323
 	static float GET_ENTITY_SPEED(Entity entity) { return rage::Invoke<float>(0xD5037BA82E12416F, entity); } // 0xD5037BA82E12416F 0x9E1E4798 b323
-	static rage::scrVector GET_ENTITY_SPEED_VECTOR(Entity entity, BOOL relative) { return rage::Invoke<Vector3>(0x9A8D700A51CB7B0D, entity, relative); } // 0x9A8D700A51CB7B0D 0x3ED2B997 b323
+	static rage::scrVector GET_ENTITY_SPEED_VECTOR(Entity entity, BOOL relative) { return rage::Invoke<rage::scrVector>(0x9A8D700A51CB7B0D, entity, relative); } // 0x9A8D700A51CB7B0D 0x3ED2B997 b323
 	static float GET_ENTITY_UPRIGHT_VALUE(Entity entity) { return rage::Invoke<float>(0x95EED5A694951F9F, entity); } // 0x95EED5A694951F9F 0xF4268190 b323
-	static rage::scrVector GET_ENTITY_VELOCITY(Entity entity) { return rage::Invoke<Vector3>(0x4805D2B1D8CF94A9, entity); } // 0x4805D2B1D8CF94A9 0xC14C9B6B b323
+	static rage::scrVector GET_ENTITY_VELOCITY(Entity entity) { return rage::Invoke<rage::scrVector>(0x4805D2B1D8CF94A9, entity); } // 0x4805D2B1D8CF94A9 0xC14C9B6B b323
 	static Object GET_OBJECT_INDEX_FROM_ENTITY_INDEX(Entity entity) { return rage::Invoke<Object>(0xD7E3B9735C0F89D6, entity); } // 0xD7E3B9735C0F89D6 0xBC5A9C58 b323
 	static Ped GET_PED_INDEX_FROM_ENTITY_INDEX(Entity entity) { return rage::Invoke<Ped>(0x04A2A40C73395041, entity); } // 0x04A2A40C73395041 0xC46F74AC b323
 	static Vehicle GET_VEHICLE_INDEX_FROM_ENTITY_INDEX(Entity entity) { return rage::Invoke<Vehicle>(0x4B53F92932ADFAC0, entity); } // 0x4B53F92932ADFAC0 0xC69CF43D b323
-	static rage::scrVector GET_WORLD_POSITION_OF_ENTITY_BONE(Entity entity, int boneIndex) { return rage::Invoke<Vector3>(0x44A8FCB8ED227738, entity, boneIndex); } // 0x44A8FCB8ED227738 0x7C6339DF b323
+	static rage::scrVector GET_WORLD_POSITION_OF_ENTITY_BONE(Entity entity, int boneIndex) { return rage::Invoke<rage::scrVector>(0x44A8FCB8ED227738, entity, boneIndex); } // 0x44A8FCB8ED227738 0x7C6339DF b323
 	static Player GET_NEAREST_PLAYER_TO_ENTITY(Entity entity) { return rage::Invoke<Player>(0x7196842CB375CDB3, entity); } // 0x7196842CB375CDB3 0xCE17FDEC b323
 	static Player GET_NEAREST_PLAYER_TO_ENTITY_ON_TEAM(Entity entity, int team) { return rage::Invoke<Player>(0x4DC9A62F844D9337, entity, team); } // 0x4DC9A62F844D9337 0xB1808F56 b323
 	static int GET_NEAREST_PARTICIPANT_TO_ENTITY(Entity entity) { return rage::Invoke<int>(0xFFBD7052D65BE0FF, entity); } // 0xFFBD7052D65BE0FF  b2944
@@ -951,10 +951,10 @@ namespace ENTITY
 	static void SET_WAIT_FOR_COLLISIONS_BEFORE_PROBE(Entity entity, BOOL toggle) { rage::Invoke<void>(0xDC6F8601FAF2E893, entity, toggle); } // 0xDC6F8601FAF2E893 0xA0466A69 b323
 	static void SET_ENTITY_NOWEAPONDECALS(Entity entity, BOOL p1) { rage::Invoke<void>(0x2C2E3DC128F44309, entity, p1); } // 0x2C2E3DC128F44309  b323
 	static void SET_ENTITY_USE_MAX_DISTANCE_FOR_WATER_REFLECTION(Entity entity, BOOL p1) { rage::Invoke<void>(0x1A092BB0C3808B96, entity, p1); } // 0x1A092BB0C3808B96  b323
-	static rage::scrVector GET_ENTITY_BONE_ROTATION(Entity entity, int boneIndex) { return rage::Invoke<Vector3>(0xCE6294A232D03786, entity, boneIndex); } // 0xCE6294A232D03786  b791
-	static rage::scrVector GET_ENTITY_BONE_POSTION(Entity entity, int boneIndex) { return rage::Invoke<Vector3>(0x46F8696933A63C9B, entity, boneIndex); } // 0x46F8696933A63C9B  b877
-	static rage::scrVector GET_ENTITY_BONE_OBJECT_ROTATION(Entity entity, int boneIndex) { return rage::Invoke<Vector3>(0xBD8D32550E5CEBFE, entity, boneIndex); } // 0xBD8D32550E5CEBFE  b1734
-	static rage::scrVector GET_ENTITY_BONE_OBJECT_POSTION(Entity entity, int boneIndex) { return rage::Invoke<Vector3>(0xCF1247CC86961FD6, entity, boneIndex); } // 0xCF1247CC86961FD6  b2802
+	static rage::scrVector GET_ENTITY_BONE_ROTATION(Entity entity, int boneIndex) { return rage::Invoke<rage::scrVector>(0xCE6294A232D03786, entity, boneIndex); } // 0xCE6294A232D03786  b791
+	static rage::scrVector GET_ENTITY_BONE_POSTION(Entity entity, int boneIndex) { return rage::Invoke<rage::scrVector>(0x46F8696933A63C9B, entity, boneIndex); } // 0x46F8696933A63C9B  b877
+	static rage::scrVector GET_ENTITY_BONE_OBJECT_ROTATION(Entity entity, int boneIndex) { return rage::Invoke<rage::scrVector>(0xBD8D32550E5CEBFE, entity, boneIndex); } // 0xBD8D32550E5CEBFE  b1734
+	static rage::scrVector GET_ENTITY_BONE_OBJECT_POSTION(Entity entity, int boneIndex) { return rage::Invoke<rage::scrVector>(0xCF1247CC86961FD6, entity, boneIndex); } // 0xCF1247CC86961FD6  b2802
 	static int GET_ENTITY_BONE_COUNT(Entity entity) { return rage::Invoke<int>(0xB328DCC3A3AA401B, entity); } // 0xB328DCC3A3AA401B  b791
 	static void ENABLE_ENTITY_BULLET_COLLISION(Entity entity) { rage::Invoke<void>(0x6CE177D014502E8A, entity); } // 0x6CE177D014502E8A  b877
 	static void SET_ENTITY_CAN_ONLY_BE_DAMAGED_BY_ENTITY(Entity entity1, Entity entity2) { rage::Invoke<void>(0xB17BC6453F6CF5AC, entity1, entity2); } // 0xB17BC6453F6CF5AC  b944
@@ -1178,7 +1178,7 @@ namespace GRAPHICS
 	static void SET_NOISEOVERIDE(BOOL toggle) { rage::Invoke<void>(0xE787BF1C5CF823C9, toggle); } // 0xE787BF1C5CF823C9 0xD576F5DD b323
 	static void SET_NOISINESSOVERIDE(float value) { rage::Invoke<void>(0xCB6A7C3BB17A0C67, value); } // 0xCB6A7C3BB17A0C67 0x046B62D9 b323
 	static BOOL GET_SCREEN_COORD_FROM_WORLD_COORD(Vector3 world_, float* screenX, float* screenY) { return rage::Invoke<BOOL>(0x34E82F05DF2974F5, world_.x, world_.y, world_.z, screenX, screenY); } // 0x34E82F05DF2974F5 0x1F950E4B b323
-	static rage::scrVector GET_TEXTURE_RESOLUTION(const char* textureDict, const char* textureName) { return rage::Invoke<Vector3>(0x35736EE65BD00C11, textureDict, textureName); } // 0x35736EE65BD00C11 0x096DAA4D b323
+	static rage::scrVector GET_TEXTURE_RESOLUTION(const char* textureDict, const char* textureName) { return rage::Invoke<rage::scrVector>(0x35736EE65BD00C11, textureDict, textureName); } // 0x35736EE65BD00C11 0x096DAA4D b323
 	static BOOL OVERRIDE_PED_CREW_LOGO_TEXTURE(Ped ped, const char* txd, const char* txn) { return rage::Invoke<BOOL>(0x95EB5E34F821BABE, ped, txd, txn); } // 0x95EB5E34F821BABE  b877
 	static void SET_DISTANCE_BLUR_STRENGTH_OVERRIDE(float p0) { rage::Invoke<void>(0xE2892E7E55D7073A, p0); } // 0xE2892E7E55D7073A 0x455F1084 b323
 	static void SET_FLASH(float p0, float p1, float fadeIn, float duration, float fadeOut) { rage::Invoke<void>(0x0AB84296FED9CFC6, p0, p1, fadeIn, duration, fadeOut); } // 0x0AB84296FED9CFC6 0x7E55A1EE b323
@@ -1227,7 +1227,7 @@ namespace GRAPHICS
 	static void GOLF_TRAIL_SET_SHADER_PARAMS(float p0, float p1, float p2, float p3, float p4) { rage::Invoke<void>(0x9CFDD90B2B844BF7, p0, p1, p2, p3, p4); } // 0x9CFDD90B2B844BF7 0x4EA70FB4 b323
 	static void GOLF_TRAIL_SET_FACING(BOOL p0) { rage::Invoke<void>(0x06F761EA47C1D3ED, p0); } // 0x06F761EA47C1D3ED 0x0D830DC7 b323
 	static float GOLF_TRAIL_GET_MAX_HEIGHT() { return rage::Invoke<float>(0xA4819F5E23E2FFAD); } // 0xA4819F5E23E2FFAD 0xA08B46AD b323
-	static rage::scrVector GOLF_TRAIL_GET_VISUAL_CONTROL_POINT(int p0) { return rage::Invoke<Vector3>(0xA4664972A9B8F8BA, p0); } // 0xA4664972A9B8F8BA 0xECD470F0 b323
+	static rage::scrVector GOLF_TRAIL_GET_VISUAL_CONTROL_POINT(int p0) { return rage::Invoke<rage::scrVector>(0xA4664972A9B8F8BA, p0); } // 0xA4664972A9B8F8BA 0xECD470F0 b323
 	static void SET_SEETHROUGH(BOOL toggle) { rage::Invoke<void>(0x7E08924259E08CE0, toggle); } // 0x7E08924259E08CE0 0x74D4995C b323
 	static BOOL GET_USINGSEETHROUGH() { return rage::Invoke<BOOL>(0x44B80ABAB9D80BD3); } // 0x44B80ABAB9D80BD3 0x1FE547F2 b323
 	static void SEETHROUGH_RESET() { rage::Invoke<void>(0x70A64C0234EF522C); } // 0x70A64C0234EF522C 0x310E9B67 b323
@@ -1653,7 +1653,7 @@ namespace HUD
 	static Blip GET_NEXT_BLIP_INFO_ID(int blipSprite) { return rage::Invoke<Blip>(0x14F96AA50D6FBEA7, blipSprite); } // 0x14F96AA50D6FBEA7 0x9356E92F b323
 	static Blip GET_FIRST_BLIP_INFO_ID(int blipSprite) { return rage::Invoke<Blip>(0x1BEDE233E6CD2A1F, blipSprite); } // 0x1BEDE233E6CD2A1F 0x64C0273D b323
 	static Blip GET_CLOSEST_BLIP_INFO_ID(int blipSprite) { return rage::Invoke<Blip>(0xD484BF71050CA1EE, blipSprite); } // 0xD484BF71050CA1EE  b1180
-	static rage::scrVector GET_BLIP_INFO_ID_COORD(Blip blip) { return rage::Invoke<Vector3>(0xFA7C7F0AADF25D09, blip); } // 0xFA7C7F0AADF25D09 0xB7374A66 b323
+	static rage::scrVector GET_BLIP_INFO_ID_COORD(Blip blip) { return rage::Invoke<rage::scrVector>(0xFA7C7F0AADF25D09, blip); } // 0xFA7C7F0AADF25D09 0xB7374A66 b323
 	static int GET_BLIP_INFO_ID_DISPLAY(Blip blip) { return rage::Invoke<int>(0x1E314167F701DC3B, blip); } // 0x1E314167F701DC3B 0xD0FC19F4 b323
 	static int GET_BLIP_INFO_ID_TYPE(Blip blip) { return rage::Invoke<int>(0xBE9B0959FFD0779B, blip); } // 0xBE9B0959FFD0779B 0x501D7B4E b323
 	static Entity GET_BLIP_INFO_ID_ENTITY_INDEX(Blip blip) { return rage::Invoke<Entity>(0x4BA4E2553AFEDC2C, blip); } // 0x4BA4E2553AFEDC2C 0xA068C40B b323
@@ -1667,7 +1667,7 @@ namespace HUD
 	static void TRIGGER_SONAR_BLIP(Vector3 pos_, float radius, int p4) { rage::Invoke<void>(0x72DD432F3CDFC0EE, pos_.x, pos_.y, pos_.z, radius, p4); } // 0x72DD432F3CDFC0EE 0xBF25E7B2 b323
 	static void ALLOW_SONAR_BLIPS(BOOL toggle) { rage::Invoke<void>(0x60734CC207C9833C, toggle); } // 0x60734CC207C9833C 0xE7E1E32B b323
 	static void SET_BLIP_COORDS(Blip blip, Vector3 pos_) { rage::Invoke<void>(0xAE2AF67E9D9AF65D, blip, pos_.x, pos_.y, pos_.z); } // 0xAE2AF67E9D9AF65D 0x680A34D4 b323
-	static rage::scrVector GET_BLIP_COORDS(Blip blip) { return rage::Invoke<Vector3>(0x586AFE3FF72D996E, blip); } // 0x586AFE3FF72D996E 0xEF6FF47B b323
+	static rage::scrVector GET_BLIP_COORDS(Blip blip) { return rage::Invoke<rage::scrVector>(0x586AFE3FF72D996E, blip); } // 0x586AFE3FF72D996E 0xEF6FF47B b323
 	static void SET_BLIP_SPRITE(Blip blip, int spriteId) { rage::Invoke<void>(0xDF735600A4696DAF, blip, spriteId); } // 0xDF735600A4696DAF 0x8DBBB0B9 b323
 	static int GET_BLIP_SPRITE(Blip blip) { return rage::Invoke<int>(0x1FC877464A04FC4F, blip); } // 0x1FC877464A04FC4F 0x72FF2E73 b323
 	static void SET_COP_BLIP_SPRITE(int p0, float p1) { rage::Invoke<void>(0x9FCB3CBFB3EAD69A, p0, p1); } // 0x9FCB3CBFB3EAD69A  b1734
@@ -1836,7 +1836,7 @@ namespace HUD
 	static void RESET_RETICULE_VALUES() { rage::Invoke<void>(0x12782CE0A636E9F0); } // 0x12782CE0A636E9F0 0xBE27AA3F b323
 	static void RESET_HUD_COMPONENT_VALUES(int id) { rage::Invoke<void>(0x450930E616475D0D, id); } // 0x450930E616475D0D 0xD15B46DA b323
 	static void SET_HUD_COMPONENT_POSITION(int id, Vector2 vec) { rage::Invoke<void>(0xAABB1F56E2A17CED, id, vec.x, vec.y); } // 0xAABB1F56E2A17CED 0x2F3A0D15 b323
-	static rage::scrVector GET_HUD_COMPONENT_POSITION(int id) { return rage::Invoke<Vector3>(0x223CA69A8C4417FD, id); } // 0x223CA69A8C4417FD 0x080DCED6 b323
+	static rage::scrVector GET_HUD_COMPONENT_POSITION(int id) { return rage::Invoke<rage::scrVector>(0x223CA69A8C4417FD, id); } // 0x223CA69A8C4417FD 0x080DCED6 b323
 	static void CLEAR_REMINDER_MESSAGE() { rage::Invoke<void>(0xB57D8DD645CFA2CF); } // 0xB57D8DD645CFA2CF 0x5BBCC934 b323
 	static int GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(Vector3 world_, float* screenX, float* screenY) { return rage::Invoke<int>(0xF9904D11F1ACBEC3, world_.x, world_.y, world_.z, screenX, screenY); } // 0xF9904D11F1ACBEC3 0xFE9A39F8 b323
 	static void OPEN_REPORTUGC_MENU() { rage::Invoke<void>(0x523A590C1A3CC0D3); } // 0x523A590C1A3CC0D3 0x10DE5150 b323
@@ -1903,7 +1903,7 @@ namespace HUD
 	static BOOL IS_PAUSE_MENU_ACTIVE() { return rage::Invoke<BOOL>(0xB0034A223497FFCB); } // 0xB0034A223497FFCB 0xD3600591 b323
 	static BOOL IS_STORE_PENDING_NETWORK_SHUTDOWN_TO_OPEN() { return rage::Invoke<BOOL>(0x2F057596F2BD0061); } // 0x2F057596F2BD0061 0xC85C4487 b323
 	static int GET_PAUSE_MENU_STATE() { return rage::Invoke<int>(0x272ACD84970869C5); } // 0x272ACD84970869C5 0x92F50134 b323
-	static rage::scrVector GET_PAUSE_MENU_POSITION() { return rage::Invoke<Vector3>(0x5BFF36D6ED83E0AE); } // 0x5BFF36D6ED83E0AE  b323
+	static rage::scrVector GET_PAUSE_MENU_POSITION() { return rage::Invoke<rage::scrVector>(0x5BFF36D6ED83E0AE); } // 0x5BFF36D6ED83E0AE  b323
 	static BOOL IS_PAUSE_MENU_RESTARTING() { return rage::Invoke<BOOL>(0x1C491717107431C7); } // 0x1C491717107431C7 0x3C4CF4D9 b323
 	static void FORCE_SCRIPTED_GFX_WHEN_FRONTEND_ACTIVE(const char* p0) { rage::Invoke<void>(0x2162C446DFDF38FD, p0); } // 0x2162C446DFDF38FD 0x2DFD35C7 b323
 	static void PAUSE_MENUCEPTION_GO_DEEPER(int page) { rage::Invoke<void>(0x77F16B447824DA6C, page); } // 0x77F16B447824DA6C 0x0A89336C b323
@@ -1982,7 +1982,7 @@ namespace INTERIOR
 	static float GET_INTERIOR_HEADING(Interior interior) { return rage::Invoke<float>(0xF49B58631D9E22D9, interior); } // 0xF49B58631D9E22D9  b1493
 	static void GET_INTERIOR_LOCATION_AND_NAMEHASH(Interior interior, Vector3* position, Hash* nameHash) { rage::Invoke<void>(0x252BDC06B73FA6EA, interior, position, nameHash); } // 0x252BDC06B73FA6EA 0x75885CB3 b1290
 	static int GET_INTERIOR_GROUP_ID(Interior interior) { return rage::Invoke<int>(0xE4A84ABF135EF91A, interior); } // 0xE4A84ABF135EF91A 0x09D6376F b323
-	static rage::scrVector GET_OFFSET_FROM_INTERIOR_IN_WORLD_COORDS(Interior interior, Vector3 vec) { return rage::Invoke<Vector3>(0x9E3B3E6D66F6E22F, interior, vec.x, vec.y, vec.z); } // 0x9E3B3E6D66F6E22F 0x7D8F26A1 b323
+	static rage::scrVector GET_OFFSET_FROM_INTERIOR_IN_WORLD_COORDS(Interior interior, Vector3 vec) { return rage::Invoke<rage::scrVector>(0x9E3B3E6D66F6E22F, interior, vec.x, vec.y, vec.z); } // 0x9E3B3E6D66F6E22F 0x7D8F26A1 b323
 	static BOOL IS_INTERIOR_SCENE() { return rage::Invoke<BOOL>(0xBC72B5D7A1CBD54D); } // 0xBC72B5D7A1CBD54D 0x55226C13 b323
 	static BOOL IS_VALID_INTERIOR(Interior interior) { return rage::Invoke<BOOL>(0x26B0E73D7EAAF4D3, interior); } // 0x26B0E73D7EAAF4D3 0x39C0B635 b323
 	static void CLEAR_ROOM_FOR_ENTITY(Entity entity) { rage::Invoke<void>(0xB365FC0C4E27FFA7, entity); } // 0xB365FC0C4E27FFA7 0x7DDADB92 b323
@@ -2117,7 +2117,7 @@ namespace MISC
 	static void SET_WIND_SPEED(float speed) { rage::Invoke<void>(0xEE09ECEDBABE47FC, speed); } // 0xEE09ECEDBABE47FC 0x45705F94 b323
 	static float GET_WIND_SPEED() { return rage::Invoke<float>(0xA8CF1CC0AFCD3F12); } // 0xA8CF1CC0AFCD3F12 0x098F0F3C b323
 	static void SET_WIND_DIRECTION(float direction) { rage::Invoke<void>(0xEB0F4468467B4528, direction); } // 0xEB0F4468467B4528 0x381AEEE9 b323
-	static rage::scrVector GET_WIND_DIRECTION() { return rage::Invoke<Vector3>(0x1F400FEF721170DA); } // 0x1F400FEF721170DA 0x89499A0D b323
+	static rage::scrVector GET_WIND_DIRECTION() { return rage::Invoke<rage::scrVector>(0x1F400FEF721170DA); } // 0x1F400FEF721170DA 0x89499A0D b323
 	static void SET_RAIN(float intensity) { rage::Invoke<void>(0x643E26EA6E024D92, intensity); } // 0x643E26EA6E024D92  b323
 	static float GET_RAIN_LEVEL() { return rage::Invoke<float>(0x96695E368AD855F3); } // 0x96695E368AD855F3 0xC9F67F28 b323
 	static void SET_SNOW(float level) { rage::Invoke<void>(0x7F06937B0CDCBC1A, level); } // 0x7F06937B0CDCBC1A  b1868
@@ -2149,7 +2149,7 @@ namespace MISC
 	static float GET_ANGLE_BETWEEN_2D_VECTORS(Vector2 vec1_, Vector2 vec2_) { return rage::Invoke<float>(0x186FC4BE848E1C92, vec1_.x, vec1_.y, vec2_.x, vec2_.y); } // 0x186FC4BE848E1C92 0xDBF75E58 b323
 	static float GET_HEADING_FROM_VECTOR_2D(float dx, float dy) { return rage::Invoke<float>(0x2FFB6B224F4B2926, dx, dy); } // 0x2FFB6B224F4B2926 0xD209D52B b323
 	static float GET_RATIO_OF_CLOSEST_POINT_ON_LINE(Vector3 vec1_, Vector3 vec2_, Vector3 vec3_, BOOL clamp) { return rage::Invoke<float>(0x7F8F6405F4777AF6, vec1_.x, vec1_.y, vec1_.z, vec2_.x, vec2_.y, vec2_.z, vec3_.x, vec3_.y, vec3_.z, clamp); } // 0x7F8F6405F4777AF6 0x89459F0A b323
-	static rage::scrVector GET_CLOSEST_POINT_ON_LINE(Vector3 vec1_, Vector3 vec2_, Vector3 vec3_, BOOL clamp) { return rage::Invoke<Vector3>(0x21C235BC64831E5A, vec1_.x, vec1_.y, vec1_.z, vec2_.x, vec2_.y, vec2_.z, vec3_.x, vec3_.y, vec3_.z, clamp); } // 0x21C235BC64831E5A 0xCAECF37E b323
+	static rage::scrVector GET_CLOSEST_POINT_ON_LINE(Vector3 vec1_, Vector3 vec2_, Vector3 vec3_, BOOL clamp) { return rage::Invoke<rage::scrVector>(0x21C235BC64831E5A, vec1_.x, vec1_.y, vec1_.z, vec2_.x, vec2_.y, vec2_.z, vec3_.x, vec3_.y, vec3_.z, clamp); } // 0x21C235BC64831E5A 0xCAECF37E b323
 	static BOOL GET_LINE_PLANE_INTERSECTION(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float* p12) { return rage::Invoke<BOOL>(0xF56DFB7B61BE7276, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0xF56DFB7B61BE7276 0xC6CC812C b323
 	static BOOL GET_POINT_AREA_OVERLAP(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11, Any p12, Any p13) { return rage::Invoke<BOOL>(0xA0AD167E4B39D9A2, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } // 0xA0AD167E4B39D9A2  b2189
 	static void SET_BIT(int* address, int offset) { rage::Invoke<void>(0x933D6A9EEC1BACD0, address, offset); } // 0x933D6A9EEC1BACD0 0x4EFE7E6B b323
@@ -3666,10 +3666,10 @@ namespace NETWORK
 	static int NETWORK_GET_UNRELIABLE_RESEND_COUNT(Player player) { return rage::Invoke<int>(0x3765C3A3E8192E10, player); } // 0x3765C3A3E8192E10  b323
 	static int NETWORK_GET_HIGHEST_RELIABLE_RESEND_COUNT(Player player) { return rage::Invoke<int>(0x52C1EADAF7B10302, player); } // 0x52C1EADAF7B10302  b323
 	static void NETWORK_REPORT_CODE_TAMPER() { rage::Invoke<void>(0x5626D9D6810730D5); } // 0x5626D9D6810730D5  b350
-	static rage::scrVector NETWORK_GET_LAST_ENTITY_POS_RECEIVED_OVER_NETWORK(Entity entity) { return rage::Invoke<Vector3>(0x64D779659BC37B19, entity); } // 0x64D779659BC37B19  b393
-	static rage::scrVector NETWORK_GET_LAST_PLAYER_POS_RECEIVED_OVER_NETWORK(Player player) { return rage::Invoke<Vector3>(0x125E6D638B8605D4, player); } // 0x125E6D638B8605D4  b393
-	static rage::scrVector NETWORK_GET_LAST_VEL_RECEIVED_OVER_NETWORK(Entity entity) { return rage::Invoke<Vector3>(0x33DE49EDF4DDE77A, entity); } // 0x33DE49EDF4DDE77A  b1103
-	static rage::scrVector NETWORK_GET_PREDICTED_VELOCITY(Entity entity, float maxSpeedToPredict) { return rage::Invoke<Vector3>(0xAA5FAFCD2C5F5E47, entity, maxSpeedToPredict); } // 0xAA5FAFCD2C5F5E47  b1103
+	static rage::scrVector NETWORK_GET_LAST_ENTITY_POS_RECEIVED_OVER_NETWORK(Entity entity) { return rage::Invoke<rage::scrVector>(0x64D779659BC37B19, entity); } // 0x64D779659BC37B19  b393
+	static rage::scrVector NETWORK_GET_LAST_PLAYER_POS_RECEIVED_OVER_NETWORK(Player player) { return rage::Invoke<rage::scrVector>(0x125E6D638B8605D4, player); } // 0x125E6D638B8605D4  b393
+	static rage::scrVector NETWORK_GET_LAST_VEL_RECEIVED_OVER_NETWORK(Entity entity) { return rage::Invoke<rage::scrVector>(0x33DE49EDF4DDE77A, entity); } // 0x33DE49EDF4DDE77A  b1103
+	static rage::scrVector NETWORK_GET_PREDICTED_VELOCITY(Entity entity, float maxSpeedToPredict) { return rage::Invoke<rage::scrVector>(0xAA5FAFCD2C5F5E47, entity, maxSpeedToPredict); } // 0xAA5FAFCD2C5F5E47  b1103
 	static void NETWORK_DUMP_NET_IF_CONFIG() { rage::Invoke<void>(0xAEDF1BC1C133D6E3); } // 0xAEDF1BC1C133D6E3  b323
 	static void NETWORK_GET_SIGNALLING_INFO(Any* p0) { rage::Invoke<void>(0x2555CF7DA5473794, p0); } // 0x2555CF7DA5473794  b323
 	static void NETWORK_GET_NET_STATISTICS_INFO(Any* p0) { rage::Invoke<void>(0x6FD992C4A1C1B986, p0); } // 0x6FD992C4A1C1B986  b323
@@ -3693,7 +3693,7 @@ namespace OBJECT
 	static BOOL HAS_CLOSEST_OBJECT_OF_TYPE_BEEN_BROKEN(float p0, float p1, float p2, float p3, Hash modelHash, Any p5) { return rage::Invoke<BOOL>(0x761B0E69AC4D007E, p0, p1, p2, p3, modelHash, p5); } // 0x761B0E69AC4D007E 0x6FC0353D b323
 	static BOOL HAS_CLOSEST_OBJECT_OF_TYPE_BEEN_COMPLETELY_DESTROYED(Vector3 vec, float radius, Hash modelHash, BOOL p5) { return rage::Invoke<BOOL>(0x46494A2475701343, vec.x, vec.y, vec.z, radius, modelHash, p5); } // 0x46494A2475701343 0x7DB578DD b323
 	static BOOL GET_HAS_OBJECT_BEEN_COMPLETELY_DESTROYED(Any p0) { return rage::Invoke<BOOL>(0x2542269291C6AC84, p0); } // 0x2542269291C6AC84  b1180
-	static rage::scrVector GET_OFFSET_FROM_COORD_AND_HEADING_IN_WORLD_COORDS(Vector3 pos_, float heading, Vector3 offset_) { return rage::Invoke<Vector3>(0x163E252DE035A133, pos_.x, pos_.y, pos_.z, heading, offset_.x, offset_.y, offset_.z); } // 0x163E252DE035A133 0x87A42A12 b323
+	static rage::scrVector GET_OFFSET_FROM_COORD_AND_HEADING_IN_WORLD_COORDS(Vector3 pos_, float heading, Vector3 offset_) { return rage::Invoke<rage::scrVector>(0x163E252DE035A133, pos_.x, pos_.y, pos_.z, heading, offset_.x, offset_.y, offset_.z); } // 0x163E252DE035A133 0x87A42A12 b323
 	static BOOL GET_COORDS_AND_ROTATION_OF_CLOSEST_OBJECT_OF_TYPE(Vector3 vec, float radius, Hash modelHash, Vector3* outPosition, Vector3* outRotation, int rotationOrder) { return rage::Invoke<BOOL>(0x163F8B586BC95F2A, vec.x, vec.y, vec.z, radius, modelHash, outPosition, outRotation, rotationOrder); } // 0x163F8B586BC95F2A 0x65213FC3 b323
 	static void SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(Hash type, Vector3 vec, BOOL locked, float heading, BOOL p6) { rage::Invoke<void>(0xF82D8F1926A02C3D, type, vec.x, vec.y, vec.z, locked, heading, p6); } // 0xF82D8F1926A02C3D 0x38C951A4 b323
 	static void GET_STATE_OF_CLOSEST_DOOR_OF_TYPE(Hash type, Vector3 vec, BOOL* locked, float* heading) { rage::Invoke<void>(0xEDC1A5B84AEF33FF, type, vec.x, vec.y, vec.z, locked, heading); } // 0xEDC1A5B84AEF33FF 0x4B44A83D b323
@@ -3768,10 +3768,10 @@ namespace OBJECT
 	static void HIDE_PORTABLE_PICKUP_WHEN_DETACHED(Object pickupObject, BOOL toggle) { rage::Invoke<void>(0x867458251D47CCB2, pickupObject, toggle); } // 0x867458251D47CCB2 0x1F63B042 b463
 	static void SET_MAX_NUM_PORTABLE_PICKUPS_CARRIED_BY_PLAYER(Hash modelHash, int number) { rage::Invoke<void>(0x0BF3B3BD47D79C08, modelHash, number); } // 0x0BF3B3BD47D79C08 0x7EFBA039 b323
 	static void SET_LOCAL_PLAYER_CAN_COLLECT_PORTABLE_PICKUPS(BOOL toggle) { rage::Invoke<void>(0x78857FC65CADB909, toggle); } // 0x78857FC65CADB909 0xA3CDF152 b323
-	static rage::scrVector GET_SAFE_PICKUP_COORDS(Vector3 vec, float p3, float p4) { return rage::Invoke<Vector3>(0x6E16BC2503FF1FF0, vec.x, vec.y, vec.z, p3, p4); } // 0x6E16BC2503FF1FF0 0x618B5F67 b323
+	static rage::scrVector GET_SAFE_PICKUP_COORDS(Vector3 vec, float p3, float p4) { return rage::Invoke<rage::scrVector>(0x6E16BC2503FF1FF0, vec.x, vec.y, vec.z, p3, p4); } // 0x6E16BC2503FF1FF0 0x618B5F67 b323
 	static void ADD_EXTENDED_PICKUP_PROBE_AREA(Vector3 vec, float radius) { rage::Invoke<void>(0xD4A7A435B3710D05, vec.x, vec.y, vec.z, radius); } // 0xD4A7A435B3710D05  b1290
 	static void CLEAR_EXTENDED_PICKUP_PROBE_AREAS() { rage::Invoke<void>(0xB7C6D80FB371659A); } // 0xB7C6D80FB371659A  b1290
-	static rage::scrVector GET_PICKUP_COORDS(Pickup pickup) { return rage::Invoke<Vector3>(0x225B8B35C88029B3, pickup); } // 0x225B8B35C88029B3 0xC2E1E2C5 b323
+	static rage::scrVector GET_PICKUP_COORDS(Pickup pickup) { return rage::Invoke<rage::scrVector>(0x225B8B35C88029B3, pickup); } // 0x225B8B35C88029B3 0xC2E1E2C5 b323
 	static void SUPPRESS_PICKUP_SOUND_FOR_PICKUP(Any p0, Any p1) { rage::Invoke<void>(0x8DCA505A5C196F05, p0, p1); } // 0x8DCA505A5C196F05  b1180
 	static void REMOVE_ALL_PICKUPS_OF_TYPE(Hash pickupHash) { rage::Invoke<void>(0x27F9D613092159CF, pickupHash); } // 0x27F9D613092159CF 0x40062C53 b323
 	static BOOL HAS_PICKUP_BEEN_COLLECTED(Pickup pickup) { return rage::Invoke<BOOL>(0x80EC48E6679313F9, pickup); } // 0x80EC48E6679313F9 0x0BE5CCED b323
@@ -3927,7 +3927,7 @@ namespace PATHFIND
 	static void ADJUST_AMBIENT_PED_SPAWN_DENSITIES_THIS_FRAME(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { rage::Invoke<void>(0xAA76052DDA9BFC3E, p0, p1, p2, p3, p4, p5, p6); } // 0xAA76052DDA9BFC3E 0xD0F51299 b323
 	static void SET_PED_PATHS_BACK_TO_ORIGINAL(Vector3 vec1_, Vector3 vec2_, Any p6) { rage::Invoke<void>(0xE04B48F2CC926253, vec1_.x, vec1_.y, vec1_.z, vec2_.x, vec2_.y, vec2_.z, p6); } // 0xE04B48F2CC926253 0x3F1ABDA4 b323
 	static BOOL GET_RANDOM_VEHICLE_NODE(Vector3 vec, float radius, BOOL p4, BOOL p5, BOOL p6, Vector3* outPosition, int* nodeId) { return rage::Invoke<BOOL>(0x93E0DB8440B73A7D, vec.x, vec.y, vec.z, radius, p4, p5, p6, outPosition, nodeId); } // 0x93E0DB8440B73A7D 0xAD1476EA b323
-	static rage::scrVector GET_SPAWN_COORDS_FOR_VEHICLE_NODE(int nodeAddress, Vector3 towardscoors_, Vector3* centrePoint, float* heading) { return rage::Invoke<Vector3>(0x809549AFC7AEC597, nodeAddress, towardscoors_.x, towardscoors_.y, towardscoors_.z, centrePoint, heading); } // 0x809549AFC7AEC597  b2944
+	static rage::scrVector GET_SPAWN_COORDS_FOR_VEHICLE_NODE(int nodeAddress, Vector3 towardscoors_, Vector3* centrePoint, float* heading) { return rage::Invoke<rage::scrVector>(0x809549AFC7AEC597, nodeAddress, towardscoors_.x, towardscoors_.y, towardscoors_.z, centrePoint, heading); } // 0x809549AFC7AEC597  b2944
 	static void GET_STREET_NAME_AT_COORD(Vector3 vec, Hash* streetName, Hash* crossingRoad) { rage::Invoke<void>(0x2EB41072B4C1E4C0, vec.x, vec.y, vec.z, streetName, crossingRoad); } // 0x2EB41072B4C1E4C0 0xDEBEEFCF b323
 	static int GENERATE_DIRECTIONS_TO_COORD(Vector3 vec, BOOL p3, int* direction, float* p5, float* distToNxJunction) { return rage::Invoke<int>(0xF90125F1F79ECDF8, vec.x, vec.y, vec.z, p3, direction, p5, distToNxJunction); } // 0xF90125F1F79ECDF8 0xED35C094 b323
 	static void SET_IGNORE_NO_GPS_FLAG(BOOL toggle) { rage::Invoke<void>(0x72751156E7678833, toggle); } // 0x72751156E7678833 0xB72CF194 b323
@@ -4034,7 +4034,7 @@ namespace PED
 	static BOOL IS_PED_ON_FOOT(Ped ped) { return rage::Invoke<BOOL>(0x01FEE67DB37F59B2, ped); } // 0x01FEE67DB37F59B2 0xC60D0785 b323
 	static BOOL IS_PED_ON_ANY_BIKE(Ped ped) { return rage::Invoke<BOOL>(0x94495889E22C6479, ped); } // 0x94495889E22C6479 0x4D885B2E b323
 	static BOOL IS_PED_PLANTING_BOMB(Ped ped) { return rage::Invoke<BOOL>(0xC70B5FAE151982D8, ped); } // 0xC70B5FAE151982D8 0x0EDAC574 b323
-	static rage::scrVector GET_DEAD_PED_PICKUP_COORDS(Ped ped, float p1, float p2) { return rage::Invoke<Vector3>(0xCD5003B097200F36, ped, p1, p2); } // 0xCD5003B097200F36 0x129F9DC1 b323
+	static rage::scrVector GET_DEAD_PED_PICKUP_COORDS(Ped ped, float p1, float p2) { return rage::Invoke<rage::scrVector>(0xCD5003B097200F36, ped, p1, p2); } // 0xCD5003B097200F36 0x129F9DC1 b323
 	static BOOL IS_PED_IN_ANY_BOAT(Ped ped) { return rage::Invoke<BOOL>(0x2E0E1C2B4F6CB339, ped); } // 0x2E0E1C2B4F6CB339 0x1118A947 b323
 	static BOOL IS_PED_IN_ANY_SUB(Ped ped) { return rage::Invoke<BOOL>(0xFBFC01CCFB35D99E, ped); } // 0xFBFC01CCFB35D99E 0xE65F8059 b323
 	static BOOL IS_PED_IN_ANY_HELI(Ped ped) { return rage::Invoke<BOOL>(0x298B91AE825E5705, ped); } // 0x298B91AE825E5705 0x7AB5523B b323
@@ -4223,8 +4223,8 @@ namespace PED
 	static void SET_PED_ALTERNATE_MOVEMENT_ANIM(Ped ped, int stance, const char* animDictionary, const char* animationName, float p4, BOOL p5) { rage::Invoke<void>(0x90A43CC281FFAB46, ped, stance, animDictionary, animationName, p4, p5); } // 0x90A43CC281FFAB46 0xBA84FD8C b323
 	static void CLEAR_PED_ALTERNATE_MOVEMENT_ANIM(Ped ped, int stance, float p2) { rage::Invoke<void>(0xD8D19675ED5FBDCE, ped, stance, p2); } // 0xD8D19675ED5FBDCE 0x7A7F5BC3 b323
 	static void SET_PED_GESTURE_GROUP(Ped ped, const char* animGroupGesture) { rage::Invoke<void>(0xDDF803377F94AAA8, ped, animGroupGesture); } // 0xDDF803377F94AAA8 0x170DA109 b323
-	static rage::scrVector GET_ANIM_INITIAL_OFFSET_POSITION(const char* animDict, const char* animName, Vector3 vec, Vector3 rot_, float p8, int p9) { return rage::Invoke<Vector3>(0xBE22B26DD764C040, animDict, animName, vec.x, vec.y, vec.z, rot_.x, rot_.y, rot_.z, p8, p9); } // 0xBE22B26DD764C040 0xC59D4268 b323
-	static rage::scrVector GET_ANIM_INITIAL_OFFSET_ROTATION(const char* animDict, const char* animName, Vector3 vec, Vector3 rot_, float p8, int p9) { return rage::Invoke<Vector3>(0x4B805E6046EE9E47, animDict, animName, vec.x, vec.y, vec.z, rot_.x, rot_.y, rot_.z, p8, p9); } // 0x4B805E6046EE9E47 0x5F7789E6 b323
+	static rage::scrVector GET_ANIM_INITIAL_OFFSET_POSITION(const char* animDict, const char* animName, Vector3 vec, Vector3 rot_, float p8, int p9) { return rage::Invoke<rage::scrVector>(0xBE22B26DD764C040, animDict, animName, vec.x, vec.y, vec.z, rot_.x, rot_.y, rot_.z, p8, p9); } // 0xBE22B26DD764C040 0xC59D4268 b323
+	static rage::scrVector GET_ANIM_INITIAL_OFFSET_ROTATION(const char* animDict, const char* animName, Vector3 vec, Vector3 rot_, float p8, int p9) { return rage::Invoke<rage::scrVector>(0x4B805E6046EE9E47, animDict, animName, vec.x, vec.y, vec.z, rot_.x, rot_.y, rot_.z, p8, p9); } // 0x4B805E6046EE9E47 0x5F7789E6 b323
 	static int GET_PED_DRAWABLE_VARIATION(Ped ped, int componentId) { return rage::Invoke<int>(0x67F3780DD425D4FC, ped, componentId); } // 0x67F3780DD425D4FC 0x29850FE2 b323
 	static int GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Ped ped, int componentId) { return rage::Invoke<int>(0x27561561732A7842, ped, componentId); } // 0x27561561732A7842 0x9754C27D b323
 	static int GET_PED_TEXTURE_VARIATION(Ped ped, int componentId) { return rage::Invoke<int>(0x04A355E041E004E6, ped, componentId); } // 0x04A355E041E004E6 0xC0A8590A b323
@@ -4321,14 +4321,14 @@ namespace PED
 	static void SET_PED_DEFENSIVE_AREA_ATTACHED_TO_PED(Ped ped, Ped attachPed, float p2, float p3, float p4, float p5, float p6, float p7, float p8, BOOL p9, BOOL p10) { rage::Invoke<void>(0x4EF47FE21698A8B6, ped, attachPed, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x4EF47FE21698A8B6 0x74BDA7CE b323
 	static void SET_PED_DEFENSIVE_AREA_DIRECTION(Ped ped, float p1, float p2, float p3, BOOL p4) { rage::Invoke<void>(0x413C6C763A4AFFAD, ped, p1, p2, p3, p4); } // 0x413C6C763A4AFFAD 0xB66B0C9A b323
 	static void REMOVE_PED_DEFENSIVE_AREA(Ped ped, BOOL toggle) { rage::Invoke<void>(0x74D4E028107450A9, ped, toggle); } // 0x74D4E028107450A9 0x34AAAFA5 b323
-	static rage::scrVector GET_PED_DEFENSIVE_AREA_POSITION(Ped ped, BOOL p1) { return rage::Invoke<Vector3>(0x3C06B8786DD94CD1, ped, p1); } // 0x3C06B8786DD94CD1 0xCB65198D b323
+	static rage::scrVector GET_PED_DEFENSIVE_AREA_POSITION(Ped ped, BOOL p1) { return rage::Invoke<rage::scrVector>(0x3C06B8786DD94CD1, ped, p1); } // 0x3C06B8786DD94CD1 0xCB65198D b323
 	static BOOL IS_PED_DEFENSIVE_AREA_ACTIVE(Ped ped, BOOL p1) { return rage::Invoke<BOOL>(0xBA63D9FE45412247, ped, p1); } // 0xBA63D9FE45412247 0x6D88BCD3 b323
 	static void SET_PED_PREFERRED_COVER_SET(Ped ped, Any itemSet) { rage::Invoke<void>(0x8421EB4DA7E391B9, ped, itemSet); } // 0x8421EB4DA7E391B9 0xF3B7EFBF b323
 	static void REMOVE_PED_PREFERRED_COVER_SET(Ped ped) { rage::Invoke<void>(0xFDDB234CF74073D9, ped); } // 0xFDDB234CF74073D9 0xA0134498 b323
 	static void REVIVE_INJURED_PED(Ped ped) { rage::Invoke<void>(0x8D8ACD8388CD99CE, ped); } // 0x8D8ACD8388CD99CE 0x14D3E6E3 b323
 	static void RESURRECT_PED(Ped ped) { rage::Invoke<void>(0x71BC8E838B9C6035, ped); } // 0x71BC8E838B9C6035 0xA4B82097 b323
 	static void SET_PED_NAME_DEBUG(Ped ped, const char* name) { rage::Invoke<void>(0x98EFA132A4117BE1, ped, name); } // 0x98EFA132A4117BE1 0x20D6273E b323
-	static rage::scrVector GET_PED_EXTRACTED_DISPLACEMENT(Ped ped, BOOL worldSpace) { return rage::Invoke<Vector3>(0xE0AF41401ADF87E3, ped, worldSpace); } // 0xE0AF41401ADF87E3 0x5231F901 b323
+	static rage::scrVector GET_PED_EXTRACTED_DISPLACEMENT(Ped ped, BOOL worldSpace) { return rage::Invoke<rage::scrVector>(0xE0AF41401ADF87E3, ped, worldSpace); } // 0xE0AF41401ADF87E3 0x5231F901 b323
 	static void SET_PED_DIES_WHEN_INJURED(Ped ped, BOOL toggle) { rage::Invoke<void>(0x5BA7919BED300023, ped, toggle); } // 0x5BA7919BED300023 0xE94E24D4 b323
 	static void SET_PED_ENABLE_WEAPON_BLOCKING(Ped ped, BOOL toggle) { rage::Invoke<void>(0x97A790315D3831FD, ped, toggle); } // 0x97A790315D3831FD 0x4CAD1A4A b323
 	static void SPECIAL_FUNCTION_DO_NOT_USE(Ped ped, BOOL p1) { rage::Invoke<void>(0xF9ACF4A08098EA25, ped, p1); } // 0xF9ACF4A08098EA25 0x141CC936 b323
@@ -4357,7 +4357,7 @@ namespace PED
 	static void CLEAR_PED_DECORATIONS(Ped ped) { rage::Invoke<void>(0x0E5173C163976E38, ped); } // 0x0E5173C163976E38 0xD4496BF3 b323
 	static void CLEAR_PED_DECORATIONS_LEAVE_SCARS(Ped ped) { rage::Invoke<void>(0xE3B27E70CEAB9F0C, ped); } // 0xE3B27E70CEAB9F0C 0xEFD58EB9 b323
 	static BOOL WAS_PED_SKELETON_UPDATED(Ped ped) { return rage::Invoke<BOOL>(0x11B499C1E0FF8559, ped); } // 0x11B499C1E0FF8559 0xF7E2FBAD b323
-	static rage::scrVector GET_PED_BONE_COORDS(Ped ped, int boneId, Vector3 offset_) { return rage::Invoke<Vector3>(0x17C07FC640E86B4E, ped, boneId, offset_.x, offset_.y, offset_.z); } // 0x17C07FC640E86B4E 0x4579CAB1 b323
+	static rage::scrVector GET_PED_BONE_COORDS(Ped ped, int boneId, Vector3 offset_) { return rage::Invoke<rage::scrVector>(0x17C07FC640E86B4E, ped, boneId, offset_.x, offset_.y, offset_.z); } // 0x17C07FC640E86B4E 0x4579CAB1 b323
 	static void CREATE_NM_MESSAGE(BOOL startImmediately, int messageId) { rage::Invoke<void>(0x418EF2A1BCE56685, startImmediately, messageId); } // 0x418EF2A1BCE56685 0x1CFBFD4B b323
 	static void GIVE_PED_NM_MESSAGE(Ped ped) { rage::Invoke<void>(0xB158DFCCC56E5C5B, ped); } // 0xB158DFCCC56E5C5B 0x737C3689 b323
 	static int ADD_SCENARIO_BLOCKING_AREA(Vector3 vec1_, Vector3 vec2_, BOOL p6, BOOL p7, BOOL p8, BOOL p9, Any p10) { return rage::Invoke<int>(0x1B5C85C612E5256E, vec1_.x, vec1_.y, vec1_.z, vec2_.x, vec2_.y, vec2_.z, p6, p7, p8, p9, p10); } // 0x1B5C85C612E5256E 0xA38C0234 b323
@@ -4595,8 +4595,8 @@ namespace PHYSICS
 	static void ROPE_SET_UPDATE_ORDER(int ropeId, Any p1) { rage::Invoke<void>(0xDC57A637A20006ED, ropeId, p1); } // 0xDC57A637A20006ED 0x80DB77A7 b323
 	static void ROPE_SET_SMOOTH_REELIN(int ropeId, BOOL p1) { rage::Invoke<void>(0x36CCB9BE67B970FD, ropeId, p1); } // 0x36CCB9BE67B970FD 0xC67D5CF6 b323
 	static BOOL IS_ROPE_ATTACHED_AT_BOTH_ENDS(int* ropeId) { return rage::Invoke<BOOL>(0x84DE3B5FB3E666F0, ropeId); } // 0x84DE3B5FB3E666F0 0x7A18BB9C b323
-	static rage::scrVector GET_ROPE_LAST_VERTEX_COORD(int ropeId) { return rage::Invoke<Vector3>(0x21BB0FBD3E217C2D, ropeId); } // 0x21BB0FBD3E217C2D 0x91F6848B b323
-	static rage::scrVector GET_ROPE_VERTEX_COORD(int ropeId, int vertex) { return rage::Invoke<Vector3>(0xEA61CA8E80F09E4D, ropeId, vertex); } // 0xEA61CA8E80F09E4D 0x84374452 b323
+	static rage::scrVector GET_ROPE_LAST_VERTEX_COORD(int ropeId) { return rage::Invoke<rage::scrVector>(0x21BB0FBD3E217C2D, ropeId); } // 0x21BB0FBD3E217C2D 0x91F6848B b323
+	static rage::scrVector GET_ROPE_VERTEX_COORD(int ropeId, int vertex) { return rage::Invoke<rage::scrVector>(0xEA61CA8E80F09E4D, ropeId, vertex); } // 0xEA61CA8E80F09E4D 0x84374452 b323
 	static void START_ROPE_WINDING(int ropeId) { rage::Invoke<void>(0x1461C72C889E343E, ropeId); } // 0x1461C72C889E343E 0x5187BED3 b323
 	static void STOP_ROPE_WINDING(int ropeId) { rage::Invoke<void>(0xCB2D4AB84A19AA7C, ropeId); } // 0xCB2D4AB84A19AA7C 0x46826B53 b323
 	static void START_ROPE_UNWINDING_FRONT(int ropeId) { rage::Invoke<void>(0x538D1179EC1AA9A9, ropeId); } // 0x538D1179EC1AA9A9 0xFC0DB4C3 b323
@@ -4616,7 +4616,7 @@ namespace PHYSICS
 	static void SET_DAMPING(Entity entity, int vertex, float value) { rage::Invoke<void>(0xEEA3B200A6FEB65B, entity, vertex, value); } // 0xEEA3B200A6FEB65B 0xCFB37773 b323
 	static void ACTIVATE_PHYSICS(Entity entity) { rage::Invoke<void>(0x710311ADF0E20730, entity); } // 0x710311ADF0E20730 0x031711B8 b323
 	static void SET_CGOFFSET(Entity entity, Vector3 vec) { rage::Invoke<void>(0xD8FA3908D7B86904, entity, vec.x, vec.y, vec.z); } // 0xD8FA3908D7B86904 0x59910AB2 b323
-	static rage::scrVector GET_CGOFFSET(Entity entity) { return rage::Invoke<Vector3>(0x8214A4B5A7A33612, entity); } // 0x8214A4B5A7A33612 0x49A11F0D b323
+	static rage::scrVector GET_CGOFFSET(Entity entity) { return rage::Invoke<rage::scrVector>(0x8214A4B5A7A33612, entity); } // 0x8214A4B5A7A33612 0x49A11F0D b323
 	static void SET_CG_AT_BOUNDCENTER(Entity entity) { rage::Invoke<void>(0xBE520D9761FF811F, entity); } // 0xBE520D9761FF811F 0xA5B55421 b323
 	static void BREAK_ENTITY_GLASS(Entity entity, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, Any p9, BOOL p10) { rage::Invoke<void>(0x2E648D16F6E308F3, entity, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x2E648D16F6E308F3 0xD0E0402F b323
 	static BOOL GET_IS_ENTITY_A_FRAG(Object object) { return rage::Invoke<BOOL>(0x0C112765300C7E1E, object); } // 0x0C112765300C7E1E  b505
@@ -4641,7 +4641,7 @@ namespace PLAYER
 	static int GET_NUMBER_OF_PLAYERS_IN_TEAM(int team) { return rage::Invoke<int>(0x1FC200409F10E6F1, team); } // 0x1FC200409F10E6F1  b1180
 	static const char* GET_PLAYER_NAME(Player player) { return rage::Invoke<const char*>(0x6D0DE6A7B5DA71F8, player); } // 0x6D0DE6A7B5DA71F8 0x406B4B20 b323
 	static float GET_WANTED_LEVEL_RADIUS(Player player) { return rage::Invoke<float>(0x085DEB493BE80812, player); } // 0x085DEB493BE80812 0x1CF7D7DA b323
-	static rage::scrVector GET_PLAYER_WANTED_CENTRE_POSITION(Player player) { return rage::Invoke<Vector3>(0x0C92BA89F1AF26F8, player); } // 0x0C92BA89F1AF26F8 0x821F2D2C b323
+	static rage::scrVector GET_PLAYER_WANTED_CENTRE_POSITION(Player player) { return rage::Invoke<rage::scrVector>(0x0C92BA89F1AF26F8, player); } // 0x0C92BA89F1AF26F8 0x821F2D2C b323
 	static void SET_PLAYER_WANTED_CENTRE_POSITION(Player player, Vector3* position, BOOL p2, BOOL p3) { rage::Invoke<void>(0x520E541A97A13354, player, position, p2, p3); } // 0x520E541A97A13354 0xF261633A b323
 	static int GET_WANTED_LEVEL_THRESHOLD(int wantedLevel) { return rage::Invoke<int>(0xFDD179EAF45B556C, wantedLevel); } // 0xFDD179EAF45B556C 0xD9783F6B b323
 	static void SET_PLAYER_WANTED_LEVEL(Player player, int wantedLevel, BOOL disableNoMission) { rage::Invoke<void>(0x39FF19C64EF7DA5B, player, wantedLevel, disableNoMission); } // 0x39FF19C64EF7DA5B 0xB7A0914B b323
@@ -5678,7 +5678,7 @@ namespace TASK
 	static ScrHandle ADD_COVER_POINT(Vector3 vec, float direction, int usage, int height, int arc, BOOL isPriority) { return rage::Invoke<ScrHandle>(0xD5C12A75C7B9497F, vec.x, vec.y, vec.z, direction, usage, height, arc, isPriority); } // 0xD5C12A75C7B9497F 0xA0AF0B98 b323
 	static void REMOVE_COVER_POINT(ScrHandle coverpoint) { rage::Invoke<void>(0xAE287C923D891715, coverpoint); } // 0xAE287C923D891715 0x0776888B b323
 	static BOOL DOES_SCRIPTED_COVER_POINT_EXIST_AT_COORDS(Vector3 vec) { return rage::Invoke<BOOL>(0xA98B8E3C088E5A31, vec.x, vec.y, vec.z); } // 0xA98B8E3C088E5A31 0x29F97A71 b323
-	static rage::scrVector GET_SCRIPTED_COVER_POINT_COORDS(ScrHandle coverpoint) { return rage::Invoke<Vector3>(0x594A1028FC2A3E85, coverpoint); } // 0x594A1028FC2A3E85 0xC6B6CCC1 b323
+	static rage::scrVector GET_SCRIPTED_COVER_POINT_COORDS(ScrHandle coverpoint) { return rage::Invoke<rage::scrVector>(0x594A1028FC2A3E85, coverpoint); } // 0x594A1028FC2A3E85 0xC6B6CCC1 b323
 	static void ADD_SCRIPTED_COVER_AREA(Vector3 vec, float radius) { rage::Invoke<void>(0x28B7B9BFDAF274AA, vec.x, vec.y, vec.z, radius); } // 0x28B7B9BFDAF274AA  b2545
 	static void TASK_COMBAT_PED(Ped ped, Ped targetPed, int combatFlags, int threatResponseFlags) { rage::Invoke<void>(0xF166E48407BAC484, ped, targetPed, combatFlags, threatResponseFlags); } // 0xF166E48407BAC484 0xCB0D8932 b323
 	static void TASK_COMBAT_PED_TIMED(Ped ped, Ped target, int time, int flags) { rage::Invoke<void>(0x944F30DCB7096BDE, ped, target, time, flags); } // 0x944F30DCB7096BDE 0xF5CA2A45 b323
@@ -5838,7 +5838,7 @@ namespace TASK
 
 namespace VEHICLE
 {
-	static Vehicle CREATE_VEHICLE(Hash modelHash, scrVector vec, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) { return rage::Invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, vec.x, vec.y, vec.z, heading, isNetwork, bScriptHostVeh, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
+	static Vehicle CREATE_VEHICLE(Hash modelHash, Vector3 vec, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) { return rage::Invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, vec.x, vec.y, vec.z, heading, isNetwork, bScriptHostVeh, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
 	static void DELETE_VEHICLE(Vehicle* vehicle) { rage::Invoke<void>(0xEA386986E786A54F, vehicle); } // 0xEA386986E786A54F 0x9803AF60 b323
 	static void SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(Vehicle vehicle, BOOL toggle, BOOL p2) { rage::Invoke<void>(0x7D6F9A3EF26136A0, vehicle, toggle, p2); } // 0x7D6F9A3EF26136A0 0xBB54ECCA b323
 	static void SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON_SYNCED(Vehicle vehicle, BOOL canBeLockedOn, BOOL p2) { rage::Invoke<void>(0x1DDA078D12879EEE, vehicle, canBeLockedOn, p2); } // 0x1DDA078D12879EEE  b463
@@ -6018,10 +6018,10 @@ namespace VEHICLE
 	static void REQUEST_VEHICLE_RECORDING(int recording, const char* script) { rage::Invoke<void>(0xAF514CABE74CBF15, recording, script); } // 0xAF514CABE74CBF15 0x91AFEFD9 b323
 	static BOOL HAS_VEHICLE_RECORDING_BEEN_LOADED(int recording, const char* script) { return rage::Invoke<BOOL>(0x300D614A4C785FC4, recording, script); } // 0x300D614A4C785FC4 0xF52CD7F5 b323
 	static void REMOVE_VEHICLE_RECORDING(int recording, const char* script) { rage::Invoke<void>(0xF1160ACCF98A3FC8, recording, script); } // 0xF1160ACCF98A3FC8 0xD3C05B00 b323
-	static rage::scrVector GET_POSITION_OF_VEHICLE_RECORDING_ID_AT_TIME(int id, float time) { return rage::Invoke<Vector3>(0x92523B76657A517D, id, time); } // 0x92523B76657A517D 0xF31973BB b323
-	static rage::scrVector GET_POSITION_OF_VEHICLE_RECORDING_AT_TIME(int recording, float time, const char* script) { return rage::Invoke<Vector3>(0xD242728AA6F0FBA2, recording, time, script); } // 0xD242728AA6F0FBA2 0x7178558D b323
-	static rage::scrVector GET_ROTATION_OF_VEHICLE_RECORDING_ID_AT_TIME(int id, float time) { return rage::Invoke<Vector3>(0xF0F2103EFAF8CBA7, id, time); } // 0xF0F2103EFAF8CBA7 0x4D1C15C2 b323
-	static rage::scrVector GET_ROTATION_OF_VEHICLE_RECORDING_AT_TIME(int recording, float time, const char* script) { return rage::Invoke<Vector3>(0x2058206FBE79A8AD, recording, time, script); } // 0x2058206FBE79A8AD 0xD96DEC68 b323
+	static rage::scrVector GET_POSITION_OF_VEHICLE_RECORDING_ID_AT_TIME(int id, float time) { return rage::Invoke<rage::scrVector>(0x92523B76657A517D, id, time); } // 0x92523B76657A517D 0xF31973BB b323
+	static rage::scrVector GET_POSITION_OF_VEHICLE_RECORDING_AT_TIME(int recording, float time, const char* script) { return rage::Invoke<rage::scrVector>(0xD242728AA6F0FBA2, recording, time, script); } // 0xD242728AA6F0FBA2 0x7178558D b323
+	static rage::scrVector GET_ROTATION_OF_VEHICLE_RECORDING_ID_AT_TIME(int id, float time) { return rage::Invoke<rage::scrVector>(0xF0F2103EFAF8CBA7, id, time); } // 0xF0F2103EFAF8CBA7 0x4D1C15C2 b323
+	static rage::scrVector GET_ROTATION_OF_VEHICLE_RECORDING_AT_TIME(int recording, float time, const char* script) { return rage::Invoke<rage::scrVector>(0x2058206FBE79A8AD, recording, time, script); } // 0x2058206FBE79A8AD 0xD96DEC68 b323
 	static float GET_TOTAL_DURATION_OF_VEHICLE_RECORDING_ID(int id) { return rage::Invoke<float>(0x102D125411A7B6E6, id); } // 0x102D125411A7B6E6 0x7116785E b323
 	static float GET_TOTAL_DURATION_OF_VEHICLE_RECORDING(int recording, const char* script) { return rage::Invoke<float>(0x0E48D1C262390950, recording, script); } // 0x0E48D1C262390950 0x5B35EEB7 b323
 	static float GET_POSITION_IN_RECORDING(Vehicle vehicle) { return rage::Invoke<float>(0x2DACD605FC681475, vehicle); } // 0x2DACD605FC681475 0x7DCD644C b323
@@ -6171,7 +6171,7 @@ namespace VEHICLE
 	static void SET_VEHICLE_HAS_STRONG_AXLES(Vehicle vehicle, BOOL toggle) { rage::Invoke<void>(0x92F0CF722BC4202F, vehicle, toggle); } // 0x92F0CF722BC4202F 0x0D1CBC65 b323
 	static const char* GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Hash modelHash) { return rage::Invoke<const char*>(0xB215AAC32D25D019, modelHash); } // 0xB215AAC32D25D019 0xEC86DF39 b323
 	static const char* GET_MAKE_NAME_FROM_VEHICLE_MODEL(Hash modelHash) { return rage::Invoke<const char*>(0xF7AF4F159FF99F97, modelHash); } // 0xF7AF4F159FF99F97  b1868
-	static rage::scrVector GET_VEHICLE_DEFORMATION_AT_POS(Vehicle vehicle, Vector3 offset_) { return rage::Invoke<Vector3>(0x4EC6CFBC7B2E9536, vehicle, offset_.x, offset_.y, offset_.z); } // 0x4EC6CFBC7B2E9536 0xABF02075 b323
+	static rage::scrVector GET_VEHICLE_DEFORMATION_AT_POS(Vehicle vehicle, Vector3 offset_) { return rage::Invoke<rage::scrVector>(0x4EC6CFBC7B2E9536, vehicle, offset_.x, offset_.y, offset_.z); } // 0x4EC6CFBC7B2E9536 0xABF02075 b323
 	static void SET_VEHICLE_LIVERY(Vehicle vehicle, int livery) { rage::Invoke<void>(0x60BF608F1B8CD1B6, vehicle, livery); } // 0x60BF608F1B8CD1B6 0x7AD87059 b323
 	static int GET_VEHICLE_LIVERY(Vehicle vehicle) { return rage::Invoke<int>(0x2BB9230590DA5E8A, vehicle); } // 0x2BB9230590DA5E8A 0xEC82A51D b323
 	static int GET_VEHICLE_LIVERY_COUNT(Vehicle vehicle) { return rage::Invoke<int>(0x87B63E25A529D526, vehicle); } // 0x87B63E25A529D526 0xFB0CA947 b323
@@ -6271,7 +6271,7 @@ namespace VEHICLE
 	static void SET_VEHICLE_SEARCHLIGHT(Vehicle heli, BOOL toggle, BOOL canBeUsedByAI) { rage::Invoke<void>(0x14E85C5EE7A4D542, heli, toggle, canBeUsedByAI); } // 0x14E85C5EE7A4D542 0xE2C0DD8A b323
 	static BOOL DOES_VEHICLE_HAVE_SEARCHLIGHT(Vehicle vehicle) { return rage::Invoke<BOOL>(0x99015ED7DBEA5113, vehicle); } // 0x99015ED7DBEA5113  b2189
 	static BOOL IS_ENTRY_POINT_FOR_SEAT_CLEAR(Ped ped, Vehicle vehicle, int seatIndex, BOOL side, BOOL onEnter) { return rage::Invoke<BOOL>(0x639431E895B9AA57, ped, vehicle, seatIndex, side, onEnter); } // 0x639431E895B9AA57 0xAB0E79EB b323
-	static rage::scrVector GET_ENTRY_POINT_POSITION(Vehicle vehicle, int doorId) { return rage::Invoke<Vector3>(0xC0572928C0ABFDA3, vehicle, doorId); } // 0xC0572928C0ABFDA3  b944
+	static rage::scrVector GET_ENTRY_POINT_POSITION(Vehicle vehicle, int doorId) { return rage::Invoke<rage::scrVector>(0xC0572928C0ABFDA3, vehicle, doorId); } // 0xC0572928C0ABFDA3  b944
 	static BOOL CAN_SHUFFLE_SEAT(Vehicle vehicle, int seatIndex) { return rage::Invoke<BOOL>(0x30785D90C956BF35, vehicle, seatIndex); } // 0x30785D90C956BF35 0xB3EB01ED b323
 	static int GET_NUM_MOD_KITS(Vehicle vehicle) { return rage::Invoke<int>(0x33F2E3FE70EAAE1D, vehicle); } // 0x33F2E3FE70EAAE1D 0xE4903AA0 b323
 	static void SET_VEHICLE_MOD_KIT(Vehicle vehicle, int modKit) { rage::Invoke<void>(0x1F2AA07F00B3217A, vehicle, modKit); } // 0x1F2AA07F00B3217A 0xB8132158 b323
@@ -6390,7 +6390,7 @@ namespace VEHICLE
 	static void SET_CARGOBOB_FORCE_DONT_DETACH_VEHICLE(Vehicle cargobob, BOOL toggle) { rage::Invoke<void>(0x571FEB383F629926, cargobob, toggle); } // 0x571FEB383F629926 0x49949FDA b323
 	static void SET_CARGOBOB_EXCLUDE_FROM_PICKUP_ENTITY(Any p0, Any p1) { rage::Invoke<void>(0x1F34B0626C594380, p0, p1); } // 0x1F34B0626C594380  b757
 	static BOOL CAN_CARGOBOB_PICK_UP_ENTITY(Any p0, Any p1) { return rage::Invoke<BOOL>(0x2C1D8B3B19E517CC, p0, p1); } // 0x2C1D8B3B19E517CC  b757
-	static rage::scrVector GET_ATTACHED_PICK_UP_HOOK_POSITION(Vehicle cargobob) { return rage::Invoke<Vector3>(0xCBDB9B923CACC92D, cargobob); } // 0xCBDB9B923CACC92D 0xE6633DCF b323
+	static rage::scrVector GET_ATTACHED_PICK_UP_HOOK_POSITION(Vehicle cargobob) { return rage::Invoke<rage::scrVector>(0xCBDB9B923CACC92D, cargobob); } // 0xCBDB9B923CACC92D 0xE6633DCF b323
 	static BOOL DOES_CARGOBOB_HAVE_PICK_UP_ROPE(Vehicle cargobob) { return rage::Invoke<BOOL>(0x1821D91AD4B56108, cargobob); } // 0x1821D91AD4B56108 0xAF769B81 b323
 	static void CREATE_PICK_UP_ROPE_FOR_CARGOBOB(Vehicle cargobob, int state) { rage::Invoke<void>(0x7BEB0C7A235F6F3B, cargobob, state); } // 0x7BEB0C7A235F6F3B 0x4D3C9A99 b323
 	static void REMOVE_PICK_UP_ROPE_FOR_CARGOBOB(Vehicle cargobob) { rage::Invoke<void>(0x9768CF648F54C804, cargobob); } // 0x9768CF648F54C804 0xA8211EE9 b323
@@ -6551,7 +6551,7 @@ namespace VEHICLE
 	static void SET_SPECIAL_FLIGHT_MODE_ALLOWED(Vehicle vehicle, BOOL toggle) { rage::Invoke<void>(0xF1211889DF15A763, vehicle, toggle); } // 0xF1211889DF15A763  b1290
 	static void SET_DISABLE_HOVER_MODE_FLIGHT(Vehicle vehicle, BOOL toggle) { rage::Invoke<void>(0x2D55FE374D5FDB91, vehicle, toggle); } // 0x2D55FE374D5FDB91  b1290
 	static BOOL GET_OUTRIGGERS_DEPLOYED(Vehicle vehicle) { return rage::Invoke<BOOL>(0x3A9128352EAC9E85, vehicle); } // 0x3A9128352EAC9E85  b1290
-	static rage::scrVector FIND_SPAWN_COORDINATES_FOR_HELI(Ped ped) { return rage::Invoke<Vector3>(0x8DC9675797123522, ped); } // 0x8DC9675797123522  b1290
+	static rage::scrVector FIND_SPAWN_COORDINATES_FOR_HELI(Ped ped) { return rage::Invoke<rage::scrVector>(0x8DC9675797123522, ped); } // 0x8DC9675797123522  b1290
 	static void SET_DEPLOY_FOLDING_WINGS(Vehicle vehicle, BOOL deploy, BOOL p2) { rage::Invoke<void>(0xB251E0B33E58B424, vehicle, deploy, p2); } // 0xB251E0B33E58B424  b1290
 	static BOOL ARE_FOLDING_WINGS_DEPLOYED(Vehicle vehicle) { return rage::Invoke<BOOL>(0xAEF12960FA943792, vehicle); } // 0xAEF12960FA943792  b1290
 	static void SET_DEPLOY_MISSILE_BAYS_(Vehicle vehicle, BOOL deploy) { rage::Invoke<void>(0x0C02468829E4AA65, vehicle, deploy); } // 0x0C02468829E4AA65  b2944

@@ -124,6 +124,10 @@ namespace rage {
 }
 //datXXXXXXX
 namespace rage {
+	const u64 g_rscVirtualLeafSize_WIN32 = 8192;
+	const u64 g_rscPhysicalLeafSize_WIN32 = 8192;
+	const u64 g_rscVirtualLeafSize = g_rscVirtualLeafSize_WIN32;
+	const u64 g_rscPhysicalLeafSize = g_rscPhysicalLeafSize_WIN32;
 	struct datResourceInfo {
 		struct Sizes {
 			u32 LeafShift : 4;
@@ -131,12 +135,27 @@ namespace rage {
 			u32 BaseCount : 7;
 			u32 HasTail2 : 1, HasTail4 : 1, HasTail8 : 1, HasTail16 : 1;
 			u32 Version : 4;
+			u32 GetCount() const {
+				return Head16Count + Head8Count + Head4Count + Head2Count + BaseCount + HasTail2 + HasTail4 + HasTail8 + HasTail16;
+			}
+			u32 GetSize(u32 leafSize) const {
+				leafSize <<= LeafShift;
+				return (((Head16Count << 4) + (Head8Count << 3) + (Head4Count << 2) + (Head2Count << 1) + BaseCount) * leafSize)
+					+ (HasTail2 ? (leafSize >> 1) : 0) + (HasTail4 ? (leafSize >> 2) : 0) + (HasTail8 ? (leafSize >> 3) : 0) + (HasTail16 ? (leafSize >> 4) : 0);
+			}
 		};
+		u64 GetVirtualSize() const { return Virtual.GetSize(g_rscVirtualLeafSize); }
+		u64 GetPhysicalSize() const { return Physical.GetSize(g_rscPhysicalLeafSize); }
+		u64 GetVirtualChunkSize() const { return g_rscVirtualLeafSize << Virtual.LeafShift; }
+		u64 GetPhysicalChunkSize() const { return g_rscPhysicalLeafSize << Physical.LeafShift; }
+		u64 GetVirtualChunkCount() const { return Virtual.GetCount(); }
+		u64 GetPhysicalChunkCount() const { return Physical.GetCount(); }
+		int GetVersion() const { return (Virtual.Version << 4) | (Physical.Version); }
 		Sizes Virtual;
 		Sizes Physical;
 	};
 	struct datResourceChunk {
-		static const u32 MAX_CHUNKS = 128;
+		static constexpr u32 MAX_CHUNKS = 128;
 		void *SrcAddr;
 		void *DestAddr;
 		u64 Size;
@@ -207,10 +226,10 @@ namespace rage {
 	class atFixedBitSetBase {
 		template<int X, typename Y> friend class atFixedBitSetIterator;
 	protected:
-		static const int BlockSize = sizeof(Type);
-		static const int BitsPerBlock = BlockSize * 8;
-		static const int BlockBitShift = CompileTimeLog2Floor<BitsPerBlock>::value;
-		static const int NumBlocks = (((Size)+(BitsPerBlock - 1)) >> BlockBitShift);
+		static constexpr int BlockSize = sizeof(Type);
+		static constexpr int BitsPerBlock = BlockSize * 8;
+		static constexpr int BlockBitShift = CompileTimeLog2Floor<BitsPerBlock>::value;
+		static constexpr int NumBlocks = (((Size)+(BitsPerBlock - 1)) >> BlockBitShift);
 	public:
 		enum {
 			NUM_BITS = Size,
@@ -240,6 +259,20 @@ namespace rage {
 	typedef atFixedBitSet<8, u8> atFixedBitSet8;
 	typedef atFixedBitSet<16, u16> atFixedBitSet16;
 	typedef atFixedBitSet<32, u32> atFixedBitSet32;
+	class ConstStringBase {
+	public:
+		operator const char*() const {
+			return c_str();
+		}
+		const char* c_str() const {
+			return m_String;
+		}
+		const char* m_String;
+	};
+	class ConstString : public ConstStringBase {
+	public:
+
+	};
 	class atStringBuilder {
 	public:
 		const char* ToString() {
@@ -259,7 +292,15 @@ namespace rage {
 		u32 m_hash;
 	};
 	typedef atHashString atFinalHashString;
-	typedef const char* atString;
+	class atString {
+	public:
+		const char* c_str() const {
+			return m_Length ? m_Data : "";
+		}
+
+		char* m_Data;
+		u16 m_Length, m_Allocated;
+	};
 	template <typename DataT, typename CountT = u16>
 	class atArray {
 	public:
@@ -329,9 +370,224 @@ namespace rage {
 	private:
 		DataT m_Elements[MaxCount];
 	};
-	//PURPOSE
-	//  Embed within the target item a unique instance of inmap_node for each
-	//  inmap a target item will occupy.
+	inline u32 atHash(unsigned x) { return x; }
+	inline u32 atHash(const void *x) { return (u32)(u64)x; }
+	inline u32 atHash_const_char(const char* s) {
+		u32 h = 0, g;
+		if (!s)
+			return 0;
+		// stolen from data/hash, presumably whoever wrote
+		// this knew what they were doing.
+		while (*s) {
+			h = (h << 4) + (*s++);
+			if (((g = h & 0xf0000000)) != 0) {
+				h = h ^ (g >> 24);
+				h = h ^ g;
+			}
+		}
+		return h;
+	}
+	inline u32 atHash_const_charU(const char* s) {
+		u32 h = 0, g;
+		while (*s) {
+			char c = *s++;
+			if (c >= 'a' && c <= 'z')
+				c -= 0x20;
+			h = (h << 4) + c;
+			if (((g = h & 0xf0000000)) != 0) {
+				h = h ^ (g >> 24);
+				h = h ^ g;
+			}
+		}
+		return h;
+	}
+	inline u16 atHash16(const char* s) {
+		u32 hash = atHash_const_char(s);
+		u32 prime = 65167;
+		return u16((hash % prime) + (0xffff - prime));
+	}
+	inline u16 atHash16U(const char* s) {
+		u32 hash = atHash_const_charU(s);
+		u32 prime = 65167;
+		return u16((hash % prime) + (0xffff - prime));
+	}
+	inline u32 atHash64(u64 key) {
+		u32 h = 0, g;
+		u32 count = 8;
+		while (--count) {
+			char s = (char)key; // take the bottom 8 bits
+			key = key >> 8;
+
+			h = (h << 4) + s;
+			if (((g = h & 0xf0000000)) != 0) {
+				h = h ^ (g >> 24);
+				h = h ^ g;
+			}
+		}
+
+		return h;
+	}
+	template <typename T>
+	struct atMapHashFn {
+		u32 operator()(const T& key) const { return atHash(key); }
+	};
+	template <>
+	struct atMapHashFn<const char*> {
+		u32 operator ()(const char* key) const { return atHash_const_char(key); }
+	};
+	template <> struct atMapHashFn<atString> : public atMapHashFn<const char*> {};
+	template <> struct atMapHashFn<ConstString> : public atMapHashFn<const char*> {};
+	struct atMapCaseInsensitiveHashFn {
+		u32 operator ()(const char* key) const { return atHash_const_charU(key); }
+	};
+	template <>
+	struct atMapHashFn<u64> {
+		u32 operator ()(u64 key) const { return (atHash64(key)); }
+	};
+	template <typename _T>
+	struct atMapEquals {
+		bool operator ()(const _T& left, const _T& right) const { return left == right; }
+	};
+	template <>
+	struct atMapEquals<const char*> {
+		bool operator ()(const char* left, const char* right) const { return strcmp(left, right) == 0; }
+	};
+	template <> struct atMapEquals<atString> : public atMapEquals<const char*> {};
+	template <> struct atMapEquals<ConstString> : public atMapEquals<const char*> {};
+	template <>
+	struct atMapEquals<u64> {
+		bool operator ()(const u64 left, const u64 right) const { return (left == right); }
+	};
+	template <typename _Key, typename _Data>
+	struct atMapEntry {
+		atMapEntry(const _Key& k, atMapEntry* n) : key(k), data(), next(n) {}
+		atMapEntry(const _Key& k, const _Data& d, atMapEntry* n) : key(k), data(d), next(n) {}
+		_Key key;
+		_Data data;
+		atMapEntry* next;
+		typedef atMapEntry<_Key, _Data> _ThisType;
+
+		enum ePlaceNoneInitializer { PLACE_NONE };
+		enum ePlaceKeyInitializer { PLACE_KEY };
+		enum ePlaceDataInitializer { PLACE_DATA };
+		enum ePlaceKeyDataInitializer { PLACE_KEY_AND_DATA };
+	};
+	template <typename _Key, typename _Data>
+	class atMapMemory {
+		typedef atMapEntry<_Key, _Data> _EntryType;
+	public:
+		_EntryType* Allocate(const _Key& k, _EntryType* n) {
+			return rage_new _EntryType(k, n);
+		}
+		_EntryType* Allocate(const _Key& k, const _Data& d, _EntryType* n) {
+			return rage_new _EntryType(k, d, n);
+		}
+		void DeAllocate(_EntryType* ptr) {
+			delete ptr;
+		}
+		void AllocateHash(int slotCount, _EntryType**& hash) {
+			hash = rage_new _EntryType * [slotCount];
+		}
+		void DeAllocateHash(_EntryType** hash) {
+			delete[] hash;
+		}
+	};
+	struct atMapCaseInsensitiveEquals {
+		bool operator ()(const char* left, const char* right) const { return stricmp(left, right) == 0; }
+	};
+	template <class _Key,class _Data,class _Hash = atMapHashFn<_Key>,class _Equals = atMapEquals<_Key>, class _MemoryPolicy = atMapMemory< _Key, _Data> >
+	class atMap {
+	public:
+		typedef atMapEntry<_Key, _Data> Entry;
+		typedef _Key KeyType;
+		typedef _Data DataType;
+
+		int GetNumSlots() const { return m_Slots; }
+		int GetNumUsed() const { return m_Used; }
+		Entry* GetEntry(int i) { return m_Hash[i]; }
+		const Entry* GetEntry(int i) const { return m_Hash[i]; }
+
+		class Iterator {
+		private:
+			friend class atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>;
+			int hashpos;
+			Entry* n;
+			atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>* map;
+			Iterator(atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), n(0), map(&m) { Start(); }
+		public:
+			void Start() {
+				int localHashPos;
+				int slotCount = map->GetNumSlots();
+				for (localHashPos = 0; localHashPos < slotCount; localHashPos++) {
+					n = map->GetEntry(localHashPos);
+					if (n)
+						break;
+				}
+				hashpos = localHashPos;
+			}
+			void Next() {
+				if (AtEnd())
+					return;
+				n = n->next;
+				int localHashPos = hashpos;
+				const int numSlots = map->GetNumSlots();
+				while (!n && (localHashPos + 1) < numSlots) {
+					localHashPos++;
+					n = map->GetEntry(localHashPos);
+				}
+				hashpos = localHashPos;
+			}
+			bool AtEnd() const { return !n; }
+			_Key& GetKey() const { FastAssert(n); return n->key; }
+			_Data& GetData() const { FastAssert(n); return n->data; }
+			_Data* GetDataPtr() const { FastAssert(n); return &n->data; }
+			_Data& operator*() const { return GetData(); }
+			_Data* operator->() const { FastAssert(n); return &n->data; }
+			Iterator& operator++() { Next(); return *this; }
+			operator bool() const { return !AtEnd(); }
+		};
+
+		// PURPOSE: Class to encapsulate linear iteration through all inserted items in map, and to maintain const-only access to the items
+		class ConstIterator {
+		private:
+			friend class atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>;
+			int hashpos;
+			const Entry* cn;
+			const atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>* cmap;
+			ConstIterator(const atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), cn(0), cmap(&m) { Start(); }
+		public:
+			void Start() {
+				for (hashpos = 0; hashpos < cmap->GetNumSlots(); hashpos++) {
+					cn = cmap->GetEntry(hashpos);
+					if (cn) break;
+				}
+			}
+			void Next() {
+				if (AtEnd()) return;
+				cn = cn->next;
+				const int numSlots = cmap->GetNumSlots();
+				while (!cn && (hashpos + 1) < numSlots) {
+					hashpos++;
+					cn = cmap->GetEntry(hashpos);
+				}
+			}
+			bool AtEnd() const { return !cn; }
+			const _Key& GetKey() const { return cn->key; }
+			const _Data& GetData() const { return cn->data; }
+			const _Data* GetDataPtr() const { return &cn->data; }
+			const _Data& operator*() const { return GetData(); }
+			const _Data* operator->() const { return &cn->data; }
+			ConstIterator& operator ++ () { Next(); return *this; }
+			operator bool() const { return !AtEnd(); }
+		};
+		Entry** m_Hash; // Storage for toplevel hash array
+		u16 m_Slots; // Number of slots in toplevel hash
+		u16 m_Used; // Number of those slots currently in use
+		_Hash m_HashFn; // Hash functor
+		_Equals m_Equals; // Equality functor
+		_MemoryPolicy m_Memory;	 // Memory functor
+		u8 m_AllowReCompute; //Make sure we can't do dynamic memory allocation (good for resourced maps and general dynamic memory use removal)
+	};
 	template <typename K, typename T>
 	class inmap_node {
 	public:
@@ -404,20 +660,20 @@ namespace rage {
 		};
 		static TProxy right(T* t) { return TProxy((t->*NODE).m_right); }
 		//static T*& right( T* t ) { return ( t->*NODE ).m_right; }
-		//static const T* right( const T* t ) { return ( t->*NODE ).m_right; }
+		//static constexpr T* right( const T* t ) { return ( t->*NODE ).m_right; }
 		static T*& left(T* t) { return (t->*NODE).m_left; }
-		//static const T* left( const T* t ) { return ( t->*NODE ).m_left; }
+		//static constexpr T* left( const T* t ) { return ( t->*NODE ).m_left; }
 		static T*& parent(T* t) { return (t->*NODE).m_parent; }
-		//static const T* parent( const T* t ) { return ( t->*NODE ).m_parent; }
+		//static constexpr T* parent( const T* t ) { return ( t->*NODE ).m_parent; }
 		static T*& grandparent(T* t) { return parent(parent(t)); }
-		//static const T* grandparent( const T* t ) { return parent( parent( t ) ); }
+		//static constexpr T* grandparent( const T* t ) { return parent( parent( t ) ); }
 		static T*& uncle(T* t) {
 			T* p = parent(t);
 			T* gp = parent(p);
 			T* lu = left(gp);
 			return p == lu ? right(gp) : lu;
 		}
-		//static const T* uncle( const T* t ) { return uncle( const_cast< T* >( t ) ); }
+		//static constexpr T* uncle( const T* t ) { return uncle( const_cast< T* >( t ) ); }
 		static CProxy color(T* t) { return CProxy((t->*NODE).m_right); }
 		//static bool& color( T* t ) { return ( t->*NODE ).m_color; }
 		//static bool color( const T* t ) { return ( t->*NODE ).m_color; }
@@ -427,12 +683,12 @@ namespace rage {
 			for (T* l = left(t); l; t = l, l = left(t)) {}
 			return t;
 		}
-		static const T* minimum(const T* t) { return minimum(const_cast<T*>(t)); }
+		static constexpr T* minimum(const T* t) { return minimum(const_cast<T*>(t)); }
 		static T* maximum(T* t) {
 			for (T* r = right(t); r; t = r, r = right(t)) {}
 			return t;
 		}
-		static const T* maximum(const T* t) { return maximum(const_cast<T*>(t)); }
+		static constexpr T* maximum(const T* t) { return maximum(const_cast<T*>(t)); }
 		static T* predecessor(T* t) {
 			T* p = left(t);
 			if (p) {
@@ -448,7 +704,7 @@ namespace rage {
 			}
 			return p;
 		}
-		static const T* predecessor(const T* t) { return predecessor(const_cast<T*>(t)); }
+		static constexpr T* predecessor(const T* t) { return predecessor(const_cast<T*>(t)); }
 		static T* successor(T* t) {
 			T* s = right(t);
 			if (s) {
@@ -464,7 +720,7 @@ namespace rage {
 			}
 			return s;
 		}
-		static const T* successor(const T* t) { return successor(const_cast<T*>(t)); }
+		static constexpr T* successor(const T* t) { return successor(const_cast<T*>(t)); }
 		//PURPOSE
 		//  Template we'll use to create reverse_iterators from iterators
 		template <typename ITER>
@@ -2160,7 +2416,7 @@ namespace rage {
 		};
 		template <typename H, typename T, typename D, typename S, typename indexType, u32 maxSize>
 		class grcStateBlockStore {
-			static const u16 MaxRefCount = 65535;
+			static constexpr u16 MaxRefCount = 65535;
 		public:
 			grcStateBlockStore() {
 				FirstUsed = maxSize;
@@ -2526,7 +2782,7 @@ namespace rage {
 		void AddRef() const {
 			++refCount;
 		}
-		static const u32 c_MaxStreams = 4; // Really 16 under DX11...
+		static constexpr u32 c_MaxStreams = 4; // Really 16 under DX11...
 		int elementCount;
 		mutable int refCount;
 		u32 Stream0Size;
@@ -2663,7 +2919,7 @@ namespace rage {
 	inline static u8 s_StencilRefMask = 0xFF;
 	class grcEffect {
 	public:
-		static const int MAX_TECHNIQUE_GROUPS = 64;
+		static constexpr int MAX_TECHNIQUE_GROUPS = 64;
 		grcEffectTechnique LookupTechnique(const char* name) {
 			return LookupTechniqueByHash(atStringHash(name));
 		}
@@ -3253,7 +3509,7 @@ namespace rage {
 		bool IsInitialized() const { return m_Hash && m_Buckets; }
 		u32 GetCount() { return m_entries; }
 	private:
-		static const u32 NONE = 0xFFFFFFFF;
+		static constexpr u32 NONE = 0xFFFFFFFF;
 		struct Bucket { _KeyType hash; u32 value; u32 next; };
 		Bucket* m_Buckets;
 		u32* m_Hash;
@@ -3477,9 +3733,9 @@ namespace rage {
 		virtual void Init(u32 initMode) = 0;
 		virtual void Shutdown(u32 shutdownMode) = 0;
 		virtual void Update(u32 updateMode) = 0;
-		static const u32 DEFAULT_MAX_SYSTEMS_REGISTERED = 128;
-		static const u32 MAX_DEPENDENCY_LEVELS = 32;
-		static const u32 MAX_NESTED_UPDATE_GROUPS = 32;
+		static constexpr u32 DEFAULT_MAX_SYSTEMS_REGISTERED = 128;
+		static constexpr u32 MAX_DEPENDENCY_LEVELS = 32;
+		static constexpr u32 MAX_NESTED_UPDATE_GROUPS = 32;
 		struct systemData {
 			systemData() {}
 			bool InitialisesThisMode(u32 initMode) const { return ((m_InitTypes & initMode) != 0); }
@@ -3598,7 +3854,7 @@ namespace rage {
 			NETWORK,
 			MEMORY,
 		};
-		static const u32 HARDDRIVE_LSN = 0x40000000;
+		static constexpr u32 HARDDRIVE_LSN = 0x40000000;
 		virtual ~fiDevice() {}
 		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
 		virtual fiHandle OpenBulk(const char* filename, u64& outBias) const = 0;
@@ -3656,6 +3912,135 @@ namespace rage {
 		int m_Offset,	// offset into buffer of current position
 			m_Length,	// amount of info in buffer during read
 			m_Size;		// total size of the buffer
+	};
+	struct fiPackEntry {
+		bool IsDir() const { return m_FileOffset == FileOffset_IsDir; }
+		bool IsResource() const { return m_IsResource; }
+		bool IsFile() const { return !IsDir() && !IsResource(); }
+		bool IsCompressed() const { return m_ConsumedSize != 0; }
+		u32 GetConsumedSize() const { return m_ConsumedSize ? (u32)m_ConsumedSize : u.file.m_UncompressedSize; }
+		u32 GetUncompressedSize() const { return IsResource() ? u32(m_ConsumedSize) : u.file.m_UncompressedSize; }
+		u32 GetFileOffset() const { return u32(m_FileOffset) << FileOffset_Shift; }
+		void SetFileOffset(u32 offset) { m_FileOffset = offset >> FileOffset_Shift; }
+		int GetVersion() const { return IsResource() ? (int)u.resource.m_Info.GetVersion() : 0; }
+
+		static constexpr u64 FileOffset_IsDir = (1<<23)-1;
+		static constexpr int FileOffset_Shift = 9;
+		static constexpr u32 MaxConsumedSize = 0xFFFFFF;
+		u64 m_NameOffset : 16,
+			m_ConsumedSize : 24,
+			m_FileOffset : 23,
+			m_IsResource : 1;
+		union {
+			struct {
+				u32 m_UncompressedSize; // For files; file is compressed if m_ConsumedSize is nonzero.  Resources are always compressed.
+				u32 m_Encrypted; // Encryption key ID, or 0 if not encrypted. Only compressed files will be encrypted for now?
+			} file;
+			struct {
+				u32 m_DirectoryIndex; // For directories; first index in pack array of the directory
+				u32 m_DirectoryCount; // For directories; count of entries in the directory.
+			} directory;
+			struct {
+				datResourceInfo m_Info;
+			} resource;
+		} u;
+	};
+	class fiCollection : public fiDevice {
+	public:
+		fiCollection() : m_isStreaming(true) {}
+		virtual void Shutdown() {}
+		virtual fiHandle OpenBulkFromHandle(u32 handle,u64 &offset) const = 0;
+		virtual const fiPackEntry& GetEntryInfo(u32 handle) const = 0;
+		virtual u32 GetEntryPhysicalSortKey(u32 handle,bool uncached) const = 0;
+		virtual const char *GetEntryName(u32 handle) const = 0;
+		virtual const char *GetEntryFullName(u32 handle,char *dest,int destSize) const = 0;		// Slower
+		virtual int GetEntryIndex(const char *name) const = 0;
+		virtual u32 GetBasePhysicalSortKey() const = 0;
+		virtual bool Prefetch(u32 handle) const = 0;
+		virtual bool IsPackfile() const { return false; }
+		virtual bool IsStreaming() const { return m_isStreaming; }
+		virtual void SetStreaming(bool val) { m_isStreaming = val; }
+
+		bool m_isStreaming;
+		static constexpr u32 EntryMask = 0xFFFF;
+		static constexpr int ArchiveShift = 16;
+		static constexpr u32 ArchiveMask = 0xFFFF;
+	};
+	class fiPackfile : public fiCollection {
+	public:
+		virtual ~fiPackfile() {}
+		virtual void Shutdown() {}
+		virtual const fiPackEntry* FindEntry(const char* name) const { return nullptr; }
+		virtual fiHandle Open(const char* filename, bool readOnly) const { return nullptr; }
+		virtual fiHandle OpenDirect(const char* filename, bool readOnly) const { return nullptr; }
+		virtual fiHandle Create(const char* filename) const { return nullptr; }
+		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const { return NULL; }
+		virtual int Write(fiHandle handle, const void* buffer, int bufferSize) const { return NULL; }
+		virtual int Seek(fiHandle handle, int offset, fiSeekWhence whence) const { return NULL; }
+		virtual u64 Seek64(fiHandle handle, s64 offset, fiSeekWhence whence) const { return NULL; }
+		virtual int Size(fiHandle handle) const { return NULL; }
+		virtual u64 Size64(fiHandle handle) const { return NULL; }
+		virtual int Close(fiHandle handle) const { return NULL; }
+		virtual u64 GetFileSize(const char* filename) const { return NULL; }
+		virtual u64 GetFileTime(const char* filename) const { return NULL; }
+		virtual bool SetFileTime(const char* filename, u64 timestamp) const { return false; }
+		virtual u32 GetAttributes(const char* filename) const { return NULL; }
+		virtual fiHandle OpenBulk(const char* filename, u64& outBias) const { return nullptr; }
+		virtual int ReadBulk(fiHandle handle, u64 offset, void* outBuffer, int bufferSize) const { return NULL; }
+		virtual int CloseBulk(fiHandle handle) const { return NULL; }
+		virtual fiHandle FindFileBegin(const char* directoryName, fiFindData& outData) { return NULL; }
+		virtual bool FindFileNext(fiHandle handle, fiFindData& outData) { return NULL; }
+		virtual int FindFileEnd(fiHandle handle) { return NULL; }
+		virtual int GetResourceInfo(const char* name, datResourceInfo& outHeader) { return NULL; }
+		virtual u64 GetBulkOffset(const char* name) { return NULL; }
+		virtual u32 GetPhysicalSortKey(const char* pName) { return NULL; }
+		virtual u32 GetPackfileIndex() const { return m_SelfIndex; }
+		virtual u32 GetEncryptionKey() const { return m_KeyId; }
+		virtual const fiPackEntry& GetEntryInfo(u32 handle) = 0;
+		virtual fiHandle OpenBulkFromHandle(u32 handle, u64& offset) { return NULL; }
+		virtual u32 GetEntryPhysicalSortKey(u32 handle, bool) { return NULL; }
+		virtual const char* GetEntryName(u32 handle) { return ""; }
+		virtual const char* GetEntryFullName(u32 handle, char* dest, int destSize) { return ""; }
+		virtual u32 GetBasePhysicalSortKey() { return NULL; }
+		virtual int GetEntryIndex(const char* name) { return NULL; }
+		virtual bool IsRpf() { return false; }
+		virtual const char* GetDebugName() { return ""; }
+		virtual bool Prefetch(u32) const { return true; }
+		virtual bool IsPackfile() const { return true; }
+		virtual RootDeviceId GetRootDeviceId(const char* /*name*/) const {
+			if (m_ForceOnOdd)
+				return OPTICAL;
+			return m_Device->GetRootDeviceId(m_Fullname.c_str());
+		}
+		typedef u16 ParentIndexType;
+		char* m_NameHeap; // Nameheap for all filenames in the zipfile.
+		ParentIndexType* m_ParentIndices;
+		fiPackEntry* m_Entries; // Master entry table; entry 0 is the root directory
+		u32 m_EntryCount;
+		fiHandle m_Handle; // (bulk) handle on the device of the zipfile itself
+		u64 m_FileTime; // File time of the zipfile itself
+		u64 m_ArchiveBias; // For nested zipfiles (sigh)
+		u64 m_ArchiveSize;
+		const fiDevice* m_Device; // Device the zipfile itself lives on
+		int m_RelativeOffset; // Amount of incoming pathname to strip off
+		char m_Name[32]; // Debug name
+		atString m_Fullname;
+		bool m_IsXCompressed;
+		bool m_IsByteSwapped;
+		u16 m_SelfIndex;
+		u32 m_SortKey; // sort key used to define position on a DVD
+		const void* m_pDrmKey; // Drmkey used to decode drm content (ps3 only?)
+		char* m_MemoryBuffer; // Buffer to put packfile into if caching in memory
+		bool m_IsRpf;
+		bool m_IsCached;
+		bool m_IsInstalled;
+		bool m_IsUserHeader; // If true, the user provided the memory for the header data and is responsible for its clean-up.
+		u32 m_CachedMetaDataSize; // Cached meta data size, only valid after having called Init/ReInit() at least once.
+		u32 m_CachedDataSize; // Cached size for the header (including both the initial header as well as all entries).
+		u32 m_KeyId; // Encryption key ID
+		u8 m_NameShift;
+		bool m_ForceOnOdd;
+		bool m_KeepNameHeap; // Should we persist the name heap? i.e., don't delete on UnInit()/Shutdown(), etc.
 	};
 }
 //ioXXXXXXX
@@ -4257,7 +4642,7 @@ namespace rage {
 	};
 	class netTimeout {
 	public:
-		static const u32 DEFAULT_LONG_FRAME_THRESHOLD_MS = (3 * 1000);
+		static constexpr u32 DEFAULT_LONG_FRAME_THRESHOLD_MS = (3 * 1000);
 		u32 m_CurTime;
 		u32 m_LongFrameThresholdMs;
 		int m_Timeout;
@@ -4272,7 +4657,7 @@ namespace rage {
 	};
 	class netHttpRequest {
 	public:
-		static const u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH  = 1044;
+		static constexpr u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH  = 1044;
 		enum TransferEncoding {
 			TRANSFER_ENCODING_NORMAL,
 			TRANSFER_ENCODING_CHUNKED,
@@ -4390,8 +4775,8 @@ namespace rage {
 	};
 	class Sha1 {
 	public:
-		static const u8 SHA1_DIGEST_LENGTH = 20; // 160-bit digest
-		static const u8 SHA1_BLOCK_LENGTH = 64;	// 512-bit block
+		static constexpr u8 SHA1_DIGEST_LENGTH = 20; // 160-bit digest
+		static constexpr u8 SHA1_BLOCK_LENGTH = 64;	// 512-bit block
 		struct SHA1_CTX {
 			u32 state[5];
 			u64 count;
@@ -4494,8 +4879,8 @@ namespace rage {
 		RLROS_NUM_PRIVILEGEID  
 	};
 	struct rlRosCredentials {
-		static const u32 SESSION_KEY_SIZE = 32;
-		static const u32 CLOUD_KEY_SIZE = 32;
+		static constexpr u32 SESSION_KEY_SIZE = 32;
+		static constexpr u32 CLOUD_KEY_SIZE = 32;
 		typedef EncryptionKey<SESSION_KEY_SIZE> SessionKey;
 		typedef EncryptionKey<CLOUD_KEY_SIZE> CloudKey;
 		struct PrivilegeInfo {
@@ -4665,8 +5050,8 @@ namespace rage {
 	};
 	class rlHttpTask : public rlTaskBase {
 	public:
-		static const int MAX_MULTIPART_BOUNDARY_LENGTH = 32;
-		static const int MAX_MULTIPART_BOUNDARY_BUF_SIZE = MAX_MULTIPART_BOUNDARY_LENGTH + 1;
+		static constexpr int MAX_MULTIPART_BOUNDARY_LENGTH = 32;
+		static constexpr int MAX_MULTIPART_BOUNDARY_BUF_SIZE = MAX_MULTIPART_BOUNDARY_LENGTH + 1;
 		RL_TASK_DECL(rlHttpTask);
 		RL_TASK_USE_CHANNEL(rline_http);
 		virtual ~rlHttpTask() = default;
@@ -4791,7 +5176,7 @@ namespace rage {
 	#define MAX_CALLSTACK 16
 	class scrThread {
 	public:
-		enum { c_DefaultStackSize = 512 }; // Static const causes missing symbol under gcc 4.1.1 debug builds.
+		enum { c_DefaultStackSize = 512 }; // static constexpr causes missing symbol under gcc 4.1.1 debug builds.
 		// Presume it's something to do with its use as a default parameter.
 		enum { c_NativeInsnLength = 4 }; // Length of OP_NATIVE insn in case caller needs PC of *next* insn.
 		enum State { RUNNING, BLOCKED, ABORTED, HALTED };
@@ -4865,11 +5250,75 @@ namespace rage {
 		char m_ScriptName[64];
 	};
 	typedef void(*scrCmd)(scrThread::Info*);
+	const int MAX_LEGIT_OPS = (11*1024*1024); //	Used as the size of the atFixedArray called Program in rage\script\tools\scriptcompiler\node.h
+
+	// These configure the size of each opcode page
+	static constexpr u32 scrPageShift = 14;
+	static constexpr u32 scrPageSize = (1 << scrPageShift);
+	static constexpr u32 scrPageMask = (scrPageSize - 1);
+
+	// These configure the size of each string page.
+	static constexpr u32 scrStringShift = 14;
+	static constexpr u32 scrStringSize = (1 << scrStringShift);
+	static constexpr u32 scrStringMask = (scrStringSize - 1);
+
+	// These configure the size of each globals page, in multiples of sizeof(scrValue).  This is used to prevent globals from requiring an absurdly large memory block just long enough to (re)load.
+	static constexpr u32 scrGlobalsPageShift = 14;
+	static constexpr u32 scrGlobalsPageSize = (1 << scrGlobalsPageShift);
+	static constexpr u32 scrGlobalsPageMask = (scrGlobalsPageSize - 1);
+
+	class scrProgram : public pgBase {
+		friend class scrThread;
+	public:
+		static const int RORC_VERSION = 12;
+
+		enum {
+			MAX_GLOBAL_BLOCKS_SHIFT = (24 - 6),
+			MAX_GLOBAL_BLOCKS = (64),
+			GLOBAL_SIZE_MASK = ((1 << (MAX_GLOBAL_BLOCKS_SHIFT)) - 1)
+		};
+
+		u8** Table; // +8 (zero if compiled)
+		u32 GlobalsHash; // +12
+		u32 OpcodeSize;	// +16
+		u32 ArgStructSize; // +20
+		u32 StaticSize;	// +24
+		u32 GlobalSizeAndBlock;// +28 - upper bits are the globals block index
+		u32 NativeSize; // +32
+		scrValue* Statics; // +36
+		scrValue** GlobalsTable; // +40 (zero if compiled, globals cannot be declared in a compiled script)
+		u64* Natives; // +44 (if compiled, really a script function pointer)
+		u32 ProcCount; // +48 (zero if compiled)
+		const char** ProcNames; // +52 (zero if compiled)
+		u32 HashCode; // +56
+		u32 RefCount; // +60
+		ConstString ScriptName; // +64
+		const char** StringHeaps; // +68 (zero if compiled)
+		u32 StringHeapSize; // +72 (zero if compiled)
+		atMap<s32, bool>* m_programBreakpoints; // +76 (zero if compiled)
+
+		u8* GetCode(u32 index) {
+			if (index < OpcodeSize) {
+				return &Table[index >> scrPageShift][index & scrPageMask];
+			}
+			return nullptr;
+		}
+		const scrValue* GetStatics() const { return Statics; }
+		int GetStaticSize() const { return StaticSize; }
+		int GetStringHeapSize() const { return StringHeapSize; }
+		u32 GetHashCode() const { return HashCode; }
+		u32 GetNativeSize() const { return NativeSize; }
+		const u64* GetNatives() const { return Natives; }
+		u32 GetStringHeapCount() const { return (StringHeapSize + scrStringMask) >> scrStringShift; }
+		u32 GetStringHeapChunkSize(u32 i) { return i == GetStringHeapCount() - 1 ? StringHeapSize - (i << scrStringShift) : scrStringSize; }
+		u32 GetGlobalsPageCount() const { return ((GlobalSizeAndBlock & GLOBAL_SIZE_MASK) + scrGlobalsPageMask) >> scrGlobalsPageShift; }
+		u32 GetGlobalsPageChunkSize(u32 i) { return i == GetGlobalsPageCount() - 1 ? (GlobalSizeAndBlock & GLOBAL_SIZE_MASK) - (i << scrGlobalsPageShift) : scrGlobalsPageSize; }
+	};
 	template <typename T>
 	class scrCommandHash {
 	private:
-		static const int ToplevelSize = 256;	// Must be power of two
-		static const int PerBucket = 7;
+		static constexpr int ToplevelSize = 256; // Must be power of two
+		static constexpr int PerBucket = 7;
 		struct Bucket {
 			sysObfuscated<Bucket*, false> obf_Next;
 			T Data[PerBucket];

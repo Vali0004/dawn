@@ -74,7 +74,7 @@ void routine()
 	if (g_was_injected_early)
 	{
 		std::this_thread::sleep_for(1000ms);
-		//std::thread(&game_speedup).detach();
+		//cs::util::spawn_detached_thread(&game_speedup);
 	}
 
 	cs::pointers::g_GetProcAddress = &GetProcAddress;
@@ -95,7 +95,7 @@ void routine()
 
 	cs::hooking::create();
 
-	std::thread(&game_death).detach();
+	cs::util::spawn_detached_thread(&game_death);
 
 	if (!IsDebuggerPresent())
 	{
@@ -130,7 +130,7 @@ void routine()
 DWORD WINAPI entry(void* hmod)
 {
 	g_entry = reinterpret_cast<HMODULE>(hmod);
-	std::thread(&routine).detach();
+	cs::util::spawn_detached_thread(&routine);
 
 	while (g_running)
 	{}

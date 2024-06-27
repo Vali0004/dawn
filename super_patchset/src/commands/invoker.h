@@ -24,12 +24,6 @@ namespace rage
 	{
 		arg[argCount++] = *reinterpret_cast<scrValue*>(&value);
 	}
-	template <>
-	void SetArg<scrVector>(scrValue* arg, u64& argCount, scrVector value) {
-		SetArg(arg, argCount, value.x);
-		SetArg(arg, argCount, value.y);
-		SetArg(arg, argCount, value.z);
-	}
 
 	template <typename T, typename ...Args>
 	inline T Invoke(u64 hash, Args&&... args)

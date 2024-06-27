@@ -9,10 +9,7 @@ namespace cs::pointers
 	inline types::CLoadingScreensSetLoadingContextT g_CLoadingScreensSetLoadingContext{};
 	inline types::CLoadingScreensSetMovieContextT g_CLoadingScreensSetMovieContext{};
 	inline types::CLoadingScreensShutdownT g_CLoadingScreensShutdown{};
-	inline types::grcStateBlockCreateRasterizerStateT g_grcStateBlockCreateRasterizerState{};
-	inline types::grcStateBlockDestroyRasterizerStateT g_grcStateBlockDestroyRasterizerState{};
-	inline types::grcStateBlockSetRasterizerStateT g_grcStateBlockSetRasterizerState{};
-	inline types::grcStateBlockFlushRasterizerStateT g_grcStateBlockFlushRasterizerState{};
+	inline types::scrThreadRunT g_scrThreadRun{};
 	inline types::RgscRetailLogRgscRetailMsgT g_RgscRetailLogRgscRetailMsg{};
 	inline types::RgscInitT g_RgscInit{};
 	inline types::rlHttpTaskBuildUrlT g_rlHttpTaskBuildUrl{};
@@ -31,6 +28,7 @@ namespace cs::pointers
 	inline types::AESTransformITDecryptT g_AESTransformITDecrypt{};
 	inline types::AESDecryptT g_AESDecrypt{};
 	inline types::AESisTransformITKeyT g_AESisTransformITKey{};
+	inline types::fiPackfileReInitT g_fiPackfileReInit{};
 	inline types::CommandShouldWarnOfSimpleModCheckT g_CommandShouldWarnOfSimpleModCheck{};
 	inline types::GetProcAddressT g_GetProcAddress{};
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
@@ -39,7 +37,6 @@ namespace cs::pointers
 	inline CExtraContentManager** g_CExtraContentManagersmInstance{};
 	inline rage::grcSwapChain** g_pSwapChain{};
 	inline u32* g_sysObfRandNext{};
-	inline u8* g_StateblockDirty{};
 	inline rage::gameSkeleton* g_gameSkeleton{};
 	inline rage::scrCommandHash<rage::scrCmd>* g_sCommandHash{};
 	inline rage::atArray<rage::scrThread*>* g_smThreads{};
@@ -166,17 +163,15 @@ namespace cs::pointers
 	inline void late_scan()
 	{
 		memory::pointer_manager ptr_mgr{};
+		ptr_mgr.add("rage::scrThread::Run", g_scrThreadRun, "48 8B C4 4C 89 40 ? 48 89 50 ? 48 89 48 ? 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 4D 8B F9");
 		ptr_mgr.add("CExtraContentManager::LoadContent", g_CExtraContentManagerLoadContent, "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B F9 48 8D 4D");
 		ptr_mgr.add("CExtraContentManager::EndEnumerateContent", g_CExtraContentManagerEndEnumerateContent, "48 89 5C 24 ? 57 48 83 EC ? 80 A1 ? ? ? ? ? 41 8A D8");
 		ptr_mgr.add("CExtraContentManager::AddContentFolder", g_CExtraContentManagerAddContentFolder, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B F9 48 8B DA");
 		ptr_mgr.add("rage::AES::TransformITDecrypt", g_AESTransformITDecrypt, "E8 ? ? ? ? 41 8B D4 44 39 63 28 76 3F 41 B9", "call");
 		ptr_mgr.add("rage::AES::Decrypt", g_AESDecrypt, "E8 ? ? ? ? 8B 55 F8 48 8B 43 10 48 03 D0 48 8B CB 48 89 53 18 66 44 89 22 33 D2 E8", "call");
 		ptr_mgr.add("rage::AES::isTransformITKey", g_AESisTransformITKey, "E8 ? ? ? ? 48 8B 53 20 44 8B C7 41 8B CE E8", "call");
+		ptr_mgr.add("rage::fiPackfile::ReInit", g_fiPackfileReInit, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 4C 89 60 ? 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B D9");
 		ptr_mgr.add("CommandShouldWarnOfSimpleModCheck", g_CommandShouldWarnOfSimpleModCheck, "40 53 48 83 EC 30 48 8B 1D ? ? ? ? BA");
-		ptr_mgr.add("rage::grcStateBlock::CreateRasterizerState", g_grcStateBlockCreateRasterizerState, "48 8B C4 55 48 8D 68 ? 48 81 EC ? ? ? ? F3 0F 10 01");
-		ptr_mgr.add("rage::grcStateBlock::DestroyRasterizerState", g_grcStateBlockDestroyRasterizerState, "E8 ? ? ? ? F3 0F 10 4B ? F3 0F 10 03", "call");
-		//ptr_mgr.add("rage::grcStateBlock::SetRasterizerState", g_grcStateBlockSetRasterizerState, "39 0D ? ? ? ? 74 ? 80 0D");
-		//ptr_mgr.add("rage::grcStateBlock::FlushRasterizerState", g_grcStateBlockFlushRasterizerState, "40 53 48 83 EC ? 65 48 8B 14 25 ? ? ? ? 8B 05 ? ? ? ? 48 63 D9");
 		
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");
 		ptr_mgr.add("rage::s_CommandHash", g_sCommandHash, "48 8D 0D ? ? ? ? 48 8B 14 FA", "qword");
@@ -185,7 +180,6 @@ namespace cs::pointers
 		ptr_mgr.add("CNetworkAssetVerifier::sm_Instance", g_CNetworkAssetVerifiersmInstance, "48 8B 0D ? ? ? ? E8 ? ? ? ? B1", "qword");
 		ptr_mgr.add("rage::grcDevice::sm_pSwapChain", g_pSwapChain, "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", "qword");
 		ptr_mgr.add("rage::sysObfuscatedTypes::obfRand::next", g_sysObfRandNext, "8B 0D ? ? ? ? BA ? ? ? ? 69 C9", "dword");
-		ptr_mgr.add("rage::grcStateBlock::Stateblock_Dirty", g_StateblockDirty, "8A 05 ? ? ? ? EB ? 8A 05 ? ? ? ? 89 0D", "dword");
 		ptr_mgr.add("CExtraContentManager::sm_Instance", g_CExtraContentManagersmInstance, "48 8B 1D ? ? ? ? 8B F9 83 F9", "qword");
 		ptr_mgr.add("rage::rlTitleId::g_rlTitleId", g_rlTitleId, "48 8B 0D ? ? ? ? 48 8B D8 E8 ? ? ? ? 41", "qword");
 		trigger_scan(ptr_mgr);

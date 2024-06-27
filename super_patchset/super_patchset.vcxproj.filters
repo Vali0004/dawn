@@ -140,6 +140,7 @@
     <ClInclude Include="src\commands\types.h" />
     <ClInclude Include="src\commands\cmd_util.h" />
     <ClInclude Include="src\util.h" />
+    <ClInclude Include="src\features\features.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

@@ -4,35 +4,6 @@
 
 namespace cs::renderer
 {
-	inline rage::grcStateBlock::grcRasterizerStateHandle RS_WireFrame{};
-	inline rage::grcStateBlock::grcRasterizerStateDesc DefaultRasterizerStateBlockDesc{};
-	inline bool WireframeOverride{};
-
-	inline void CreateHandles()
-	{
-		DefaultRasterizerStateBlockDesc.CullMode = rage::grcRSV::CULL_BACK;
-		DefaultRasterizerStateBlockDesc.FillMode = rage::grcRSV::FILL_WIREFRAME;
-		RS_WireFrame = pointers::g_grcStateBlockCreateRasterizerState(&DefaultRasterizerStateBlockDesc, NULL);
-		LOG_TO_STREAM("RasterizerState WireFrame: " << HEX((u64)RS_WireFrame));
-	}
-	inline void DestroyHandles()
-	{
-		if (RS_WireFrame)
-		{
-			pointers::g_grcStateBlockDestroyRasterizerState(RS_WireFrame);
-		}
-	}
-	inline bool SetWireframeOverride(bool enable)
-	{
-		bool prev = WireframeOverride;
-		WireframeOverride = enable;
-		if (prev != WireframeOverride)
-		{
-			*pointers::g_StateblockDirty |= rage::grcStateBlock::RASTERIZER_STATE_DIRTY;
-		}
-		return prev;
-	}
-
 	class renderer;
 	inline std::unique_ptr<renderer> g_renderer{};
 
@@ -62,12 +33,10 @@ namespace cs::renderer
 			ImGui_ImplWin32_Init(pointers::g_hwnd);
 
 			menu::init();
-			CreateHandles();
 		}
 
 		void destroy()
 		{
-			DestroyHandles();
 			SetWindowLongPtrA(pointers::g_hwnd, GWLP_WNDPROC, LONG_PTR(m_wndproc));
 
 			ImGui_ImplDX11_Shutdown();
@@ -104,6 +73,7 @@ namespace cs::renderer
 
 			ImGui::NewFrame();
 			callbacks::run();
+			//menu::tick();
 			if (gui::is_open())
 			{
 				menu::render();

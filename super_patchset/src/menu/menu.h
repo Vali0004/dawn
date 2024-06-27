@@ -5,6 +5,7 @@
 #include "commands/list.h"
 #include "commands/cmd_util.h"
 #include "util.h"
+#include "features/features.h"
 
 inline void print_sc_data()
 {
@@ -61,7 +62,6 @@ inline void print_sc_data()
 }
 namespace cs::renderer
 {
-	extern bool SetWireframeOverride(bool enable);
 	namespace gui
 	{
 		inline bool g_open{};
@@ -165,14 +165,11 @@ namespace cs::renderer
 		int g_current_player{};
 		namespace main
 		{
-			inline void render_dummy()
+			inline void render_self()
 			{
-				tab_bar("dummy_bar", [] {
-					tab_item("Dummy", [] {
-						text("This is a dummy menu!"); same_line();
-						//font("arialbd.ttf", [] {
-							text("Please choose a different tab.");
-						//});
+				tab_bar("self_bar", [] {
+					tab_item("Movement", [] {
+						checkbox("No Clip", features::g_features.m_no_clip.m_toggle);
 					});
 				});
 			}
@@ -201,33 +198,28 @@ namespace cs::renderer
 				tab_bar("settings_bar", [] {
 					tab_item("Command tests", [] {
 						button("Spawn a adder", [] {
-							rage::run_as_thread("main_persistent"_j, [] {
-								u32 hash{ "adder"_j };
-
-								for (int i{}; i != 200 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
-								{
-									STREAMING::REQUEST_MODEL(hash);
-								}
-
-								if (!STREAMING::HAS_MODEL_LOADED(hash))
+							u32 hash{ "adder"_j };
+							rage::run_as_thread_detached(NETWORK::NETWORK_IS_IN_SESSION() ? "freemode"_j : "main_persistent"_j, [hash] {
+								if (!util::gta::request_model(hash))
 								{
 									LOG_TO_STREAM("Model failed to load.");
 								}
-
-								Ped ped{ PLAYER::PLAYER_PED_ID() };
-								scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
-								LOG_TO_STREAM(std::format("Entity coords: X{}, Y{}, Z{}", pos.x, pos.y, pos.z));
-								Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
-								LOG_TO_STREAM(std::format("Vehicle ID: {}", vehicle));
-
-								if (NETWORK::NETWORK_IS_SESSION_STARTED())
+								else
 								{
-									DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+									Ped ped{ PLAYER::PLAYER_PED_ID() };
+									rage::scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
+									Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
+
+									if (NETWORK::NETWORK_IS_SESSION_STARTED())
+									{
+										DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+									}
+
+									PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+
+									STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
 								}
-
-								PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
-
-								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+								std::this_thread::sleep_for(100ms);
 							});
 						});
 					});
@@ -241,12 +233,6 @@ namespace cs::renderer
 								pointers::g_CLoadingScreensSetMovieContext(LOADINGSCREEN_SCALEFORM_CTX_BLANK);
 								pointers::g_CLoadingScreensShutdown(0);
 							});
-						});
-						button("Enable WireFrame test", [] {
-							SetWireframeOverride(true);
-						});
-						button("Disable WireFrame test", [] {
-							SetWireframeOverride(false);
 						});
 						button("Print SocialClub data", [] {
 							print_sc_data();
@@ -268,7 +254,7 @@ namespace cs::renderer
 							{
 								LOG_TO_STREAM("Passed.");
 							}
-							pointers::g_CExtraContentManagerEndEnumerateContent(content_mgr, false, false);
+							pointers::g_CExtraContentManagerLoadContent(content_mgr, false, false);
 						});
 					});
 					tab_item("Console", [] {
@@ -291,21 +277,21 @@ namespace cs::renderer
 							g_console->close_handles(true);
 						});
 					});
+					tab_button("Exit game", [] {
+						exit(0);
+						abort();
+					});
+					tab_button("Unload", [] {
+						g_running = false;
+					});
 				});
 			}
 
 			inline void render_bar()
 			{
-				tab_item("Dummy", &render_dummy);
+				tab_item("Self", &render_self);
 				tab_item("Network", &render_network);
 				tab_item("Settings", &render_settings);
-				tab_button("Exit game", [] {
-					exit(0);
-					abort();
-				});
-				tab_button("Unload", [] {
-					g_running = false;
-				});
 			}
 
 			inline void render()
@@ -316,10 +302,26 @@ namespace cs::renderer
 			}
 		}
 
+		inline void tick()
+		{
+			/*if (!util::gta::in_loading_screen())
+			{
+				rage::run_as_thread("main_persistent"_j, [] {
+
+					features::on_tick();
+				});
+			}
+			else
+			{
+				features::on_tick();
+			}*/
+			features::on_tick();
+		}
+
 		inline void render()
 		{
 			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
-			set_next_window({ 50.f, 50.f, 650.f-15.f, 410.f }, ImGuiCond_Once);
+			set_next_window({ 50.f, 50.f, 650.f - 15.f, 410.f }, ImGuiCond_Once);
 			main::render();
 		}
 	}

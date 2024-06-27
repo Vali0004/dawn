@@ -13,11 +13,14 @@
 #define LOG_FILE(prefix, ...) \
 	LOG_TO_FILE(std::format(#prefix " | " __VA_ARGS__));
 
-namespace cs {
+namespace cs
+{
 	inline HANDLE g_handle{};
 	inline HWND g_console_hwnd{};
 	inline PROCESS_INFORMATION g_proc_info{};
-	inline void open_remote_console() {
+
+	inline void open_remote_console()
+	{
 		stdfs::path p{};
 		p = p.append(std::getenv("appdata")).append(BASE_NAME).append("ConsoleHost.exe");
 		STARTUPINFOA start_info{ sizeof(STARTUPINFOA) };
@@ -26,37 +29,50 @@ namespace cs {
 			return;
 		}
 	}
-	inline bool make_remote_console() {
+
+	inline bool make_remote_console()
+	{
 		open_remote_console();
 		g_handle = CreateFileA("\\\\.\\pipe\\consolePipe", GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		g_console_hwnd = FindWindowA(NULL, "ConsoleHost");
-		if (!g_console_hwnd || g_handle == INVALID_HANDLE_VALUE) {
+		if (!g_console_hwnd || g_handle == INVALID_HANDLE_VALUE)
+		{
 			return false;
 		}
 		return true;
 	}
-	inline void destroy_remote_console() {
-		if (g_proc_info.hProcess != INVALID_HANDLE_VALUE) {
+
+	inline void destroy_remote_console()
+	{
+		if (g_proc_info.hProcess != INVALID_HANDLE_VALUE)
+		{
 			CloseHandle(g_proc_info.hProcess);
 			CloseHandle(g_proc_info.hThread);
 		}
-		if (g_handle != INVALID_HANDLE_VALUE) {
+		if (g_handle != INVALID_HANDLE_VALUE)
+		{
 			CloseHandle(g_handle);
 		}
 	}
-	inline void reconnect_to_remote_console() {
+	inline void reconnect_to_remote_console()
+	{
 		destroy_remote_console();
 		make_remote_console();
 	}
+
 	inline class konsole* g_console{};
-	class konsole {
+	class konsole
+	{
 	public:
-		void init_wapi(bool remote_console) {
+		void init_wapi(bool remote_console)
+		{
 			set_remote_console(remote_console);
-			if (remote_console) {
+			if (remote_console)
+			{
 				m_remote_console = make_remote_console();
 			}
-			if (!m_remote_console) {
+			if (!m_remote_console)
+			{
 				if (!AttachConsole(ATTACH_PARENT_PROCESS))
 					AllocConsole();
 				SetConsoleCP(CP_UTF8);
@@ -69,221 +85,289 @@ namespace cs {
 				freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 			}
 		}
-		void init_cout() {
-			if (!m_remote_console) {
+		void init_cout()
+		{
+			if (!m_remote_console)
+			{
 				m_cout.open("CONOUT$");
 			}
 		}
-		void init_filestream(const std::string& file_out) {
+		void init_filestream(const std::string& file_out)
+		{
 			stdfs::path path(stdfs::path().append(std::getenv("appdata")).append(BASE_NAME));
-			if (!stdfs::exists(path)) {
+
+			if (!stdfs::exists(path))
+			{
 				stdfs::create_directories(path);
 			}
+
 			m_filestream.open((path).append(file_out), std::ios_base::out);
 		}
-		void close_handles(bool preseve_file = false) {
-			if (m_remote_console) {
+
+		void close_handles(bool preseve_file = false)
+		{
+			if (m_remote_console)
+			{
 				destroy_remote_console();
 			}
-			else {
+			else
+			{
 				fclose(stdin);
 				fclose(stdout);
 				m_cout.close();
 				FreeConsole();
 			}
-			if (!preseve_file && m_filestream.is_open()) {
+
+			if (!preseve_file && m_filestream.is_open())
+			{
 				m_filestream.close();
 			}
 		}
-		void set_remote_console(bool v) { m_remote_console = v; }
-		~konsole() {
+
+		void set_remote_console(bool v)
+		{
+			m_remote_console = v;
+		}
+
+		~konsole()
+		{
 			close_handles();
 			g_console = nullptr;
 			delete reinterpret_cast<konsole*>(g_console);
 		}
-		konsole(bool remote_console) {
+
+		konsole(bool remote_console)
+		{
 			g_console = this;
 			init_wapi(remote_console);
 			init_cout();
 		}
-		konsole(const std::string& file_out, bool remote_console) : konsole(remote_console) {
+		konsole(const std::string& file_out, bool remote_console) : konsole(remote_console)
+		{
 			init_filestream(file_out);
 		}
-		HANDLE get_handle() {
+
+		HANDLE get_handle()
+		{
 			return GetStdHandle(STD_OUTPUT_HANDLE);
 		}
-		void set_console_title(const std::string& title) {
+
+		void set_console_title(const std::string& title)
+		{
 			m_title = title;
-			if (!m_remote_console) {
+			if (!m_remote_console)
+			{
 				SetConsoleTitleA(title.c_str());
 			}
-			else {
+			else
+			{
 				SetWindowTextA(g_console_hwnd, title.c_str());
 			}
 		}
-		void set_text(u16 color) {
-			if (!m_remote_console) {
+
+		void set_text(u16 color)
+		{
+			if (!m_remote_console)
+			{
 				SetConsoleTextAttribute(get_handle(), color);
 			}
 		}
-		void send_text_to_handle(std::string str) {
-			if (!m_remote_console) {
+
+		void send_text_to_handle(std::string str)
+		{
+			if (!m_remote_console)
+			{
 				m_cout << str;
 			}
-			else {
+			else
+			{
 				ul32 bytes_written{};
 				WriteFile(g_handle, str.c_str(), static_cast<ul32>(str.length()), &bytes_written, nullptr);
 			}
 		}
-		void log_to_stream_console(std::string str) {
-			if (m_operators.uppercase) {
+
+		void log_to_stream_console(std::string str)
+		{
+			if (m_operators.uppercase)
+			{
 				std::transform(str.cbegin(), str.cend(), str.begin(), &toupper);
 			}
-			if (m_operators.hex) {
+
+			if (m_operators.hex)
+			{
 				m_operators.hex = false;
 			}
+
 			send_text_to_handle(str);
 		}
-		void log_to_stream_int(s64 v) {
+		template <typename T>
+		void log_to_stream_int(T v)
+		{
 			std::string str{};
-			if (m_operators.hex) {
-				if (m_operators.uppercase) {
+			if (m_operators.hex)
+			{
+				if (m_operators.uppercase)
+				{
 					str = std::format("{:X}", v);
 				}
-				else {
+				else
+				{
 					str = std::format("{:x}", v);
 				}
 				m_operators.hex = false;
 			}
-			else {
+			else
+			{
 				str = std::format("{}", v);
 			}
+
 			send_text_to_handle(str);
-			if (m_filestream.is_open()) {
+
+			if (m_filestream.is_open())
+			{
 				m_filestream << str;
 			}
 		}
-		void log_to_stream_uint(u64 v) {
-			std::string str{};
-			if (m_operators.hex) {
-				if (m_operators.uppercase) {
-					str = std::format("{:X}", v);
-				}
-				else {
-					str = std::format("{:x}", v);
-				}
-				m_operators.hex = false;
-			}
-			else {
-				str = std::format("{}", v);
-			}
-			send_text_to_handle(str);
-			if (m_filestream.is_open()) {
+		void log_to_stream_file(std::string str)
+		{
+			if (m_filestream.is_open())
+			{
 				m_filestream << str;
 			}
 		}
-		void log_to_stream_file(std::string str) {
-			if (m_filestream.is_open()) {
-				m_filestream << str;
-			}
-		}
-		void log_to_stream(std::string str) {
+		void log_to_stream(std::string str)
+		{
 			log_to_stream_console(str);
 			log_to_stream_file(str);
 		}
-		static void create(konsole* handle, const std::string& title, const std::string& file_out, bool remote_console = true) {
+
+		static void create(konsole* handle, const std::string& title, const std::string& file_out, bool remote_console = true)
+		{
 			konsole* out{ new konsole(file_out, remote_console) };
 			out->set_console_title(title);
 			handle = out;
 		}
-		static void destroy(konsole* handle) {
+
+		static void destroy(konsole* handle)
+		{
 			handle->~konsole();
 		}
+
 		// STD parity
-		void flush() {
-			if (!m_remote_console) {
+		void flush()
+		{
+			if (!m_remote_console)
+			{
 				m_cout.flush();
 			}
 		}
 	public:
-		struct {
+		struct
+		{
 			bool hex{}, uppercase{};
-		} m_operators;
+		} m_operators{};
 		std::string m_title{};
 	private:
 		bool m_remote_console{};
 		std::ofstream m_cout{};
 		std::ofstream m_filestream{};
 	};
-	inline konsole& endl(konsole& output) {
+
+	inline konsole& endl(konsole& output)
+	{
 		output.log_to_stream("\n");
 		output.flush();
 		return output;
 	}
 }
-inline cs::konsole& operator<<(cs::konsole& output, std::ios_base&(*manip)(std::ios_base&)) {
-	if (manip == std::uppercase) {
+inline cs::konsole& operator<<(cs::konsole& output, std::ios_base&(*manip)(std::ios_base&))
+{
+	if (manip == std::uppercase)
+	{
 		output.m_operators.uppercase = true;
-	} else if (manip == std::nouppercase) {
+	}
+	else if (manip == std::nouppercase)
+	{
 		output.m_operators.uppercase = false;
-	} else if (manip == std::hex) {
+	}
+	else if (manip == std::hex)
+	{
 		output.m_operators.hex = true;
-	} else if (manip == std::dec) {
+	}
+	else if (manip == std::dec)
+	{
 		output.m_operators = {};
 	}
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, cs::konsole&(*manip)(cs::konsole&)) {
+inline cs::konsole& operator<<(cs::konsole& output, cs::konsole&(*manip)(cs::konsole&))
+{
 	return (*manip)(output);
 }
 template <typename T>
-inline cs::konsole& operator<<(cs::konsole& output, T numerial) {
-	if (std::is_same_v<T, u64>) { output.log_to_stream_uint(u64(numerial)); }
-	else if (std::is_same_v<T, s64>) { output.log_to_stream_int(s64(numerial)); }
-	else if (std::is_same_v<T, u32>) { output.log_to_stream_uint(u32(numerial)); }
-	else if (std::is_same_v<T, s32>) { output.log_to_stream_int(s32(numerial)); }
-	else if (std::is_same_v<T, u16>) { output.log_to_stream_uint(u16(numerial)); }
-	else if (std::is_same_v<T, s16>) { output.log_to_stream_int(s16(numerial)); }
-	else if (std::is_same_v<T, u8>) { output.log_to_stream_uint(u8(numerial)); }
-	else if (std::is_same_v<T, s8>) { output.log_to_stream_int(s8(numerial)); }
+inline cs::konsole& operator<<(cs::konsole& output, T numerial)
+{
+	if (std::is_arithmetic_v<T>)
+	{
+		output.log_to_stream_int<T>(numerial);
+	}
+
 	return output << std::nouppercase;
 }
-inline cs::konsole& operator<<(cs::konsole& output, f64 numerial) {
+inline cs::konsole& operator<<(cs::konsole& output, f64 numerial)
+{
 	output.log_to_stream(std::format("{}", numerial));
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, f32 numerial) {
+inline cs::konsole& operator<<(cs::konsole& output, f32 numerial)
+{
 	output.log_to_stream(std::format("{}", numerial));
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, const char* str) {
+inline cs::konsole& operator<<(cs::konsole& output, const char* str)
+{
 	output.log_to_stream(str);
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, char* str) {
+inline cs::konsole& operator<<(cs::konsole& output, char* str)
+{
 	output.log_to_stream(str);
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, const std::string& str) {
+inline cs::konsole& operator<<(cs::konsole& output, const std::string& str)
+{
 	output.log_to_stream(str);
 	return output;
 }
-inline cs::konsole& operator<<(cs::konsole& output, const std::string_view& str) {
+inline cs::konsole& operator<<(cs::konsole& output, const std::string_view& str)
+{
 	output.log_to_stream(str.data());
 	return output;
 }
-struct color {
-	color(u8 r, u8 g, u8 b, bool bg = false) : r(r), g(g), b(b), bg(bg) {}
+struct color
+{
+	color(u8 r, u8 g, u8 b, bool bg = false) :
+		r(r),
+		g(g),
+		b(b),
+		bg(bg)
+	{}
 	color() {}
+
 	u8 r{}, g{}, b{};
 	bool bg{};
 };
-inline cs::konsole& operator<<(cs::konsole& output, color color) {
+
+inline cs::konsole& operator<<(cs::konsole& output, color color)
+{
 	output.log_to_stream_console(std::format("\x1b[{};2;{};{};{}m", color.bg ? 48 : 38, color.r, color.g, color.b));
 	return output;
 }
-namespace cs::ansi {
-	inline konsole& reset(konsole& output) {
+
+namespace cs::ansi
+{
+	inline konsole& reset(konsole& output)
+	{
 		output.log_to_stream_console("\x1b[0m");
 		return output;
 	}

@@ -10,6 +10,50 @@
 
 namespace cs::hooking
 {
+	inline bool g_run_script_patches{ true };
+	inline void patch_opcodes(rage::scrProgram* pt, rage::scrThread::Serialized* ser, const u32 scriptHash, const std::string& ptr, const u32 offset, const std::vector<std::optional<u8>>& patch)
+	{
+		if (ser->m_Prog == scriptHash)
+		{
+			std::vector<std::optional<u8>> bytes{ memory::get_bytes_from_ida_mem_signature(ptr) };
+
+			for (u32 i{}; i != pt->OpcodeSize - bytes.size(); i++)
+			{
+				if (u8* codeAddr{ pt->GetCode(i) })
+				{
+					if (memory::does_memory_match(codeAddr, bytes.data(), bytes.size()))
+					{
+						u32 ip{ i + offset };
+						memcpy(pt->GetCode(ip), patch.data(), patch.size());
+					}
+				}
+			}
+		}
+	}
+
+	inline etc::hook<pointers::types::scrThreadRunT>* g_scrThreadRun{};
+	inline rage::scrThread::State scrThreadRun(rage::scrValue* stack, rage::scrValue* globals, rage::scrProgram* pt, rage::scrThread::Serialized* ser)
+	{
+		if (ser->m_Prog == "valentinerpreward2"_j)
+		{
+			return ser->m_State = rage::scrThread::ABORTED;
+		}
+
+		if (g_run_script_patches)
+		{
+			// Patch invalid vehicle. This check is for if a vehicle is a DLC vehicle, and we are able to load it in story mode.
+			//patch_opcodes(pt, ser, "shop_controller"_j, "2D 01 04 00 00 2C ? ? ? 56 ? ? 71", 5, { 0x71, 0x2E, 0x01, 0x01 });
+			g_run_script_patches = false;
+		}
+
+		if (ser->m_Prog == "freemode"_j || ser->m_Prog == "main_persistent"_j)
+		{
+			renderer::menu::tick();
+		}
+
+		return g_scrThreadRun->original()(stack, globals, pt, ser);
+	}
+
 	inline etc::hook<pointers::types::CommandShouldWarnOfSimpleModCheckT>* g_CommandShouldWarnOfSimpleModCheck{};
 	inline bool CommandShouldWarnOfSimpleModCheck()
 	{
@@ -24,27 +68,31 @@ namespace cs::hooking
 		return g_rlProfileStatsFlushTaskConfigure->original()(task, ctx, flushIt, status);
 	}
 
-	inline etc::hook<pointers::types::grcStateBlockFlushRasterizerStateT>* g_grcStateBlockFlushRasterizerState{};
-	inline void grcStateBlockFlushRasterizerState(rage::grcStateBlock::grcRasterizerStateHandle newState)
+	inline etc::hook<pointers::types::fiPackfileReInitT>* g_fiPackfileReInit{};
+	inline bool fiPackfileReInit(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)
 	{
-		rage::grcStateBlock::grcRasterizerStateHandle newStateBackup = newState;
-
-		if (renderer::WireframeOverride)
+		bool result = g_fiPackfileReInit->original()(_This, filename, readNameHeap, headerData);
+		if (result)
 		{
-			LOG_TO_STREAM("Wireframe override, set newState to WireFrame");
-			newState = renderer::RS_WireFrame;
+			for (int i{}; i != _This->m_EntryCount; ++i) 
+			{
+				rage::fiPackEntry& entry = _This->m_Entries[i];
+				if (entry.IsFile() && entry.m_NameOffset > 0 && entry.u.file.m_Encrypted)
+				{
+					if (g_keyId == 0x4E45504F)
+					{
+						entry.u.file.m_Encrypted = 0xFEFFFFF;
+					}
+				}
+			}
+			LOG_TO_STREAM("KeyID: " << HEX(_This->m_KeyId));
+			if (g_keyId == 0x4E45504F)
+			{
+				//_This->m_CachedDataSize = 0xFEFFFFF;
+				//_This->m_KeyId = 0xFEFFFFF;
+			}
 		}
-
-		g_grcStateBlockFlushRasterizerState->original()(newState);
-
-		//if (renderer::WireframeOverride)
-		//{
-			//LOG_TO_STREAM("Wireframe override, set state");
-			// Trickry to mimick what the Debug build does to achieve wireframe
-			//pointers::g_grcStateBlockSetRasterizerState(newState);
-			// We don't want it to actually set it, we just want RS_Active to be newState.
-			//*pointers::g_StateblockDirty &= ~rage::grcStateBlock::RASTERIZER_STATE_DIRTY;
-		//}
+		return result;
 	}
 
 	inline bool g_early_hook{};
@@ -123,18 +171,19 @@ namespace cs::hooking
 
 		make_hook_vtbl(grcSwapChain, *pointers::g_pSwapChain, 19,
 		{
-			LOG_TO_STREAM("Hooking SwapChain");
 			_this->set_func(8, grcSwapChainPresent);
 			_this->set_func(13, grcSwapChainResizeBuffers);
 		});
 
-		//std::this_thread::sleep_for(5s);
+		make_hook("scrThread::Run", scrThreadRun);
+
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);
 
+		//make_hook("AES::isTransformITKey", AESisTransformITKey);
 		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
 		//make_hook("AES::Decrypt", AESDecrypt);
+		//make_hook("fiPackfile::ReInit", fiPackfileReInit);
 
-		make_hook("grcStateBlock::FlushRasterizerState", grcStateBlockFlushRasterizerState);
 		etc::persist_mh::apply_queued();
 
 		make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 3,
