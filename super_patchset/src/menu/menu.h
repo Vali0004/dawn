@@ -199,7 +199,7 @@ namespace cs::renderer
 					tab_item("Command tests", [] {
 						button("Spawn a adder", [] {
 							u32 hash{ "adder"_j };
-							rage::run_as_thread_detached(NETWORK::NETWORK_IS_IN_SESSION() ? "freemode"_j : "main_persistent"_j, [hash] {
+							rage::run_as_thread_detached("main_persistent"_j, [hash] {
 								if (!util::gta::request_model(hash))
 								{
 									LOG_TO_STREAM("Model failed to load.");
