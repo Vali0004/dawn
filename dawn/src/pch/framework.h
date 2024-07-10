@@ -47,14 +47,6 @@
 #include <io.h>
 #include <regex>
 #include <xmmintrin.h>
-//ImGui Includes
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "imgui/backends/imgui_impl_dx11.h"
-#include "imgui/backends/imgui_impl_win32.h"
-//ImGui Defines
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // Namespace Defines
 using namespace std::chrono;
 using namespace std::chrono_literals;

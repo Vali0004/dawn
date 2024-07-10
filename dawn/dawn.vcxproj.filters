@@ -18,16 +18,10 @@
     </ClCompile>
     <ClCompile Include="src\pch\pch.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\imgui\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="src\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="src\common\data\base64.cpp" />
     <ClCompile Include="src\common\data\rson.cpp" />
     <ClCompile Include="src\simdjson\simdjson.cpp" />
+    <ClCompile Include="src\renderer\batch\batch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\data\bitbuffer.h">
@@ -102,25 +96,14 @@
     <ClInclude Include="src\rgsc\public_interface\tasks_interface.h" />
     <ClInclude Include="src\rgsc\public_interface\telemetry_interface.h" />
     <ClInclude Include="src\rgsc\public_interface\titleid_interface.h" />
-    <ClInclude Include="src\imgui\imconfig.h" />
-    <ClInclude Include="src\imgui\imgui.h" />
-    <ClInclude Include="src\imgui\imgui_internal.h" />
-    <ClInclude Include="src\imgui\imstb_rectpack.h" />
-    <ClInclude Include="src\imgui\imstb_textedit.h" />
-    <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\imgui\backends\imgui_impl_dx11.h" />
-    <ClInclude Include="src\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="src\common\vectors.h" />
     <ClInclude Include="src\exception_handler\amd64_disassembler.h" />
     <ClInclude Include="src\common\data\base64.h" />
     <ClInclude Include="src\common\data\macros.h" />
     <ClInclude Include="src\common\data\rson.h" />
-    <ClInclude Include="src\hooking\renderer.h" />
     <ClInclude Include="src\build_number.h" />
     <ClInclude Include="src\commands\crossmap.h" />
     <ClInclude Include="src\menu\menu.h" />
-    <ClInclude Include="src\menu\fonts.h" />
-    <ClInclude Include="src\menu\elements.h" />
     <ClInclude Include="src\hooking\hooks\helpers\ragesec.h" />
     <ClInclude Include="src\hooking\hooks\helpers\http_hk_util.h" />
     <ClInclude Include="src\hooking\hooks\game_skeleton.h" />
@@ -144,6 +127,32 @@
     <ClInclude Include="src\command_engine\abstract.h" />
     <ClInclude Include="src\command_engine\types.h" />
     <ClInclude Include="src\command_engine\manager.h" />
+    <ClInclude Include="src\renderer\batch\batch.h" />
+    <ClInclude Include="src\renderer\d3d\blend_state.h" />
+    <ClInclude Include="src\renderer\d3d\blob.h" />
+    <ClInclude Include="src\renderer\d3d\buffer.h" />
+    <ClInclude Include="src\renderer\d3d\context.h" />
+    <ClInclude Include="src\renderer\d3d\depth_stencil_state.h" />
+    <ClInclude Include="src\renderer\d3d\device.h" />
+    <ClInclude Include="src\renderer\d3d\input_layout.h" />
+    <ClInclude Include="src\renderer\d3d\pixel_shader.h" />
+    <ClInclude Include="src\renderer\d3d\rasterizer_state.h" />
+    <ClInclude Include="src\renderer\d3d\sampler_state.h" />
+    <ClInclude Include="src\renderer\d3d\shader_resource_view.h" />
+    <ClInclude Include="src\renderer\d3d\target_view.h" />
+    <ClInclude Include="src\renderer\d3d\texture_2d.h" />
+    <ClInclude Include="src\renderer\d3d\vertex_shader.h" />
+    <ClInclude Include="src\renderer\dxgi\swapchain.h" />
+    <ClInclude Include="src\renderer\shaders\vertex.h" />
+    <ClInclude Include="src\renderer\stb\stb_image.h" />
+    <ClInclude Include="src\renderer\stb\stb_rect_pack.h" />
+    <ClInclude Include="src\renderer\stb\stb_truetype.h" />
+    <ClInclude Include="src\renderer\color.h" />
+    <ClInclude Include="src\renderer\com_ptr.h" />
+    <ClInclude Include="src\renderer\font.h" />
+    <ClInclude Include="src\renderer\renderer.h" />
+    <ClInclude Include="src\renderer\state_saver.h" />
+    <ClInclude Include="src\renderer\vectors.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">
@@ -155,5 +164,9 @@
     <Filter Include="minhook\hde">
       <UniqueIdentifier>{3bdedeae-6a8e-4b34-9e9f-541d549d3796}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\renderer\shaders\pixel_shader.fx" />
+    <FxCompile Include="src\renderer\shaders\vertex_shader.fx" />
   </ItemGroup>
 </Project>

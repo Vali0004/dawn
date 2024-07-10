@@ -50,17 +50,20 @@ enum LoadingScreenContext : std::uint32_t
 	LOADINGSCREEN_CONTEXT_LAST_FRAME				// Use the last rendered frame as a background with a spinner as a loading screen
 };
 // Quick and diry WSSL ctx impl
-typedef struct DerBuffer {
+typedef struct DerBuffer
+{
 	u8* buffer;
 	void* heap;
 	u32 length;
 	int type, dynType;
 } DerBuffer;
-struct WOLFSSL_CTX {
+struct WOLFSSL_CTX
+{
 	void* method;
 	CRITICAL_SECTION countMtx;
 	int refCount, err;
-	struct buffer {
+	struct buffer
+	{
 		u8* buffer;
 		u32 length;
 	} serverDH_P, serverDH_G;
@@ -75,16 +78,19 @@ struct WOLFSSL_CTX {
 typedef WOLFSSL_CTX SSL_CTX;
 // R* stubs, yes, these exist and they're engine accurate
 struct tagRGNDATA;
-namespace rgsc {
-	class Rgsc {
+namespace rgsc
+{
+	class Rgsc
+	{
 	public:
-		IRgscDelegate *m_Delegate;
-		IRgscDelegateV1 *m_DelegateV1;
-		IRgscDelegateV2 *m_DelegateV2;
-		IRgscDelegateV3 *m_DelegateV3;
-		IFileDelegate *m_FileDelegate;
+		IRgscDelegate* m_Delegate;
+		IRgscDelegateV1* m_DelegateV1;
+		IRgscDelegateV2* m_DelegateV2;
+		IRgscDelegateV3* m_DelegateV3;
+		IFileDelegate* m_FileDelegate;
 		TitleId m_TitleId;
-		bool* IsUiEnabled() {
+		bool* IsUiEnabled()
+		{
 			return reinterpret_cast<bool*>(reinterpret_cast<u64>(this) + 0xDB913);
 		}
 	};
@@ -92,7 +98,8 @@ namespace rgsc {
 }
 //diagXXXXXX
 namespace rage {
-	enum diagSeverity {
+	enum diagSeverity
+	{
 		DIAG_SEVERITY_FATAL,
 		DIAG_SEVERITY_ASSERT,
 		DIAG_SEVERITY_ERROR,
@@ -103,14 +110,16 @@ namespace rage {
 		DIAG_SEVERITY_DEBUG3,
 		DIAG_SEVERITY_COUNT
 	};
-	enum diagChannelPosix {
+	enum diagChannelPosix
+	{
 		CHANNEL_POSIX_UNSPECIFIED = 0,	// use default (off) or inherit parent
 		CHANNEL_POSIX_OFF,				// expressly off
 		CHANNEL_POSIX_ON,				// expressly on
 	};
-	class diagChannel {
+	class diagChannel
+	{
 	public:
-		diagChannel(diagChannel *parent,const char *tag,const char *paramTag,diagSeverity fileLevel = DIAG_SEVERITY_DEBUG1,diagSeverity ttyLevel = DIAG_SEVERITY_DISPLAY,diagSeverity popupLevel = DIAG_SEVERITY_ASSERT,diagChannelPosix posixPrefix = CHANNEL_POSIX_UNSPECIFIED);
+		diagChannel(diagChannel* parent, const char* tag, const char* paramTag, diagSeverity fileLevel = DIAG_SEVERITY_DEBUG1, diagSeverity ttyLevel = DIAG_SEVERITY_DISPLAY, diagSeverity popupLevel = DIAG_SEVERITY_ASSERT, diagChannelPosix posixPrefix = CHANNEL_POSIX_UNSPECIFIED);
 		diagChannel() = default;
 		u8 FileLevel, TtyLevel, PopupLevel, MaxLevel;
 		u8 ParentCount; // Number of parents (could easily be u8)
@@ -118,8 +127,8 @@ namespace rage {
 		u8 OriginalTtyLevel; //stores the original tty severity level when setting an override
 		diagChannelPosix PosixPrefix;
 	private:
-		diagChannel *Parent;
-		diagChannel *Next;
+		diagChannel* Parent;
+		diagChannel* Next;
 	};
 }
 //datXXXXXXX
@@ -128,29 +137,54 @@ namespace rage {
 	const u64 g_rscPhysicalLeafSize_WIN32 = 8192;
 	const u64 g_rscVirtualLeafSize = g_rscVirtualLeafSize_WIN32;
 	const u64 g_rscPhysicalLeafSize = g_rscPhysicalLeafSize_WIN32;
-	struct datResourceInfo {
-		struct Sizes {
+	struct datResourceInfo
+	{
+		struct Sizes
+		{
 			u32 LeafShift : 4;
 			u32 Head16Count : 1, Head8Count : 2, Head4Count : 4, Head2Count : 6;
 			u32 BaseCount : 7;
 			u32 HasTail2 : 1, HasTail4 : 1, HasTail8 : 1, HasTail16 : 1;
 			u32 Version : 4;
-			u32 GetCount() const {
+			u32 GetCount() const
+			{
 				return Head16Count + Head8Count + Head4Count + Head2Count + BaseCount + HasTail2 + HasTail4 + HasTail8 + HasTail16;
 			}
-			u32 GetSize(u32 leafSize) const {
+			u32 GetSize(u32 leafSize) const
+			{
 				leafSize <<= LeafShift;
 				return (((Head16Count << 4) + (Head8Count << 3) + (Head4Count << 2) + (Head2Count << 1) + BaseCount) * leafSize)
 					+ (HasTail2 ? (leafSize >> 1) : 0) + (HasTail4 ? (leafSize >> 2) : 0) + (HasTail8 ? (leafSize >> 3) : 0) + (HasTail16 ? (leafSize >> 4) : 0);
 			}
 		};
-		u64 GetVirtualSize() const { return Virtual.GetSize(g_rscVirtualLeafSize); }
-		u64 GetPhysicalSize() const { return Physical.GetSize(g_rscPhysicalLeafSize); }
-		u64 GetVirtualChunkSize() const { return g_rscVirtualLeafSize << Virtual.LeafShift; }
-		u64 GetPhysicalChunkSize() const { return g_rscPhysicalLeafSize << Physical.LeafShift; }
-		u64 GetVirtualChunkCount() const { return Virtual.GetCount(); }
-		u64 GetPhysicalChunkCount() const { return Physical.GetCount(); }
-		int GetVersion() const { return (Virtual.Version << 4) | (Physical.Version); }
+		u64 GetVirtualSize() const
+		{
+			return Virtual.GetSize(g_rscVirtualLeafSize);
+		}
+		u64 GetPhysicalSize() const
+		{
+			return Physical.GetSize(g_rscPhysicalLeafSize);
+		}
+		u64 GetVirtualChunkSize() const
+		{
+			return g_rscVirtualLeafSize << Virtual.LeafShift;
+		}
+		u64 GetPhysicalChunkSize() const
+		{
+			return g_rscPhysicalLeafSize << Physical.LeafShift;
+		}
+		u64 GetVirtualChunkCount() const
+		{
+			return Virtual.GetCount();
+		}
+		u64 GetPhysicalChunkCount() const
+		{
+			return Physical.GetCount();
+		}
+		int GetVersion() const
+		{
+			return (Virtual.Version << 4) | (Physical.Version);
+		}
 		Sizes Virtual;
 		Sizes Physical;
 	};
@@ -899,32 +933,42 @@ namespace rage {
 		};
 	}; //struct inmap_detail
 	template <typename K, typename T, inmap_node<K, T> T::*NODE, typename P>
-	class inmap_base {
+	class inmap_base
+	{
 		typedef inmap_base<K, T, NODE, P> MapType;
 		typedef inmap_detail<K, T, NODE> detail;
 	public:
-		enum { ALLOW_DUP_KEYS = P::ALLOW_DUP_KEYS };
+		enum
+		{
+			ALLOW_DUP_KEYS = P::ALLOW_DUP_KEYS
+		};
 		class const_iterator;
-		class iterator {
+		class iterator
+		{
 			friend class inmap_base<K, T, NODE, P>;
 			friend class const_iterator;
-			bool before_begin() const {
+			bool before_begin() const
+			{
 				const u64 one = 0x1;
 				return (((u64)m_map) & ~one) && (((u64)m_map) & one);
 			}
-			void set_before_begin() {
+			void set_before_begin()
+			{
 				const u64 one = 0x1;
 				m_map = (MapType*)(((u64)m_map) | one);
 			}
-			void clear_before_begin() {
+			void clear_before_begin()
+			{
 				const u64 one = 0x1;
 				m_map = (MapType*)(((u64)m_map) & ~one);
 			}
-			MapType* map() {
+			MapType* map()
+			{
 				const u64 one = 0x1;
 				return (MapType*)(((u64)m_map) & ~one);
 			}
-			MapType* map() const {
+			MapType* map() const
+			{
 				const u64 one = 0x1;
 				return (MapType*)(((u64)m_map) & ~one);
 			}
@@ -937,99 +981,127 @@ namespace rage {
 			//Can't make this a true reference - the intrusive nature
 			//of the list prevents us from changing the value of a contained item.
 			typedef value_type reference;
-			iterator() : m_map(0) {
+			iterator() : m_map(0)
+			{
 				m_Value.second = 0;
 			}
-			iterator operator++() {
-				if (m_Value.second) {
+			iterator operator++()
+			{
+				if (m_Value.second)
+				{
 					m_Value.second = detail::successor(m_Value.second);
 				}
-				else if (this->before_begin()) {
+				else if (this->before_begin())
+				{
 					//We're one before begin - go to begin
 					this->clear_before_begin();
 					m_Value.second = detail::minimum(m_map->m_root);
 				}
-				if (m_Value.second) {
+				if (m_Value.second)
+				{
 					m_Value.first = detail::key(m_Value.second);
 				}
 				return *this;
 			}
-			iterator operator--() {
-				if (m_Value.second) {
+			iterator operator--()
+			{
+				if (m_Value.second)
+				{
 					m_Value.second = detail::predecessor(m_Value.second);
-					if (!m_Value.second) {
+					if (!m_Value.second)
+					{
 						//Went past begin.
 						this->set_before_begin();
 					}
 				}
-				else if (m_map && !this->before_begin()) {
+				else if (m_map && !this->before_begin())
+				{
 					//We're at the end - go to one before the end
 					m_Value.second = detail::maximum(m_map->m_root);
 				}
-				if (m_Value.second) {
+				if (m_Value.second)
+				{
 					m_Value.first = detail::key(m_Value.second);
 				}
 				return *this;
 			}
-			iterator operator++(const int) {
+			iterator operator++(const int)
+			{
 				iterator tmp = *this;
 				++* this;
 				return tmp;
 			}
-			iterator operator--(const int) {
+			iterator operator--(const int)
+			{
 				iterator tmp = *this;
 				--* this;
 				return tmp;
 			}
-			pointer operator->() {
+			pointer operator->()
+			{
 				return &m_Value;
 			}
-			const_pointer operator->() const {
+			const_pointer operator->() const
+			{
 				return &m_Value;
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				return m_Value;
 			}
-			bool operator==(const iterator& rhs) const {
+			bool operator==(const iterator& rhs) const
+			{
 				return rhs.m_Value.second == m_Value.second;
 			}
-			bool operator!=(const iterator& rhs) const {
+			bool operator!=(const iterator& rhs) const
+			{
 				return rhs.m_Value.second != m_Value.second;
 			}
-			bool operator==(const const_iterator& rhs) const {
+			bool operator==(const const_iterator& rhs) const
+			{
 				return rhs == *this;
 			}
-			bool operator!=(const const_iterator& rhs) const {
+			bool operator!=(const const_iterator& rhs) const
+			{
 				return rhs != *this;
 			}
 		private:
-			iterator(T* t, MapType* m) : m_map(m) {
-				if (t) {
+			iterator(T* t, MapType* m) : m_map(m)
+			{
+				if (t)
+				{
 					m_Value.first = detail::key(t);
 					m_Value.second = t;
 				}
-				else {
+				else
+				{
 					m_Value.second = 0;
 				}
 			}
 			value_type m_Value;
 			MapType* m_map;
 		};
-		class const_iterator {
+		class const_iterator
+		{
 			friend class inmap_base<K, T, NODE, P>;
-			bool before_begin() const {
+			bool before_begin() const
+			{
 				return (((u64)m_map) & ~0x01u) && (((u64)m_map) & 0x01u);
 			}
-			void set_before_begin() {
+			void set_before_begin()
+			{
 				m_map = (MapType*)(((u64)m_map) | 0x01u);
 			}
-			void clear_before_begin() {
+			void clear_before_begin()
+			{
 				m_map = (MapType*)(((u64)m_map) & ~0x01u);
 			}
-			MapType* map() {
+			MapType* map()
+			{
 				return (MapType*)(((u64)m_map) & ~0x01u);
 			}
-			MapType* map() const {
+			MapType* map() const
+			{
 				return (MapType*)(((u64)m_map) & ~0x01u);
 			}
 		public:
@@ -1042,77 +1114,98 @@ namespace rage {
 			//of the list prevents us from changing the value of a contained item.
 			typedef value_type reference;
 			const_iterator()
-				: m_map(0) {
+				: m_map(0)
+			{
 				m_Value.second = 0;
 			}
 			const_iterator(const iterator& it)
-				: m_map(it.m_map) {
+				: m_map(it.m_map)
+			{
 				this->m_Value.first = it.m_Value.first;
 				this->m_Value.second = it.m_Value.second;
 			}
-			const_iterator operator++() {
-				if (m_Value.second) {
+			const_iterator operator++()
+			{
+				if (m_Value.second)
+				{
 					m_Value.second = detail::successor(m_Value.second);
 				}
-				else if (this->before_begin()) {
+				else if (this->before_begin())
+				{
 					//We're one before begin - go to begin
 					this->clear_before_begin();
 					m_Value.second = detail::minimum(m_map->m_root);
 				}
-				if (m_Value.second) {
+				if (m_Value.second)
+				{
 					m_Value.first = detail::key(m_Value.second);
 				}
 				return *this;
 			}
-			const_iterator operator--() {
-				if (m_Value.second) {
+			const_iterator operator--()
+			{
+				if (m_Value.second)
+				{
 					m_Value.second = detail::predecessor(m_Value.second);
-					if (!m_Value.second) {
+					if (!m_Value.second)
+					{
 						//Went past begin.
 						this->set_before_begin();
 					}
 				}
-				else if (m_map && !this->before_begin()) {
+				else if (m_map && !this->before_begin())
+				{
 					//We're at the end - go to one before the end
 					m_Value.second = detail::maximum(m_map->m_root);
 				}
-				if (m_Value.second) {
+				if (m_Value.second)
+				{
 					m_Value.first = detail::key(m_Value.second);
 				}
 				return *this;
 			}
-			const_iterator operator++(const int) {
+			const_iterator operator++(const int)
+			{
 				const_iterator tmp = *this;
 				++* this;
 				return tmp;
 			}
-			const_iterator operator--(const int) {
+			const_iterator operator--(const int)
+			{
 				const_iterator tmp = *this;
 				--* this;
 				return tmp;
 			}
-			pointer operator->() {
+			pointer operator->()
+			{
 				return &m_Value;
 			}
-			const_pointer operator->() const {
+			const_pointer operator->() const
+			{
 				return &m_Value;
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				return m_Value;
 			}
-			bool operator==(const const_iterator& rhs) const {
+			bool operator==(const const_iterator& rhs) const
+			{
 				return rhs.m_Value.second == m_Value.second;
 			}
-			bool operator!=(const const_iterator& rhs) const {
+			bool operator!=(const const_iterator& rhs) const
+			{
 				return rhs.m_Value.second != m_Value.second;
 			}
 		private:
-			const_iterator(T* t, const MapType* m) : m_map(m) {
-				if (t) {
+			const_iterator(T* t, const MapType* m) : m_map(m)
+			{
+				if (t)
+				{
 					m_Value.first = detail::key(t);
 					m_Value.second = t;
 				}
-				else {
+				else
+				{
 					m_Value.second = 0;
 				}
 			}
@@ -1131,8 +1224,10 @@ namespace rage {
 		typedef u64 u64ype;
 		typedef ptrdiff_t difference_type;
 		typedef typename P::Predicate key_compare;
-		struct value_compare {
-			bool operator()(const value_type& v0, const value_type& v1) {
+		struct value_compare
+		{
+			bool operator()(const value_type& v0, const value_type& v1)
+			{
 				P pred;
 				return pred(v0.first, v1.first);
 			}
@@ -1140,83 +1235,107 @@ namespace rage {
 		inmap_base()
 			: m_root(0), m_size(0)
 		{}
-		iterator begin() {
+		iterator begin()
+		{
 			return iterator(m_root ? minimum(m_root) : 0, this);
 		}
-		const_iterator begin() const {
+		const_iterator begin() const
+		{
 			return const_iterator(m_root ? minimum(m_root) : 0, this);
 		}
-		iterator end() {
+		iterator end()
+		{
 			return iterator(0, this);
 		}
-		const_iterator end() const {
+		const_iterator end() const
+		{
 			return const_iterator(0, this);
 		}
-		reverse_iterator rbegin() {
+		reverse_iterator rbegin()
+		{
 			return reverse_iterator(this->end());
 		}
-		const_reverse_iterator rbegin() const {
+		const_reverse_iterator rbegin() const
+		{
 			return const_reverse_iterator(this->end());
 		}
-		reverse_iterator rend() {
+		reverse_iterator rend()
+		{
 			return reverse_iterator(this->begin());
 		}
-		const_reverse_iterator rend() const {
+		const_reverse_iterator rend() const
+		{
 			return const_reverse_iterator(this->begin());
 		}
-		void clear() {
-			while (!this->empty()) {
+		void clear()
+		{
+			while (!this->empty())
+			{
 				this->erase(this->begin());
 			}
 		}
-		u64ype count(const K& key) const {
+		u64ype count(const K& key) const
+		{
 			const_iterator it = this->find(key);
 			const_iterator stop = this->end();
 			int n = 0;
-			for (; stop != it && key == it->first; ++it) {
+			for (; stop != it && key == it->first; ++it)
+			{
 				++n;
 			}
 			return n;
 		}
-		bool empty() const {
+		bool empty() const
+		{
 			return !m_size;
 		}
-		std::pair<iterator, bool> insert(const value_type& item) {
+		std::pair<iterator, bool> insert(const value_type& item)
+		{
 			return this->insert(item.first, item.second);
 		}
-		std::pair<iterator, bool> insert(const K& k, T* item) {
+		std::pair<iterator, bool> insert(const K& k, T* item)
+		{
 			T* n = 0;
-			if (!m_root) {
+			if (!m_root)
+			{
 				n = m_root = item;
 			}
-			else {
+			else
+			{
 				T* cur = m_root;
-				while (cur) {
+				while (cur)
+				{
 					T* next;
-					if (m_pred(k, key(cur))) {
+					if (m_pred(k, key(cur)))
+					{
 						next = left(cur);
-						if (!next) {
+						if (!next)
+						{
 							left(cur) = item;
 							parent(item) = cur;
 							n = item;
 						}
 					}
 					//If allowing duplicates, items with equal keys go right.
-					else if (m_pred(key(cur), k) || ALLOW_DUP_KEYS) {
+					else if (m_pred(key(cur), k) || ALLOW_DUP_KEYS)
+					{
 						next = right(cur);
-						if (!next) {
+						if (!next)
+						{
 							right(cur) = item;
 							parent(item) = cur;
 							n = item;
 						}
 					}
-					else {
+					else
+					{
 						break;
 					}
 					cur = next;
 				}
 			}
-			if (n) {
+			if (n)
+			{
 				color(item) = true;
 				insertFixup(item);
 				key(item) = k;
@@ -1224,73 +1343,93 @@ namespace rage {
 			}
 			return std::pair<iterator, bool>(iterator(n, this), 0 != n);
 		}
-		key_compare key_comp() const {
+		key_compare key_comp() const
+		{
 			return m_pred;
 		}
-		iterator find(const K& k, u64* cost = 0) {
+		iterator find(const K& k, u64* cost = 0)
+		{
 			iterator it = this->lower_bound(k, cost);
 			return (this->end() == it || m_pred(k, it->first)) ? this->end() : it;
 		}
-		const_iterator find(const K& k, u64* cost = 0) const {
+		const_iterator find(const K& k, u64* cost = 0) const
+		{
 			const_iterator it = this->lower_bound(k, cost);
 			return (this->end() == it || m_pred(k, it->first)) ? this->end() : it;
 		}
-		iterator erase(T* item) {
+		iterator erase(T* item)
+		{
 			iterator next(item, this);
 			++next;
 			T* y;
-			if (!left(item) || !right(item)) {
+			if (!left(item) || !right(item))
+			{
 				y = item;
 			}
-			else if (m_size & 0x01) {
+			else if (m_size & 0x01)
+			{
 				y = right(item);
 				while (left(y)) y = left(y);
 			}
-			else {
+			else
+			{
 				y = left(item);
 				while (right(y)) y = right(y);
 			}
 			T* x;
-			if (left(y)) {
+			if (left(y))
+			{
 				x = left(y);
 			}
-			else {
+			else
+			{
 				x = right(y);
 			}
-			if (x) {
+			if (x)
+			{
 				parent(x) = parent(y);
 			}
-			if (!parent(y)) {
+			if (!parent(y))
+			{
 				m_root = x;
 			}
-			else if (left(parent(y)) == y) {
+			else if (left(parent(y)) == y)
+			{
 				left(parent(y)) = x;
 			}
-			else {
+			else
+			{
 				right(parent(y)) = x;
 			}
-			if (item != y) {
-				if (item == m_root) {
+			if (item != y)
+			{
+				if (item == m_root)
+				{
 					m_root = y;
 				}
-				else if (left(parent(item)) == item) {
+				else if (left(parent(item)) == item)
+				{
 					left(parent(item)) = y;
 				}
-				else {
+				else
+				{
 					right(parent(item)) = y;
 				}
 				parent(y) = parent(item);
 				left(y) = left(item);
 				right(y) = right(item);
 				color(y) = color(item);
-				if (left(item)) {
+				if (left(item))
+				{
 					parent(left(item)) = y;
 				}
-				if (right(item)) {
+				if (right(item))
+				{
 					parent(right(item)) = y;
 				}
 			}
-			if (x && color(y) == false) {
+			if (x && color(y) == false)
+			{
 				this->eraseFixup(x);
 			}
 			//Use the raw pointer here, not the accessors.
@@ -1302,56 +1441,71 @@ namespace rage {
 			--m_size;
 			return next;
 		}
-		iterator erase(iterator where) {
+		iterator erase(iterator where)
+		{
 			return where->second ? this->erase(where->second) : this->end();
 		}
-		iterator erase(iterator first, iterator last) {
-			if (this->begin() == first && this->end() == last) {
+		iterator erase(iterator first, iterator last)
+		{
+			if (this->begin() == first && this->end() == last)
+			{
 				this->clear();
 				first = this->end();
 			}
-			else {
-				while (first != last) {
+			else
+			{
+				while (first != last)
+				{
 					first = this->erase(first);
 				}
 			}
 			return first;
 		}
-		u64ype erase(const K& k) {
+		u64ype erase(const K& k)
+		{
 			u64 count = 0;
 			iterator it = this->find(k);
 			const_iterator stop = this->end();
-			while (stop != it && k == it->first) {
+			while (stop != it && k == it->first)
+			{
 				it = this->erase(it);
 				++count;
 			}
 			return count;
 		}
-		std::pair<iterator, iterator> equal_range(const K& k) {
+		std::pair<iterator, iterator> equal_range(const K& k)
+		{
 			return std::pair<iterator, iterator>(this->lower_bound(k), this->upper_bound(k));
 		}
-		std::pair<const_iterator, const_iterator> equal_range(const K& k) const {
+		std::pair<const_iterator, const_iterator> equal_range(const K& k) const
+		{
 			return std::pair<const_iterator, const_iterator>(this->lower_bound(k), this->upper_bound(k));
 		}
-		iterator lower_bound(const K& k, u64* cost = 0) {
+		iterator lower_bound(const K& k, u64* cost = 0)
+		{
 			T* cur = m_root;
 			T* n = 0;
 			u64 findCost = 0;
-			while (cur) {
-				if (m_pred(key(cur), k)) {
+			while (cur)
+			{
+				if (m_pred(key(cur), k))
+				{
 					cur = right(cur);
 				}
-				else {
+				else
+				{
 					n = cur;
 					cur = left(cur);
 				}
 				++findCost;
 			}
-			if (ALLOW_DUP_KEYS && n) {
+			if (ALLOW_DUP_KEYS && n)
+			{
 				cur = predecessor(n);
 				while (cur
 					&& !m_pred(key(cur), k)
-					&& !m_pred(k, key(cur))) {
+					&& !m_pred(k, key(cur)))
+				{
 					n = cur;
 					cur = predecessor(cur);
 					++findCost;
@@ -1361,19 +1515,24 @@ namespace rage {
 				*cost = findCost;
 			return iterator(n, this);
 		}
-		const_iterator lower_bound(const K& k, u64* cost = 0) const {
+		const_iterator lower_bound(const K& k, u64* cost = 0) const
+		{
 			return const_cast<MapType*>(this)->lower_bound(k, cost);
 		}
-		iterator upper_bound(const K& k, u64* cost = 0) {
+		iterator upper_bound(const K& k, u64* cost = 0)
+		{
 			T* cur = m_root;
 			T* n = 0;
 			u64 findCost = 0;
-			while (cur) {
-				if (m_pred(k, key(cur))) {
+			while (cur)
+			{
+				if (m_pred(k, key(cur)))
+				{
 					n = cur;
 					cur = left(cur);
 				}
-				else {
+				else
+				{
 					cur = right(cur);
 				}
 				++findCost;
@@ -1382,37 +1541,47 @@ namespace rage {
 				*cost = findCost;
 			return iterator(n, this);
 		}
-		const_iterator upper_bound(const K& k, u64* cost = 0) const {
+		const_iterator upper_bound(const K& k, u64* cost = 0) const
+		{
 			return const_cast<MapType*>(this)->upper_bound(k, cost);
 		}
-		u64ype max_size() const {
+		u64ype max_size() const
+		{
 			const u64ype maxsize = u64ype(-1) >> 1;
 			return (0 < maxsize ? maxsize : 1);
 		}
-		u64ype size() const {
+		u64ype size() const
+		{
 			return m_size;
 		}
-		value_compare value_comp() const {
+		value_compare value_comp() const
+		{
 			value_compare vc;
 			return vc;
 		}
 	private:
-		void insertFixup(T* x) {
+		void insertFixup(T* x)
+		{
 			/* check Red-Black properties */
-			while (x != m_root && color(parent(x)) == true) {
+			while (x != m_root && color(parent(x)) == true)
+			{
 				/* we have a violation */
-				if (parent(x) == left(grandparent(x))) {
+				if (parent(x) == left(grandparent(x)))
+				{
 					T* y = right(grandparent(x));
-					if (y && color(y) == true) {
+					if (y && color(y) == true)
+					{
 						/* uncle is RED */
 						color(parent(x)) = false;
 						color(y) = false;
 						color(grandparent(x)) = true;
 						x = grandparent(x);
 					}
-					else {
+					else
+					{
 						/* uncle is BLACK */
-						if (x == right(parent(x))) {
+						if (x == right(parent(x)))
+						{
 							/* make x a left child */
 							x = parent(x);
 							rotl(x);
@@ -1423,19 +1592,23 @@ namespace rage {
 						rotr(grandparent(x));
 					}
 				}
-				else {
+				else
+				{
 					/* mirror image of above code */
 					T* y = left(grandparent(x));
-					if (y && color(y) == true) {
+					if (y && color(y) == true)
+					{
 						/* uncle is RED */
 						color(parent(x)) = false;
 						color(y) = false;
 						color(grandparent(x)) = true;
 						x = grandparent(x);
 					}
-					else {
+					else
+					{
 						/* uncle is BLACK */
-						if (x == left(parent(x))) {
+						if (x == left(parent(x)))
+						{
 							x = parent(x);
 							rotr(x);
 						}
@@ -1447,27 +1620,35 @@ namespace rage {
 			}
 			color(m_root) = false;
 		}
-		void eraseFixup(T* x) {
-			while (x != m_root && color(x) == false) {
-				if (x == left(parent(x))) {
+		void eraseFixup(T* x)
+		{
+			while (x != m_root && color(x) == false)
+			{
+				if (x == left(parent(x)))
+				{
 					T* w = right(parent(x));
-					if (w && color(w) == true) {
+					if (w && color(w) == true)
+					{
 						color(w) = false;
 						color(parent(x)) = true;
 						rotl(parent(x));
 						w = right(parent(x));
 					}
-					if (!w) {
+					if (!w)
+					{
 						x = parent(x);
 						continue;
 					}
 					if ((!left(w) || color(left(w)) == false)
-						&& (!right(w) || color(right(w)) == false)) {
+						&& (!right(w) || color(right(w)) == false))
+					{
 						color(w) = true;
 						x = parent(x);
 					}
-					else {
-						if (!right(w) || color(right(w)) == false) {
+					else
+					{
+						if (!right(w) || color(right(w)) == false)
+						{
 							color(left(w)) = false;
 							color(w) = true;
 							rotr(w);
@@ -1480,25 +1661,31 @@ namespace rage {
 						x = m_root;
 					}
 				}
-				else {
+				else
+				{
 					T* w = left(parent(x));
-					if (w && color(w) == true) {
+					if (w && color(w) == true)
+					{
 						color(w) = false;
 						color(parent(x)) = true;
 						rotr(parent(x));
 						w = left(parent(x));
 					}
-					if (!w) {
+					if (!w)
+					{
 						x = parent(x);
 						continue;
 					}
 					if ((!right(w) || color(right(w)) == false)
-						&& (!left(w) || color(left(w)) == false)) {
+						&& (!left(w) || color(left(w)) == false))
+					{
 						color(w) = true;
 						x = parent(x);
 					}
-					else {
-						if (!left(w) || color(left(w)) == false) {
+					else
+					{
+						if (!left(w) || color(left(w)) == false)
+						{
 							color(right(w)) = false;
 							color(w) = true;
 							rotl(w);
@@ -1514,55 +1701,98 @@ namespace rage {
 			}
 			color(x) = false;
 		}
-		void rotl(T* t) {
+		void rotl(T* t)
+		{
 			T* n = right(t);
 			right(t) = left(n);
-			if (left(n)) {
+			if (left(n))
+			{
 				parent(left(n)) = t;
 			}
 			parent(n) = parent(t);
-			if (t == m_root) {
+			if (t == m_root)
+			{
 				m_root = n;
 			}
-			else if (t == left(parent(t))) {
+			else if (t == left(parent(t)))
+			{
 				left(parent(t)) = n;
 			}
-			else {
+			else
+			{
 				right(parent(t)) = n;
 			}
 			left(n) = t;
 			parent(t) = n;
 		}
-		void rotr(T* t) {
+		void rotr(T* t)
+		{
 			T* n = left(t);
 			left(t) = right(n);
-			if (right(n)) {
+			if (right(n))
+			{
 				parent(right(n)) = t;
 			}
 			parent(n) = parent(t);
-			if (t == m_root) {
+			if (t == m_root)
+			{
 				m_root = n;
 			}
-			else if (t == right(parent(t))) {
+			else if (t == right(parent(t)))
+			{
 				right(parent(t)) = n;
 			}
-			else {
+			else
+			{
 				left(parent(t)) = n;
 			}
 			right(n) = t;
 			parent(t) = n;
 		}
-		static typename detail::TProxy right( T* t ) { return detail::right( t ); }
-		static T*& left( T* t ) { return detail::left( t ); }
-		static T*& parent( T* t ) { return detail::parent( t ); }
-		static T*& grandparent( T* t ) { return detail::grandparent( t ); }
-		static T*& uncle( T* t ) { return detail::uncle( t ); }
-		static K& key( T* t ) { return detail::key( t ); }
-		static typename detail::CProxy color( T* t ) { return detail::color( t ); }
-		static T* minimum( T* t ) { return detail::minimum( t ); }
-		static T* maximum( T* t ) { return detail::maximum( t ); }
-		static T* predecessor( T* t ) { return detail::predecessor( t ); }
-		static T* successor( T* t ) { return detail::successor( t ); }
+		static typename detail::TProxy right(T* t)
+		{
+			return detail::right(t);
+		}
+		static T*& left(T* t)
+		{
+			return detail::left(t);
+		}
+		static T*& parent(T* t)
+		{
+			return detail::parent(t);
+		}
+		static T*& grandparent(T* t)
+		{
+			return detail::grandparent(t);
+		}
+		static T*& uncle(T* t)
+		{
+			return detail::uncle(t);
+		}
+		static K& key(T* t)
+		{
+			return detail::key(t);
+		}
+		static typename detail::CProxy color(T* t)
+		{
+			return detail::color(t);
+		}
+		static T* minimum(T* t)
+		{
+			return detail::minimum(t);
+		}
+		static T* maximum(T* t)
+		{
+			return detail::maximum(t);
+		}
+		static T* predecessor(T* t)
+		{
+			return detail::predecessor(t);
+		}
+		static T* successor(T* t)
+		{
+			return detail::successor(t);
+		}
 		T* m_root;
 		u64ype m_size;
 		key_compare m_pred;
@@ -1571,91 +1801,113 @@ namespace rage {
 		inmap_base& operator=(const inmap_base<K, T, NODE, P>&);
 	};
 	template <typename PRED>
-	struct inmap_policies {
+	struct inmap_policies
+	{
 		typedef PRED Predicate;
-		enum {
+		enum
+		{
 			ALLOW_DUP_KEYS = false
 		};
 	};
 	template <typename PRED>
-	struct inmultimap_policies {
+	struct inmultimap_policies
+	{
 		typedef PRED Predicate;
-		enum {
+		enum
+		{
 			ALLOW_DUP_KEYS = true
 		};
 	};
 	template <typename K, typename T, inmap_node<K, T> T::*NODE, typename P = std::less<K>>
-	class inmap : public inmap_base<K, T, NODE, inmap_policies<P>> {
+	class inmap : public inmap_base<K, T, NODE, inmap_policies<P>>
+	{
 	public:
-		inmap() {}
+		inmap()
+		{}
 	private:
 		//Non-copyable
 		inmap(const inmap< K, T, NODE, P >&);
 		inmap& operator=(const inmap< K, T, NODE, P >&);
 	};
 	template <typename K, typename T, inmap_node<K, T> T::*NODE, typename P = std::less<K>>
-	class inmultimap : public inmap_base< K, T, NODE, inmultimap_policies< P > > {
+	class inmultimap : public inmap_base< K, T, NODE, inmultimap_policies< P > >
+	{
 	public:
-		inmultimap() {}
+		inmultimap()
+		{}
 	private:
 		//Non-copyable
 		inmultimap(const inmultimap< K, T, NODE, P >&);
 		inmultimap& operator=(const inmultimap< K, T, NODE, P >&);
 	};
-	namespace inlist_detail {
+	namespace inlist_detail
+	{
 		template <typename ITER>
-		class reverse_iterator {
+		class reverse_iterator
+		{
 		public:
 			typedef typename ITER::iterator_category iterator_category;
 			typedef typename ITER::value_type value_type;
 			typedef typename ITER::difference_type difference_type;
 			typedef typename ITER::pointer pointer;
 			typedef typename ITER::reference reference;
-			reverse_iterator() {}
+			reverse_iterator()
+			{}
 			explicit reverse_iterator(const ITER& it)
 				: m_It(it)
 			{}
 			template <typename OTHER>
 			reverse_iterator(const reverse_iterator<OTHER>& that)
-				: m_It(that.base()) {}
+				: m_It(that.base())
+			{}
 			template <typename OTHER>
-			reverse_iterator<ITER>& operator=(const reverse_iterator<OTHER>& that) {
+			reverse_iterator<ITER>& operator=(const reverse_iterator<OTHER>& that)
+			{
 				m_It = that.base();
 				return *this;
 			}
-			ITER base() const {
+			ITER base() const
+			{
 				return m_It;
 			}
-			reverse_iterator operator++() {
+			reverse_iterator operator++()
+			{
 				--m_It;
 				return *this;
 			}
-			reverse_iterator operator--() {
+			reverse_iterator operator--()
+			{
 				++m_It;
 				return *this;
 			}
-			reverse_iterator operator++(const int) {
+			reverse_iterator operator++(const int)
+			{
 				reverse_iterator tmp = *this;
 				--m_It;
 				return tmp;
 			}
-			reverse_iterator operator--(const int) {
+			reverse_iterator operator--(const int)
+			{
 				reverse_iterator tmp = *this;
 				++m_It;
 				return tmp;
 			}
-			pointer operator->() const {
+			pointer operator->() const
+			{
 				ITER tmp = m_It;
 				return (--tmp).operator->();
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				ITER tmp = m_It;
 				return (--tmp).operator*();
 			}
-			bool operator==(const reverse_iterator& rhs) const {
+			bool operator==(const reverse_iterator& rhs) const
+			{
 				return m_It == rhs.m_It;
 			}
-			bool operator!=(const reverse_iterator& rhs) const {
+			bool operator!=(const reverse_iterator& rhs) const
+			{
 				return m_It != rhs.m_It;
 			}
 		private:
@@ -1680,26 +1932,33 @@ namespace rage {
 		T* m_prev;
 	};
 	template <typename T, inlist_node<T> T::*NODE>
-	class inlist {
+	class inlist
+	{
 		typedef inlist<T, NODE> ListType;
 	public:
 		class const_iterator;
-		class iterator {
+		class iterator
+		{
 			friend class inlist<T, NODE>;
 			friend class const_iterator;
-			bool before_begin() const {
+			bool before_begin() const
+			{
 				return (((u64)m_list) & ~0x01) && (((u64)m_list) & 0x01);
 			}
-			void set_before_begin() {
+			void set_before_begin()
+			{
 				m_list = (ListType*)(((u64)m_list) | 0x01);
 			}
-			void clear_before_begin() {
+			void clear_before_begin()
+			{
 				m_list = (ListType*)(((u64)m_list) & ~0x01);
 			}
-			ListType* list() {
+			ListType* list()
+			{
 				return (ListType*)(((u64)m_list) & ~0x01);
 			}
-			ListType* list() const {
+			ListType* list() const
+			{
 				return (ListType*)(((u64)m_list) & ~0x01);
 			}
 		public:
@@ -1712,57 +1971,73 @@ namespace rage {
 			iterator()
 				: m_t(0), m_list(0)
 			{}
-			iterator operator++() {
-				if (m_t) {
+			iterator operator++()
+			{
+				if (m_t)
+				{
 					m_t = (m_t->*NODE).m_next;
 				}
-				else if (this->before_begin()) {
+				else if (this->before_begin())
+				{
 					this->clear_before_begin();
 					m_t = m_list->m_head;
 				}
 				return *this;
 			}
-			iterator operator--() {
-				if (m_t) {
+			iterator operator--()
+			{
+				if (m_t)
+				{
 					m_t = (m_t->*NODE).m_prev;
-					if (!m_t) {
+					if (!m_t)
+					{
 						this->set_before_begin();
 					}
 				}
-				else if (m_list && !this->before_begin()) {
+				else if (m_list && !this->before_begin())
+				{
 					m_t = m_list->m_tail;
 				}
 				return *this;
 			}
-			iterator operator++(const int) {
+			iterator operator++(const int)
+			{
 				iterator tmp = *this;
 				++* this;
 				return tmp;
 			}
-			iterator operator--(const int) {
+			iterator operator--(const int)
+			{
 				iterator tmp = *this;
 				--* this;
 				return tmp;
 			}
-			pointer operator->() {
+			pointer operator->()
+			{
 				return m_t;
 			}
-			const_pointer operator->() const {
+			const_pointer operator->() const
+			{
 				return m_t;
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				return m_t;
 			}
-			bool operator==(const iterator& rhs) const {
+			bool operator==(const iterator& rhs) const
+			{
 				return rhs.m_t == m_t;
 			}
-			bool operator!=(const iterator& rhs) const {
+			bool operator!=(const iterator& rhs) const
+			{
 				return rhs.m_t != m_t;
 			}
-			bool operator==(const const_iterator& rhs) const {
+			bool operator==(const const_iterator& rhs) const
+			{
 				return rhs == *this;
 			}
-			bool operator!=(const const_iterator& rhs) const {
+			bool operator!=(const const_iterator& rhs) const
+			{
 				return rhs != *this;
 			}
 		private:
@@ -1772,21 +2047,27 @@ namespace rage {
 			T* m_t;
 			inlist<T, NODE>* m_list;
 		};
-		class const_iterator {
+		class const_iterator
+		{
 			friend class inlist<T, NODE>;
-			bool before_begin() const {
+			bool before_begin() const
+			{
 				return (((u64)m_list) & ~0x01) && (((u64)m_list) & 0x01);
 			}
-			void set_before_begin() {
+			void set_before_begin()
+			{
 				m_list = (ListType*)(((u64)m_list) | 0x01);
 			}
-			void clear_before_begin() {
+			void clear_before_begin()
+			{
 				m_list = (ListType*)(((u64)m_list) & ~0x01);
 			}
-			ListType* list() {
+			ListType* list()
+			{
 				return (ListType*)(((u64)m_list) & ~0x01);
 			}
-			ListType* list() const {
+			ListType* list() const
+			{
 				return (ListType*)(((u64)m_list) & ~0x01);
 			}
 		public:
@@ -1802,51 +2083,65 @@ namespace rage {
 			const_iterator(const iterator& it)
 				: m_t(it.m_t), m_list(it.m_list)
 			{}
-			const_iterator operator++() {
-				if (m_t) {
+			const_iterator operator++()
+			{
+				if (m_t)
+				{
 					m_t = (m_t->*NODE).m_next;
 				}
-				else if (this->before_begin()) {
+				else if (this->before_begin())
+				{
 					this->clear_before_begin();
 					m_t = m_list->m_head;
 				}
 				return *this;
 			}
-			const_iterator operator--() {
-				if (m_t) {
+			const_iterator operator--()
+			{
+				if (m_t)
+				{
 					m_t = (m_t->*NODE).m_prev;
-					if (!m_t) {
+					if (!m_t)
+					{
 						this->set_before_begin();
 					}
 				}
-				else if (m_list && !this->before_begin()) {
+				else if (m_list && !this->before_begin())
+				{
 					m_t = m_list->m_tail;
 				}
 				return *this;
 			}
-			const_iterator operator++(const int) {
+			const_iterator operator++(const int)
+			{
 				const_iterator tmp = *this;
 				++* this;
 				return tmp;
 			}
-			const_iterator operator--(const int) {
+			const_iterator operator--(const int)
+			{
 				const_iterator tmp = *this;
 				--* this;
 				return tmp;
 			}
-			pointer operator->() {
+			pointer operator->()
+			{
 				return m_t;
 			}
-			const_pointer operator->() const {
+			const_pointer operator->() const
+			{
 				return m_t;
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				return m_t;
 			}
-			bool operator==(const const_iterator& rhs) const {
+			bool operator==(const const_iterator& rhs) const
+			{
 				return rhs.m_t == m_t;
 			}
-			bool operator!=(const const_iterator& rhs) const {
+			bool operator!=(const const_iterator& rhs) const
+			{
 				return rhs.m_t != m_t;
 			}
 		private:
@@ -1867,34 +2162,46 @@ namespace rage {
 		inlist()
 			: m_head(0), m_tail(0), m_size(0)
 		{}
-		~inlist() { this->clear(); }
-		void push_front(T* item) {
+		~inlist()
+		{
+			this->clear();
+		}
+		void push_front(T* item)
+		{
 			this->insert(this->begin(), item);
 		}
-		void push_back(T* item) {
+		void push_back(T* item)
+		{
 			this->insert(this->end(), item);
 		}
-		iterator insert(iterator where, T* item) {
+		iterator insert(iterator where, T* item)
+		{
 			return this->insert(where.m_t, item);
 		}
-		iterator insert(T* where, T* item) {
-			if (0 == where) {
-				if (m_tail) {
+		iterator insert(T* where, T* item)
+		{
+			if (0 == where)
+			{
+				if (m_tail)
+				{
 					next(m_tail) = item;
 					prev(item) = m_tail;
 					m_tail = item;
 					if (!m_head) m_head = item;
 				}
-				else {
+				else
+				{
 					m_head = m_tail = item;
 				}
 			}
-			else if (where == m_head) {
+			else if (where == m_head)
+			{
 				next(item) = m_head;
 				prev(m_head) = item;
 				m_head = item;
 			}
-			else {
+			else
+			{
 				next(item) = where;
 				prev(item) = prev(where);
 				next(prev(where)) = item;
@@ -1903,127 +2210,179 @@ namespace rage {
 			++m_size;
 			return iterator(item, this);
 		}
-		void pop_front() {
-			if (m_head) { this->erase(this->front()); }
+		void pop_front()
+		{
+			if (m_head)
+			{
+				this->erase(this->front());
+			}
 		}
-		void pop_back() {
-			if (m_tail) { this->erase(this->back()); }
+		void pop_back()
+		{
+			if (m_tail)
+			{
+				this->erase(this->back());
+			}
 		}
-		reference front() {
+		reference front()
+		{
 			return m_head;;
 		}
-		const_reference front() const {
+		const_reference front() const
+		{
 			return m_head;
 		}
-		reference back() {
+		reference back()
+		{
 			return m_tail;
 		}
-		const_reference back() const {
+		const_reference back() const
+		{
 			return m_tail;
 		}
-		iterator begin() {
+		iterator begin()
+		{
 			return iterator(m_head, this);
 		}
-		const_iterator begin() const {
+		const_iterator begin() const
+		{
 			return const_iterator(m_head, this);
 		}
-		iterator end() {
+		iterator end()
+		{
 			return iterator(0, this);
 		}
-		const_iterator end() const {
+		const_iterator end() const
+		{
 			return const_iterator(0, this);
 		}
-		reverse_iterator rbegin() {
+		reverse_iterator rbegin()
+		{
 			return reverse_iterator(this->end());
 		}
-		const_reverse_iterator rbegin() const {
+		const_reverse_iterator rbegin() const
+		{
 			return const_reverse_iterator(this->end());
 		}
-		reverse_iterator rend() {
+		reverse_iterator rend()
+		{
 			return reverse_iterator(this->begin());
 		}
-		const_reverse_iterator rend() const {
+		const_reverse_iterator rend() const
+		{
 			return const_reverse_iterator(this->begin());
 		}
-		void clear() {
-			while (!this->empty()) { this->pop_front(); }
+		void clear()
+		{
+			while (!this->empty())
+			{
+				this->pop_front();
+			}
 		}
-		bool empty() const {
+		bool empty() const
+		{
 			return !m_size;
 		}
-		iterator erase(iterator where) {
+		iterator erase(iterator where)
+		{
 			iterator next = where;
 			++next;
 			this->erase(*where);
 			return next;
 		}
-		iterator erase(iterator first, iterator last) {
-			if (this->begin() == first && this->end() == last) {
+		iterator erase(iterator first, iterator last)
+		{
+			if (this->begin() == first && this->end() == last)
+			{
 				this->clear();
 				first = this->end();
 			}
-			else {
-				while (first != last) {
+			else
+			{
+				while (first != last)
+				{
 					first = this->erase(first);
 				}
 			}
 			return first;
 		}
-		void erase(T* item) {
-			if (item == m_head) {
+		void erase(T* item)
+		{
+			if (item == m_head)
+			{
 				m_head = next(m_head);
 				next(item) = 0;
-				if (m_head) {
+				if (m_head)
+				{
 					prev(m_head) = 0;
 				}
-				else {
+				else
+				{
 					m_tail = 0;
 				}
 			}
-			else if (item == m_tail) {
+			else if (item == m_tail)
+			{
 				m_tail = prev(m_tail);
 				prev(item) = 0;
-				if (m_tail) {
+				if (m_tail)
+				{
 					next(m_tail) = 0;
 				}
 			}
-			else {
+			else
+			{
 				next(prev(item)) = next(item);
 				prev(next(item)) = prev(item);
 				prev(item) = next(item) = 0;
 			}
 			--m_size;
 		}
-		bool is_present_unsafe(T* item) const {
+		bool is_present_unsafe(T* item) const
+		{
 			return  prev(item) || next(item) || item == m_head;
 		}
-		bool try_erase_unsafe(T* item) {
-			if (is_present_unsafe(item)) {
+		bool try_erase_unsafe(T* item)
+		{
+			if (is_present_unsafe(item))
+			{
 				erase(item);
 				return true;
 			}
 			return false;
 		}
-		u64 size() const { return m_size; }
-		u64 max_size() const { return u64(-1); }
+		u64 size() const
+		{
+			return m_size;
+		}
+		u64 max_size() const
+		{
+			return u64(-1);
+		}
 		template <typename Pred>
-		void merge(inlist<T, NODE>& rhs, Pred pred) {
-			if (&rhs != this) {
+		void merge(inlist<T, NODE>& rhs, Pred pred)
+		{
+			if (&rhs != this)
+			{
 				iterator it0 = this->begin();
 				iterator stop0 = this->end();
 				iterator it1 = rhs.begin();
 				iterator stop1 = rhs.end();
-				while (it0 != stop0 && it1 != stop1) {
-					if (pred(*it1, *it0)) {
+				while (it0 != stop0 && it1 != stop1)
+				{
+					if (pred(*it1, *it0))
+					{
 						T* item1 = it1.m_t;
 						it1 = rhs.erase(it1);
 						this->insert(it0, item1);
 					}
-					else {
+					else
+					{
 						++it0;
 					}
 				}
-				while (it1 != stop1) {
+				while (it1 != stop1)
+				{
 					T* item1 = it1.m_t;
 					it1 = rhs.erase(it1);
 					this->insert(stop0, item1);
@@ -2031,34 +2390,48 @@ namespace rage {
 			}
 		}
 	private:
-		struct Less { bool operator()(const T* t0, const T* t1) { return t0 < t1; } };
+		struct Less
+		{
+			bool operator()(const T* t0, const T* t1)
+			{
+				return t0 < t1;
+			}
+		};
 	public:
-		void merge(inlist<T, NODE>& rhs) {
+		void merge(inlist<T, NODE>& rhs)
+		{
 			this->merge(rhs, Less());
 		}
-		void splice(iterator where, inlist<T, NODE>& right) {
+		void splice(iterator where, inlist<T, NODE>& right)
+		{
 			this->splice(where, right, right.begin(), right.end());
 		}
-		void splice(iterator where, inlist<T, NODE>& right, iterator first) {
+		void splice(iterator where, inlist<T, NODE>& right, iterator first)
+		{
 			this->splice(where, right, first, right.end());
 		}
-		void splice(iterator where, inlist<T, NODE>& right, iterator first, iterator stop) {
-			for (iterator it = first; it != stop; ) {
+		void splice(iterator where, inlist<T, NODE>& right, iterator first, iterator stop)
+		{
+			for (iterator it = first; it != stop; )
+			{
 				T* item = it.m_t;
 				it = right.erase(it);
 				this->insert(where, item);
 			}
 		}
-		void swap(inlist<T, NODE>& right) {
+		void swap(inlist<T, NODE>& right)
+		{
 			const u64 thisSize = this->size();
 			const u64 rightSize = right.size();
-			for (u64 i = 0; i < thisSize; ++i) {
+			for (u64 i = 0; i < thisSize; ++i)
+			{
 				iterator it = this->begin();
 				T* item = it.m_t;
 				it = this->erase(it);
 				right.push_back(item);
 			}
-			for (u64 i = 0; i < rightSize; ++i) {
+			for (u64 i = 0; i < rightSize; ++i)
+			{
 				iterator it = right.begin();
 				T* item = it.m_t;
 				it = right.erase(it);
@@ -2069,8 +2442,14 @@ namespace rage {
 		//Declare as non-copy-able
 		inlist(const inlist<T, NODE>&);
 		inlist<T, NODE>& operator=(const inlist<T, NODE>&);
-		static T*& prev(T* t) { return (t->*NODE).m_prev; }
-		static T*& next(T* t) { return (t->*NODE).m_next; }
+		static T*& prev(T* t)
+		{
+			return (t->*NODE).m_prev;
+		}
+		static T*& next(T* t)
+		{
+			return (t->*NODE).m_next;
+		}
 		T* m_head;
 		T* m_tail;
 		u64 m_size;
@@ -2079,24 +2458,30 @@ namespace rage {
 //pgXXXXXXX
 namespace rage {
 	// "borrowed" from rage
-	struct pgBaseNode {
+	struct pgBaseNode
+	{
 		pgBaseNode* Next;
 	};
-	class pgBase {
+	class pgBase
+	{
 	public:
 		virtual ~pgBase() = default;
 		pgBaseNode* m_FirstNode;
 	};
-	class pgDictionaryBase : pgBase {
+	class pgDictionaryBase : pgBase
+	{
 	public:
 	};
 #define datPadding64(count,name)	datPadding<count> name;
 	template <typename T>
-	class pgDictionary : public pgDictionaryBase {
+	class pgDictionary : public pgDictionaryBase
+	{
 	public:
-		T* Lookup(u32 code) const {
+		T* Lookup(u32 code) const
+		{
 			const pgDictionary* current = this;
-			do {
+			do
+			{
 				int idx = current->m_Codes.binary_search(code);
 				if (idx != -1)
 					return current->m_Entries[idx];
@@ -2104,29 +2489,35 @@ namespace rage {
 			} while (current);
 			return NULL;
 		}
-		T* LookupLocal(u32 code) const {
+		T* LookupLocal(u32 code) const
+		{
 			int idx = m_Codes.binary_search(code);
 			if (idx != -1)
 				return m_Entries[idx];
 			else
 				return NULL;
 		}
-		T* LookupLocal(const char* name) const {
+		T* LookupLocal(const char* name) const
+		{
 			return LookupLocal(atStringHash(name));
 		}
 		typedef bool (*DictionaryCB)(T&, u32, void*);
-		bool ForAll(DictionaryCB cb, void* data) {
+		bool ForAll(DictionaryCB cb, void* data)
+		{
 			bool result = true;
 			for (int i = 0; i < m_Entries.size(); ++i)
 				if ((result = cb(*m_Entries[i], m_Codes[i], data)) == false)
 					break;
 			return result;
 		}
-		bool AddEntry(u32 code, T* data) {
-			for (int i = 0; i < m_Codes.size(); ++i) {
+		bool AddEntry(u32 code, T* data)
+		{
+			for (int i = 0; i < m_Codes.size(); ++i)
+			{
 				if (m_Codes[i] == code)
 					break;
-				else if (m_Codes[i] > code) {
+				else if (m_Codes[i] > code)
+				{
 					m_Codes.push_back(i);
 					m_Codes[i] = code;
 					m_Entries.push_back(i);
@@ -2136,69 +2527,85 @@ namespace rage {
 			}
 			return false;
 		}
-		bool AddEntry(const char* name, T* data) {
+		bool AddEntry(const char* name, T* data)
+		{
 			u32 code = atStringHash(name);
 			return AddEntry(code, data);
 		}
-		int GetRefCount() const {
+		int GetRefCount() const
+		{
 			return m_RefCount;
 		}
-		int GetCount() const {
+		int GetCount() const
+		{
 			return m_Codes.GetCount();
 		}
-		u32 GetCode(u32 idx) const {
+		u32 GetCode(u32 idx) const
+		{
 			return m_Codes[idx];
 		}
-		T* GetEntry(u32 idx) const {
+		T* GetEntry(u32 idx) const
+		{
 			return m_Entries[idx];
 		}
-		void SetEntryUnsafe(u32 idx, T* entry) {
+		void SetEntryUnsafe(u32 idx, T* entry)
+		{
 			m_Entries[idx] = entry;
 		}
 		pgDictionary<T>* m_Parent;
 		int m_RefCount;
-		datPadding64(4,m_Padding);
+		datPadding64(4, m_Padding);
 		atArray<u32> m_Codes;
 		atArray<datOwner<T>> m_Entries;
 	};
-	class pgStreamer {
+	class pgStreamer
+	{
 	public:
 		typedef u32 Handle;
-		typedef void *ReadId;
+		typedef void* ReadId;
 	};
 }
 //sysXXXXXXX
 namespace rage {
-	namespace sysObfuscatedTypes {
+	namespace sysObfuscatedTypes
+	{
 		extern u32 obfRand();
 	}
 	#define sysMemSet memset
 	// "borrowed" from rage
-	struct sysMemContainerData {
+	struct sysMemContainerData
+	{
 		void* m_Base;
 		uint32_t m_Size;
 	};
 	typedef struct sysIpcSemaTag* sysIpcSema;
-	class sysMemAllocator {
+	class sysMemAllocator
+	{
 	public:
 		virtual ~sysMemAllocator() = default;
 	};
 	template <typename T, bool mutate = true>
-	class sysObfuscated {
+	class sysObfuscated
+	{
 	public:
-		void Init() {
+		void Init()
+		{
 			m_xor = sysObfuscatedTypes::obfRand();
-			if (mutate) {
+			if (mutate)
+			{
 				m_mutate = sysObfuscatedTypes::obfRand();
 			}
 		}
-		T Get() {
+		T Get()
+		{
 			u32 xorVal = m_xor ^ (u32)(size_t)this;
 			u32 ret[sizeof(T) / sizeof(u32)];
 			u32* src = const_cast<u32*>(&m_data[0]);
 			u32* dest = (u32*)&ret;
-			for (size_t i = 0; i < sizeof(T) / 4; ++i) {
-				if (mutate) {
+			for (size_t i = 0; i < sizeof(T) / 4; ++i)
+			{
+				if (mutate)
+				{
 					// Extract valid data from two words of storage
 					u32 a = *src & m_mutate;
 					u32 b = src[sizeof(T) / 4] & (~m_mutate);
@@ -2212,23 +2619,28 @@ namespace rage {
 					*dest++ = a | b;
 					++src;
 				}
-				else {
+				else
+				{
 					*dest++ = *src++ ^ xorVal;
 				}
 			}
 			// Call Set() to reset the xor and mutate keys on every call to Get()
-			if (mutate) {
+			if (mutate)
+			{
 				const_cast<sysObfuscated<T, mutate>*>(this)->Set(*(T*)&ret);
 			}
 			return *(T*)&ret;
 		}
-		void Set(T data) {
+		void Set(T data)
+		{
 			Init();
 			u32 xorVal = m_xor ^ (u32)(size_t)this;
 			u32* src = (u32*)&data;
 			u32* dest = &m_data[0];
-			for (size_t i = 0; i < sizeof(T) / 4; ++i) {
-				if (mutate) {
+			for (size_t i = 0; i < sizeof(T) / 4; ++i)
+			{
+				if (mutate)
+				{
 					u32 a = *src & m_mutate;
 					u32 b = *src & (~m_mutate);
 					++src;
@@ -2236,25 +2648,29 @@ namespace rage {
 					dest[sizeof(T) / 4] = b;
 					++dest;
 				}
-				else {
+				else
+				{
 					*dest++ = *src++ ^ xorVal;
 				}
 			}
 		}
-		void operator=(T data) {
+		void operator=(T data)
+		{
 			Set(data);
 		}
-		operator T() {
+		operator T()
+		{
 			return Get();
 		}
 	private:
-		u32 m_data[(mutate ? sizeof(T)*2 : sizeof(T)) / sizeof(u32)];
+		u32 m_data[(mutate ? sizeof(T) * 2 : sizeof(T)) / sizeof(u32)];
 		// XOR and mutate keys for this type
 		u32 m_xor;
 		u32 m_mutate;
 	};
 }
-struct CellGcmTexture {
+struct CellGcmTexture
+{
 	uint8_t format;
 	uint8_t mipmap;
 	uint8_t dimension;
@@ -2270,8 +2686,10 @@ struct CellGcmTexture {
 };
 //grcXXV
 namespace rage {
-	namespace grcRSV {	// RenderStateValue
-		enum {
+	namespace grcRSV
+	{	// RenderStateValue
+		enum
+		{
 			// FILLMODE:
 			FILL_POINT = 0x01, FILL_WIREFRAME = 0x2, FILL_SOLID = 0x03,
 			// ZWRITEENABLE is a bool
@@ -2310,8 +2728,10 @@ namespace rage {
 			ALPHATOMASKOFFSETS_DITHERED = 0x00000087, ALPHATOMASKOFFSETS_SOLID = 0x000000AA,
 		};
 	}
-	namespace grcSSV { // SamplerStateValue
-		enum {
+	namespace grcSSV
+	{ // SamplerStateValue
+		enum
+		{
 			// ADDRESSU/V/W:
 			TADDRESS_WRAP = 1, TADDRESS_MIRROR = 2, TADDRESS_CLAMP = 3, TADDRESS_BORDER = 4, TADDRESS_MIRRORONCE = 5,
 			// BORDERCOLOR is a 32bit color
@@ -2358,36 +2778,52 @@ namespace rage {
 }
 //grcXXXXXXX
 namespace rage {
-	namespace grcStateBlock {
-		enum eStateBlockDirty : u8 {
-			DEPTH_STENCIL_STATE_DIRTY					= (1<<0),
-			RASTERIZER_STATE_DIRTY						= (1<<1),
-			BLEND_STATE_DIRTY							= (1<<2)
+	namespace grcStateBlock
+	{
+		enum eStateBlockDirty : u8
+		{
+			DEPTH_STENCIL_STATE_DIRTY = (1 << 0),
+			RASTERIZER_STATE_DIRTY = (1 << 1),
+			BLEND_STATE_DIRTY = (1 << 2)
 		};
-		#define INVALID_STATEBLOCK 0
-		enum grcDepthStencilStateHandleEnum { DSS_Invalid = INVALID_STATEBLOCK };
-		enum grcRasterizerStateHandleEnum { RS_Invalid = INVALID_STATEBLOCK };
-		enum grcBlendStateHandleEnum { BS_Invalid = INVALID_STATEBLOCK };
-		enum grcSamplerStateHandleEnum { SS_Invalid = INVALID_STATEBLOCK };
+	#define INVALID_STATEBLOCK 0
+		enum grcDepthStencilStateHandleEnum
+		{
+			DSS_Invalid = INVALID_STATEBLOCK
+		};
+		enum grcRasterizerStateHandleEnum
+		{
+			RS_Invalid = INVALID_STATEBLOCK
+		};
+		enum grcBlendStateHandleEnum
+		{
+			BS_Invalid = INVALID_STATEBLOCK
+		};
+		enum grcSamplerStateHandleEnum
+		{
+			SS_Invalid = INVALID_STATEBLOCK
+		};
 		typedef grcStateBlock::grcDepthStencilStateHandleEnum grcDepthStencilStateHandle;
 		typedef grcStateBlock::grcRasterizerStateHandleEnum grcRasterizerStateHandle;
 		typedef grcStateBlock::grcBlendStateHandleEnum grcBlendStateHandle;
 		typedef grcStateBlock::grcSamplerStateHandleEnum grcSamplerStateHandle;
-		#define MAX_RAGE_RENDERTARGET_COUNT	8
-		struct grcDepthStencilStateDesc {
-			grcDepthStencilStateDesc() : 
-				DepthEnable(true), 
-				DepthWriteMask(true), 
+	#define MAX_RAGE_RENDERTARGET_COUNT	8
+		struct grcDepthStencilStateDesc
+		{
+			grcDepthStencilStateDesc() :
+				DepthEnable(true),
+				DepthWriteMask(true),
 				DepthFunc(grcRSV::CMP_LESS),
-				StencilEnable(false), 
-				StencilReadMask(0xFF), 
+				StencilEnable(false),
+				StencilReadMask(0xFF),
 				StencilWriteMask(0xFF)
 			{}
-			struct grcStencilOpDesc {
-				grcStencilOpDesc() : 
-					StencilFailOp(grcRSV::STENCILOP_KEEP), 
-					StencilDepthFailOp(grcRSV::STENCILOP_KEEP), 
-					StencilPassOp(grcRSV::STENCILOP_KEEP), 
+			struct grcStencilOpDesc
+			{
+				grcStencilOpDesc() :
+					StencilFailOp(grcRSV::STENCILOP_KEEP),
+					StencilDepthFailOp(grcRSV::STENCILOP_KEEP),
+					StencilPassOp(grcRSV::STENCILOP_KEEP),
 					StencilFunc(grcRSV::CMP_ALWAYS)
 				{}
 				int StencilFailOp, StencilDepthFailOp, StencilPassOp, StencilFunc;
@@ -2400,7 +2836,8 @@ namespace rage {
 			u8 StencilWriteMask;
 			grcStencilOpDesc FrontFace, BackFace;
 		};
-		struct grcRasterizerStateDesc {
+		struct grcRasterizerStateDesc
+		{
 			grcRasterizerStateDesc() :
 				FillMode(grcRSV::FILL_SOLID)
 				, CullMode(grcRSV::CULL_BACK)
@@ -2429,13 +2866,15 @@ namespace rage {
 			int HalfPixelOffset; // DX9 Extension
 			float DepthBiasDX9; // DX9 Extension
 		};
-		struct grcBlendStateDesc  {
+		struct grcBlendStateDesc
+		{
 			grcBlendStateDesc() :
 				AlphaToCoverageEnable(false)
 				, IndependentBlendEnable(false)
 				, AlphaToMaskOffsets(grcRSV::ALPHATOMASKOFFSETS_SOLID)
 			{}
-			struct grcRenderTargetBlendDesc {
+			struct grcRenderTargetBlendDesc
+			{
 				grcRenderTargetBlendDesc() :
 					BlendEnable(false),
 					SrcBlend(grcRSV::BLEND_ONE),
@@ -2460,7 +2899,8 @@ namespace rage {
 			grcRenderTargetBlendDesc BlendRTDesc[MAX_RAGE_RENDERTARGET_COUNT];
 			int AlphaToMaskOffsets; // 360 extension
 		};
-		struct grcSamplerStateDesc {
+		struct grcSamplerStateDesc
+		{
 			grcSamplerStateDesc() :
 				Filter(grcSSV::FILTER_MIN_MAG_MIP_LINEAR)
 				, AddressU(grcSSV::TADDRESS_WRAP)
@@ -2480,7 +2920,7 @@ namespace rage {
 			float MipLodBias;
 			u32 MaxAnisotropy;
 			int ComparisonFunc; // (only used by certain filter modes, DX10 only)
-			float BorderColorRed, BorderColorGreen,BorderColorBlue,BorderColorAlpha;
+			float BorderColorRed, BorderColorGreen, BorderColorBlue, BorderColorAlpha;
 			float MinLod;
 			float MaxLod;
 			int TrilinearThresh; // 360/PS3 extension: trilinear threshold.
@@ -2489,7 +2929,8 @@ namespace rage {
 		struct grcDepthStencilStateDesc;
 		struct grcRasterizerStateDesc;
 		struct grcBlendStateDesc;
-		struct grcDepthStencilState {
+		struct grcDepthStencilState
+		{
 			u8 DepthEnable, DepthWriteMask;
 			u8 StencilEnable;
 			u8 TwoSidedStencil;
@@ -2499,65 +2940,86 @@ namespace rage {
 			u16 FrontStencilFailOp, FrontStencilDepthFailOp, FrontStencilPassOp, FrontStencilFunc;
 			u16 BackStencilFailOp, BackStencilDepthFailOp, BackStencilPassOp, BackStencilFunc;
 		};
-		struct grcRasterizerState {
+		struct grcRasterizerState
+		{
 			u16 FillMode;
 			u16 CullMode;
-			union { float f; u32 u; } DepthBias;
+			union
+			{
+				float f; u32 u;
+			} DepthBias;
 			float DepthBiasClamp;
-			union { float f; u32 u; } SlopeScaledDepthBias;
+			union
+			{
+				float f; u32 u;
+			} SlopeScaledDepthBias;
 			// u8 DepthClipEnable;
 			// u8 FrontCounterClockwise;
 			// u16 ScissorEnable;
-			u32 MultisampleEnable:1, HalfPixelOffset:1, pad:30;	// Make sure any pad bits are initialized or duplicate state merging will fail!
+			u32 MultisampleEnable : 1, HalfPixelOffset : 1, pad : 30;	// Make sure any pad bits are initialized or duplicate state merging will fail!
 		};
-		struct grcBlendState {
-			struct Target {
+		struct grcBlendState
+		{
+			struct Target
+			{
 				u8 BlendEnable;
 				u8 RenderTargetWriteMask;
-				u16 SrcBlend, DestBlend, BlendOp, SrcBlendAlpha, DestBlendAlpha,  BlendOpAlpha;
+				u16 SrcBlend, DestBlend, BlendOp, SrcBlendAlpha, DestBlendAlpha, BlendOpAlpha;
 			};
 			u8 AlphaToCoverageEnable, IndependentBlendEnable;
 			u16 AlphaTestComparison;
 			int AlphaTestEnable;	// this could be a u8 but we pad it out for alignment.
 			Target Targets[8];
 		};
-		struct grcSamplerState {
+		struct grcSamplerState
+		{
 			u8 MinFilter, MagFilter, MipFilter;	// Translated from DX11 enumerated types
 			u8 AddressU, AddressV, AddressW; // TADDRESS_CLAMP
 			u8 MaxAnisotropy; // 16
 			u8 BorderColor, BorderColorW; // only black(0) or white(~0) are supported on DX9-era hardware.  (Xenon supports "opaque" black too)
 			u8 TrilinearThresh;
 			u8 MinMipLevel, MaxMipLevel; // MinMipLevel == MaxLod, MaxMipLevel == MinLod
-			union { u32 u; float f; } MipLodBias; // 0.f
+			union
+			{
+				u32 u; float f;
+			} MipLodBias; // 0.f
 			int CompareFunc;
 		};
 		template <typename H, typename T, typename D, typename S, typename indexType, u32 maxSize>
-		class grcStateBlockStore {
+		class grcStateBlockStore
+		{
 			static constexpr u16 MaxRefCount = 65535;
 		public:
-			grcStateBlockStore() {
+			grcStateBlockStore()
+			{
 				FirstUsed = maxSize;
 				FirstFree = 0;
 				Used = MaxUsed = 0;
-				for (u32 i = 0; i < maxSize; i++) {
+				for (u32 i = 0; i < maxSize; i++)
+				{
 					RefCounts[i] = 0;
 					Next[i] = indexType(i + 1);
 					State[i] = NULL;
 				}
 			}
-			const T& operator[](u64 i) {
+			const T& operator[](u64 i)
+			{
 				i--;
 				return Store[i];
 			}
-			H Allocate(const T& data, const D& desc) {
+			H Allocate(const T& data, const D& desc)
+			{
 				u32 hash = atDataHash((char*)&data, sizeof(data)), i;
 				for (i = FirstUsed; i != maxSize && (Hashes[i] != hash || memcmp(&data, Store + i, sizeof(data))); i = Next[i])
 					;
-				if (i == maxSize) {
-					if (FirstFree == maxSize) {
+				if (i == maxSize)
+				{
+					if (FirstFree == maxSize)
+					{
 						return H();
 					}
-					else {
+					else
+					{
 						// Pull head entry off the free list, add it to the used list
 						i = FirstFree;
 						FirstFree = Next[i];
@@ -2578,23 +3040,28 @@ namespace rage {
 					RefCounts[i]++;
 				return static_cast<H>(i + 1);
 			}
-			void RecreateState(H i, const D& desc) {
+			void RecreateState(H i, const D& desc)
+			{
 				i = static_cast<H>(i - 1);
 				State[i]->Release();
 				//State[i] = T::AllocateState(desc);
 			}
-			S* GetState(H i) {
+			S* GetState(H i)
+			{
 				i = static_cast<H>(i - 1);
 				return State[i];
 			}
-			void AddRef(H i) {
+			void AddRef(H i)
+			{
 				i = static_cast<H>(i - 1);
 				if (RefCounts[i] != MaxRefCount)
 					++RefCounts[i];
 			}
-			void Release(H i) {
+			void Release(H i)
+			{
 				i = static_cast<H>(i - 1);
-				if (RefCounts[i] != MaxRefCount && !--RefCounts[i]) {
+				if (RefCounts[i] != MaxRefCount && !--RefCounts[i])
+				{
 					State[i]->Release();
 					State[i] = NULL;
 					// Find ourselves on the used list, remove self
@@ -2608,12 +3075,30 @@ namespace rage {
 					--Used;
 				}
 			}
-			T* GetStore() { return (T*)((char*)Store - (sizeof(T))); }	// NOTE THE "-1" EQUIVALENT HERE, avoids -1 on every handle lookup on SPU
-			S** GetStates() { return State - 1; } // NOTE THE -1 HERE, avoids -1 on every handle lookup on SPU
-			const indexType* GetFreeList() const { return Next; }
-			indexType GetFirstUsed() const { return FirstUsed; }
-			u32 GetMaxUsed() const { return MaxUsed; }
-			u32 GetMaxSize() const { return maxSize; }
+			T* GetStore()
+			{
+				return (T*)((char*)Store - (sizeof(T)));
+			}	// NOTE THE "-1" EQUIVALENT HERE, avoids -1 on every handle lookup on SPU
+			S** GetStates()
+			{
+				return State - 1;
+			} // NOTE THE -1 HERE, avoids -1 on every handle lookup on SPU
+			const indexType* GetFreeList() const
+			{
+				return Next;
+			}
+			indexType GetFirstUsed() const
+			{
+				return FirstUsed;
+			}
+			u32 GetMaxUsed() const
+			{
+				return MaxUsed;
+			}
+			u32 GetMaxSize() const
+			{
+				return maxSize;
+			}
 		private:
 			T Store[maxSize]; // the store itself
 			u32 Hashes[maxSize]; // hash codes to speed up comparisons against existing types
@@ -2624,7 +3109,8 @@ namespace rage {
 			indexType Used, MaxUsed;
 		};
 	}
-	enum grcDrawMode {
+	enum grcDrawMode
+	{
 		drawPoints,			// Draw one or more single-pixel points
 		drawLines,			// Draw one or more disconnected line segments
 		drawLineStrip,		// Draw a single multivertex line strip
@@ -2636,29 +3122,96 @@ namespace rage {
 		drawTrisAdj,		// Triangles with adjacency information
 		drawModesTotal,
 	};
-	struct grcCellGcmTextureWrapper : CellGcmTexture {
-		inline void	SetWidth(uint16_t in) { width = in; }
-		inline uint16_t GetWidth() const { return width; };
-		inline void	SetHeight(uint16_t in) { height = in; }
-		inline uint16_t GetHeight() const { return height; };
-		inline void	SetDepth(uint16_t in) { depth = in; }
-		inline uint16_t GetDepth() const { return depth; };
-		inline void	SetFormat(uint8_t in) { format = in; }
-		inline uint8_t GetFormat() const { return format; };
-		inline void	SetDimension(uint8_t in) { dimension = in; }
-		inline uint8_t GetDimension() const { return dimension; };
-		inline void	SetMipMap(uint8_t in) { mipmap = in; }
-		inline uint8_t GetMipMap() const { return mipmap; };
-		inline void	SetBindFlag(uint8_t in) { _padding = in; }
-		inline uint8_t GetBindFlag() const { return _padding; };
-		inline void	SetTileMode(uint8_t in) { location = in; }
-		inline uint8_t GetTileMode() const { return location; };
-		inline void	SetImageType(uint8_t in) { cubemap = in; }
-		inline uint8_t GetImageType() const { return cubemap; };
-		inline void	SetOwnsMem(uint32_t in) { remap = in; }
-		inline uint32_t GetOwnsMem() const { return remap; };
-		inline void	SetUsesPreAllocatedMem(uint32_t in) { pitch = in; }
-		inline uint32_t GetUsesPreAllocatedMem() const { return pitch; };
+	struct grcCellGcmTextureWrapper : CellGcmTexture
+	{
+		inline void	SetWidth(uint16_t in)
+		{
+			width = in;
+		}
+		inline uint16_t GetWidth() const
+		{
+			return width;
+		};
+		inline void	SetHeight(uint16_t in)
+		{
+			height = in;
+		}
+		inline uint16_t GetHeight() const
+		{
+			return height;
+		};
+		inline void	SetDepth(uint16_t in)
+		{
+			depth = in;
+		}
+		inline uint16_t GetDepth() const
+		{
+			return depth;
+		};
+		inline void	SetFormat(uint8_t in)
+		{
+			format = in;
+		}
+		inline uint8_t GetFormat() const
+		{
+			return format;
+		};
+		inline void	SetDimension(uint8_t in)
+		{
+			dimension = in;
+		}
+		inline uint8_t GetDimension() const
+		{
+			return dimension;
+		};
+		inline void	SetMipMap(uint8_t in)
+		{
+			mipmap = in;
+		}
+		inline uint8_t GetMipMap() const
+		{
+			return mipmap;
+		};
+		inline void	SetBindFlag(uint8_t in)
+		{
+			_padding = in;
+		}
+		inline uint8_t GetBindFlag() const
+		{
+			return _padding;
+		};
+		inline void	SetTileMode(uint8_t in)
+		{
+			location = in;
+		}
+		inline uint8_t GetTileMode() const
+		{
+			return location;
+		};
+		inline void	SetImageType(uint8_t in)
+		{
+			cubemap = in;
+		}
+		inline uint8_t GetImageType() const
+		{
+			return cubemap;
+		};
+		inline void	SetOwnsMem(uint32_t in)
+		{
+			remap = in;
+		}
+		inline uint32_t GetOwnsMem() const
+		{
+			return remap;
+		};
+		inline void	SetUsesPreAllocatedMem(uint32_t in)
+		{
+			pitch = in;
+		}
+		inline uint32_t GetUsesPreAllocatedMem() const
+		{
+			return pitch;
+		};
 	};
 	typedef struct ID3D11Device grcDeviceHandle;
 	typedef struct IDXGISwapChain grcSwapChain;
@@ -2979,22 +3532,37 @@ namespace rage {
 		ProgramType Program;
 		u32 ProgramSize;
 	};
-	class grcDomainProgram : public grcProgram {
+	class grcDomainProgram : public grcProgram
+	{
 		friend class grcEffect;
 	public:
 		typedef grcDomainShader* ProgramType;
-		ProgramType GetProgram() { return Program; }
-		ProgramType GetProgram() const { return Program; }
-		u32 GetProgramSize() const { return ProgramSize; }
-		static ShaderType GetShaderType() { return DS_TYPE; };
+		ProgramType GetProgram()
+		{
+			return Program;
+		}
+		ProgramType GetProgram() const
+		{
+			return Program;
+		}
+		u32 GetProgramSize() const
+		{
+			return ProgramSize;
+		}
+		static ShaderType GetShaderType()
+		{
+			return DS_TYPE;
+		};
 	private:
 		ProgramType Program;
 		u32 ProgramSize;
 	};
-	class grcGeometryProgram : public grcProgram {
+	class grcGeometryProgram : public grcProgram
+	{
 		friend class grcEffect;
 	public:
-		struct grcStream {
+		struct grcStream
+		{
 			char mSemanticName[16];
 			u8 mSemanticIndex;
 			u8 mStartComponent;
@@ -3002,24 +3570,49 @@ namespace rage {
 			u8 mOutputSlot;
 		};
 		typedef grcGeometryShader* ProgramType;
-		ProgramType GetProgram() { return Program; }
-		ProgramType GetProgram() const { return Program; }
-		u32 GetProgramSize() const { return ProgramSize; }
-		static ShaderType GetShaderType() { return GS_TYPE; };
+		ProgramType GetProgram()
+		{
+			return Program;
+		}
+		ProgramType GetProgram() const
+		{
+			return Program;
+		}
+		u32 GetProgramSize() const
+		{
+			return ProgramSize;
+		}
+		static ShaderType GetShaderType()
+		{
+			return GS_TYPE;
+		};
 	private:
 		ProgramType Program;
 		u32 ProgramSize;
 		grcStream* Streams;
 		u32 StreamCount;
 	};
-	class grcHullProgram : public grcProgram {
+	class grcHullProgram : public grcProgram
+	{
 		friend class grcEffect;
 	public:
 		typedef grcHullShader* ProgramType;
-		ProgramType GetProgram() { return Program; }
-		ProgramType GetProgram() const { return Program; }
-		u32 GetProgramSize() const { return ProgramSize; }
-		static ShaderType GetShaderType() { return HS_TYPE; };
+		ProgramType GetProgram()
+		{
+			return Program;
+		}
+		ProgramType GetProgram() const
+		{
+			return Program;
+		}
+		u32 GetProgramSize() const
+		{
+			return ProgramSize;
+		}
+		static ShaderType GetShaderType()
+		{
+			return HS_TYPE;
+		};
 	private:
 		ProgramType Program;
 		u32 ProgramSize;
@@ -3028,7 +3621,8 @@ namespace rage {
 	typedef enum grcEffectVar__ { grcevNONE } grcEffectVar;
 	typedef enum grcEffectTechnique__ { grcetNONE } grcEffectTechnique;
 	typedef enum grcEffectAnnotation__ { grceaNONE } grcEffectAnnotation;
-	struct grcEffect_Technique_Pass {
+	struct grcEffect_Technique_Pass
+	{
 		u8 VertexProgramIndex, FragmentProgramIndex;
 		u8 GeometryProgramIndex, ComputeProgramIndex, DomainProgramIndex, HullProgramIndex;
 		u8 RasterizerStateHandle, DepthStencilStateHandle, BlendStateHandle, AlphaRef, StencilRef, pad;
@@ -3062,7 +3656,8 @@ namespace rage {
 		void Clone(grcInstanceData& outClone) const {
 			m_InstanceData.Clone(outClone);
 		}
-		struct Technique {
+		struct Technique
+		{
 			typedef grcEffect_Technique_Pass Pass;
 			u32 NameHash;
 			grcString Name;
@@ -3400,53 +3995,122 @@ namespace rage {
 	};
 }
 //strXXXXXXX
-namespace rage {
-	enum eHierarchyModType {
+namespace rage
+{
+	enum eHierarchyModType
+	{
 		HMT_ENABLE = 0,
 		HMT_DISABLE,
 		HMT_FLUSH
 	};
-	#define STRINDEX_INVALID 0xFFFFFFFF
-	#define STRLOCALINDEX_INVALID 0xFFFFFFFF
+#define STRINDEX_INVALID 0xFFFFFFFF
+#define STRLOCALINDEX_INVALID 0xFFFFFFFF
 	template <typename T>
-	struct strDynamicIndex {
-		enum eInvalidIndex { INVALID_INDEX = STRLOCALINDEX_INVALID };
-		inline T Get() const { return m_Index; }
-		inline void Set(T i) { m_Index = i; }
-		inline bool IsValid() const { return m_Index != STRLOCALINDEX_INVALID; }
-		inline bool IsInvalid() const { return m_Index == STRLOCALINDEX_INVALID; }
-		inline operator T() { return Get(); }
-		inline void operator =(const T other) { Set(other); }
-		inline void operator =(const strDynamicIndex<T>& other) { m_Index = other.m_Index; }
-		inline bool operator ==(const strDynamicIndex<T>& other) const { return m_Index == other.m_Index; }
-		inline bool operator ==(const T& other) const { return m_Index == other; }
-		inline bool operator !=(const strDynamicIndex<T>& other) const { return m_Index != other.m_Index; }
-		inline bool operator !=(const T& other) const { return m_Index != other; }
-		inline bool operator >(const strDynamicIndex<T>& other) const { return m_Index > other.m_Index; }
-		inline bool operator >(const T& other) const { return m_Index > other; }
-		inline bool operator >=(const strDynamicIndex<T>& other) const { return m_Index >= other.m_Index; }
-		inline bool operator >=(const T& other) const { return m_Index >= other; }
-		inline bool operator <=(const strDynamicIndex<T>& other) const { return m_Index <= other.m_Index; }
-		inline bool operator <=(const T& other) const { return m_Index <= other; }
-		inline bool operator <(const strDynamicIndex<T>& other) const { return m_Index < other.m_Index; }
-		inline bool operator <(const T& other) const { return m_Index < other; }
+	struct strDynamicIndex
+	{
+		enum eInvalidIndex
+		{
+			INVALID_INDEX = STRLOCALINDEX_INVALID
+		};
+		inline T Get() const
+		{
+			return m_Index;
+		}
+		inline void Set(T i)
+		{
+			m_Index = i;
+		}
+		inline bool IsValid() const
+		{
+			return m_Index != STRLOCALINDEX_INVALID;
+		}
+		inline bool IsInvalid() const
+		{
+			return m_Index == STRLOCALINDEX_INVALID;
+		}
+		inline operator T()
+		{
+			return Get();
+		}
+		inline void operator =(const T other)
+		{
+			Set(other);
+		}
+		inline void operator =(const strDynamicIndex<T>& other)
+		{
+			m_Index = other.m_Index;
+		}
+		inline bool operator ==(const strDynamicIndex<T>& other) const
+		{
+			return m_Index == other.m_Index;
+		}
+		inline bool operator ==(const T& other) const
+		{
+			return m_Index == other;
+		}
+		inline bool operator !=(const strDynamicIndex<T>& other) const
+		{
+			return m_Index != other.m_Index;
+		}
+		inline bool operator !=(const T& other) const
+		{
+			return m_Index != other;
+		}
+		inline bool operator >(const strDynamicIndex<T>& other) const
+		{
+			return m_Index > other.m_Index;
+		}
+		inline bool operator >(const T& other) const
+		{
+			return m_Index > other;
+		}
+		inline bool operator >=(const strDynamicIndex<T>& other) const
+		{
+			return m_Index >= other.m_Index;
+		}
+		inline bool operator >=(const T& other) const
+		{
+			return m_Index >= other;
+		}
+		inline bool operator <=(const strDynamicIndex<T>& other) const
+		{
+			return m_Index <= other.m_Index;
+		}
+		inline bool operator <=(const T& other) const
+		{
+			return m_Index <= other;
+		}
+		inline bool operator <(const strDynamicIndex<T>& other) const
+		{
+			return m_Index < other.m_Index;
+		}
+		inline bool operator <(const T& other) const
+		{
+			return m_Index < other;
+		}
 		T m_Index;
 	};
 	typedef strDynamicIndex<u32> strIndex;
 	typedef strDynamicIndex<s32> strLocalIndex;
 	typedef atHashString strStreamingObjectName;
 	typedef atHashString strStreamingObjectName;
-	enum strRefKind {
+	enum strRefKind
+	{
 		REF_RENDER = 0,
 		REF_SCRIPT = 1,
 		REF_DEFRAG = REF_RENDER,
 		REF_OTHER = 2,
 		MAX_REF_KINDS
 	};
-	class strStreamingLoader {
+	class strStreamingLoader
+	{
 	public:
-		enum Status { STATUS_IDLE, STATUS_LOADING, STATUS_CANCELED, STATUS_MAX_VALUE };
-		struct StreamingFile {
+		enum Status
+		{
+			STATUS_IDLE, STATUS_LOADING, STATUS_CANCELED, STATUS_MAX_VALUE
+		};
+		struct StreamingFile
+		{
 			// Max value is 2, but we need to give it an extra bit
 			// since enums are signed! (We could handle it in code,
 			// but this approach ends up with less confusion.)
@@ -3462,42 +4126,103 @@ namespace rage {
 			datResourceMap m_AllocationMap; // A superset of m_LoadingMap
 		};
 	};
-	class strStreamingModule : public datBase {
+	class strStreamingModule : public datBase
+	{
 		friend class strStreamingModuleMgr;
 	public:
-		virtual ~strStreamingModule() {}
-		const char* GetModuleName() const { return m_ModuleName; }
-		virtual const char* GetName(strLocalIndex UNUSED_PARAM(index)) const { return m_ModuleName; }
+		virtual ~strStreamingModule()
+		{}
+		const char* GetModuleName() const
+		{
+			return m_ModuleName;
+		}
+		virtual const char* GetName(strLocalIndex UNUSED_PARAM(index)) const
+		{
+			return m_ModuleName;
+		}
 		virtual strLocalIndex Register(const char* name) = 0;
 		virtual strLocalIndex FindSlot(const char* name) const = 0;
-		virtual void Remove(strLocalIndex index) {}
-		virtual void RemoveSlot(strLocalIndex UNUSED_PARAM(index)) {}
-		virtual bool Load(strLocalIndex UNUSED_PARAM(index), void* UNUSED_PARAM(object), int UNUSED_PARAM(size)) { return false; }
-		virtual void PlaceResource(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), datResourceInfo& UNUSED_PARAM(header)) {}
-		virtual void SetResource(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map)) {}
-		virtual void* GetPtr(strLocalIndex UNUSED_PARAM(index)) { return NULL; }
-		virtual void* GetDataPtr(strLocalIndex index) { return GetPtr(index); }
-		virtual void* Defragment(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), bool& UNUSED_PARAM(flush)) { return NULL; }
-		virtual void DefragmentComplete(strLocalIndex UNUSED_PARAM(index)) {}
-		virtual void DefragmentPreprocess(strLocalIndex UNUSED_PARAM(index)) {}
-		virtual pgBase* GetResource(strLocalIndex UNUSED_PARAM(index)) const { return NULL; }
-		virtual void GetModelMapTypeIndex(strLocalIndex UNUSED_PARAM(slotIndex), strIndex& UNUSED_PARAM(retIndex)) const {}
-		virtual bool ModifyHierarchyStatus(strLocalIndex UNUSED_PARAM(index), eHierarchyModType UNUSED_PARAM(modType)) { return false; }
-		virtual void AddRef(strLocalIndex UNUSED_PARAM(index), strRefKind UNUSED_PARAM(strRefKind)) {}
-		virtual void RemoveRef(strLocalIndex UNUSED_PARAM(index), strRefKind UNUSED_PARAM(strRefKind)) {}
-		virtual void ResetAllRefs(strLocalIndex UNUSED_PARAM(index)) {}
-		virtual int GetNumRefs(strLocalIndex UNUSED_PARAM(index)) const { return 1; }
+		virtual void Remove(strLocalIndex index)
+		{}
+		virtual void RemoveSlot(strLocalIndex UNUSED_PARAM(index))
+		{}
+		virtual bool Load(strLocalIndex UNUSED_PARAM(index), void* UNUSED_PARAM(object), int UNUSED_PARAM(size))
+		{
+			return false;
+		}
+		virtual void PlaceResource(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), datResourceInfo& UNUSED_PARAM(header))
+		{}
+		virtual void SetResource(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map))
+		{}
+		virtual void* GetPtr(strLocalIndex UNUSED_PARAM(index))
+		{
+			return NULL;
+		}
+		virtual void* GetDataPtr(strLocalIndex index)
+		{
+			return GetPtr(index);
+		}
+		virtual void* Defragment(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), bool& UNUSED_PARAM(flush))
+		{
+			return NULL;
+		}
+		virtual void DefragmentComplete(strLocalIndex UNUSED_PARAM(index))
+		{}
+		virtual void DefragmentPreprocess(strLocalIndex UNUSED_PARAM(index))
+		{}
+		virtual pgBase* GetResource(strLocalIndex UNUSED_PARAM(index)) const
+		{
+			return NULL;
+		}
+		virtual void GetModelMapTypeIndex(strLocalIndex UNUSED_PARAM(slotIndex), strIndex& UNUSED_PARAM(retIndex)) const
+		{}
+		virtual bool ModifyHierarchyStatus(strLocalIndex UNUSED_PARAM(index), eHierarchyModType UNUSED_PARAM(modType))
+		{
+			return false;
+		}
+		virtual void AddRef(strLocalIndex UNUSED_PARAM(index), strRefKind UNUSED_PARAM(strRefKind))
+		{}
+		virtual void RemoveRef(strLocalIndex UNUSED_PARAM(index), strRefKind UNUSED_PARAM(strRefKind))
+		{}
+		virtual void ResetAllRefs(strLocalIndex UNUSED_PARAM(index))
+		{}
+		virtual int GetNumRefs(strLocalIndex UNUSED_PARAM(index)) const
+		{
+			return 1;
+		}
 		virtual const char* GetRefCountString(strLocalIndex index, char* buffer, u64 bufferLen) const = 0;
-		virtual int GetDependencies(strLocalIndex UNUSED_PARAM(index), strIndex* UNUSED_PARAM(pIndices), int UNUSED_PARAM(indexArraySize)) const { return 0; }
-		virtual void PrintExtraInfo(strLocalIndex UNUSED_PARAM(index), char* UNUSED_PARAM(extraInfo), u64 UNUSED_PARAM(maxSize)) const {}
-		virtual void RequestExtraMemory(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), int UNUSED_PARAM(maxAllocs)) {}
-		virtual void ReceiveExtraMemory(strLocalIndex UNUSED_PARAM(index), const datResourceMap& UNUSED_PARAM(map)) {}
-		virtual u64 GetExtraVirtualMemory(strLocalIndex UNUSED_PARAM(index)) const { return 0; }
-		virtual u64 GetExtraPhysicalMemory(strLocalIndex UNUSED_PARAM(index)) const { return 0; }
-		virtual bool IsDefragmentCopyBlocked() const { return false; }
-		virtual bool RequiresTempMemory(strLocalIndex UNUSED_PARAM(objIndex)) const { return m_RequiresTempMemory;}
-		virtual bool CanPlaceAsynchronously( strLocalIndex UNUSED_PARAM(objIndex) ) const { return false; }
-		virtual void PlaceAsynchronously(strLocalIndex UNUSED_PARAM(objIndex), strStreamingLoader::StreamingFile& UNUSED_PARAM(file), datResourceInfo& UNUSED_PARAM(info)) {}
+		virtual int GetDependencies(strLocalIndex UNUSED_PARAM(index), strIndex* UNUSED_PARAM(pIndices), int UNUSED_PARAM(indexArraySize)) const
+		{
+			return 0;
+		}
+		virtual void PrintExtraInfo(strLocalIndex UNUSED_PARAM(index), char* UNUSED_PARAM(extraInfo), u64 UNUSED_PARAM(maxSize)) const
+		{}
+		virtual void RequestExtraMemory(strLocalIndex UNUSED_PARAM(index), datResourceMap& UNUSED_PARAM(map), int UNUSED_PARAM(maxAllocs))
+		{}
+		virtual void ReceiveExtraMemory(strLocalIndex UNUSED_PARAM(index), const datResourceMap& UNUSED_PARAM(map))
+		{}
+		virtual u64 GetExtraVirtualMemory(strLocalIndex UNUSED_PARAM(index)) const
+		{
+			return 0;
+		}
+		virtual u64 GetExtraPhysicalMemory(strLocalIndex UNUSED_PARAM(index)) const
+		{
+			return 0;
+		}
+		virtual bool IsDefragmentCopyBlocked() const
+		{
+			return false;
+		}
+		virtual bool RequiresTempMemory(strLocalIndex UNUSED_PARAM(objIndex)) const
+		{
+			return m_RequiresTempMemory;
+		}
+		virtual bool CanPlaceAsynchronously(strLocalIndex UNUSED_PARAM(objIndex)) const
+		{
+			return false;
+		}
+		virtual void PlaceAsynchronously(strLocalIndex UNUSED_PARAM(objIndex), strStreamingLoader::StreamingFile& UNUSED_PARAM(file), datResourceInfo& UNUSED_PARAM(info))
+		{}
 		strIndex m_indexOffset;
 		s32 m_moduleId;
 		u32 m_size;
@@ -3508,55 +4233,76 @@ namespace rage {
 		s32 m_expectedRscVersionNumber;
 		s32 m_moduleTypeIndex;
 	};
-	class strStreamingModuleMgr : public datBase {
+	class strStreamingModuleMgr : public datBase
+	{
 	private:
-		struct ModuleIndexInfo {
+		struct ModuleIndexInfo
+		{
 			strStreamingModule* m_Module;
 			strIndex m_LastIndex;
 			int m_ModuleIndex;
 		};
 	public:
-		strStreamingModule* GetModule(s32 module) { return m_moduleArray[module]; }
-		const strStreamingModule* GetModule(s32 module) const { return m_moduleArray[module]; }
-		int GetNumberOfModules() const { return m_moduleArray.size(); }
-		strStreamingModule* GetModuleFromIndex(strIndex streamingIndex) const {
-			const ModuleIndexInfo *info = GetModuleInfoFromIndex(streamingIndex);
+		strStreamingModule* GetModule(s32 module)
+		{
+			return m_moduleArray[module];
+		}
+		const strStreamingModule* GetModule(s32 module) const
+		{
+			return m_moduleArray[module];
+		}
+		int GetNumberOfModules() const
+		{
+			return m_moduleArray.size();
+		}
+		strStreamingModule* GetModuleFromIndex(strIndex streamingIndex) const
+		{
+			const ModuleIndexInfo* info = GetModuleInfoFromIndex(streamingIndex);
 			return info->m_Module;
 		}
-		u8 GetModuleIdFromIndex(strIndex streamingIndex) const {
-			const ModuleIndexInfo *info = GetModuleInfoFromIndex(streamingIndex);
+		u8 GetModuleIdFromIndex(strIndex streamingIndex) const
+		{
+			const ModuleIndexInfo* info = GetModuleInfoFromIndex(streamingIndex);
 			return (u8)info->m_ModuleIndex;
 		}
 		atArray<ModuleIndexInfo> m_ModuleIndexRanges;
 		atArray<strStreamingModule*> m_moduleArray;
 	private:
-		const ModuleIndexInfo* GetModuleInfoFromIndex(strIndex index) const {
+		const ModuleIndexInfo* GetModuleInfoFromIndex(strIndex index) const
+		{
 			int moduleCount = m_ModuleIndexRanges.size();
 			int minValue = 0, maxValue = moduleCount - 1;
 			int current = maxValue >> 1;
 			const ModuleIndexInfo* indexInfos = m_ModuleIndexRanges.data();
-			while (true) {
+			while (true)
+			{
 				const ModuleIndexInfo* info = &indexInfos[current];
-				if (index < info->m_LastIndex) {
+				if (index < info->m_LastIndex)
+				{
 					// We need to move left, or we found the right one.
-					if (minValue == current) {
+					if (minValue == current)
+					{
 						return info;
 					}
 					maxValue = current;
 					int newCurrent = (minValue + maxValue) >> 1;
-					if (newCurrent == current) {
+					if (newCurrent == current)
+					{
 						newCurrent--;
 					}
 					current = newCurrent;
 				}
-				else {
+				else
+				{
 					// We have to move to the right.
 					minValue = current + 1;
-					if (minValue > maxValue) {
+					if (minValue > maxValue)
+					{
 						return NULL;
 					}
 					int newCurrent = (minValue + maxValue) >> 1;
-					if (newCurrent == current) {
+					if (newCurrent == current)
+					{
 						newCurrent++;
 					}
 					current = newCurrent;
@@ -3566,25 +4312,33 @@ namespace rage {
 	};
 }
 //fwXXXXXXX
-namespace rage {
+namespace rage
+{
 	template<typename _KeyType>
-	class fwNameRegistrarDef {
+	class fwNameRegistrarDef
+	{
 	public:
-		int Lookup(_KeyType key) const {
+		int Lookup(_KeyType key) const
+		{
 			u32 bucket = m_Hash[key % m_HashCount];
-			while (bucket != NONE) {
+			while (bucket != NONE)
+			{
 				const Bucket& b = m_Buckets[bucket];
-				if (b.hash != key) {
+				if (b.hash != key)
+				{
 					bucket = b.next;
 				}
-				else {
+				else
+				{
 					return b.value;
 				}
 			}
 			return -1;
 		}
-		void Insert(_KeyType key, u32 value) {
-			if (m_FirstFreeBucket == NONE) {
+		void Insert(_KeyType key, u32 value)
+		{
+			if (m_FirstFreeBucket == NONE)
+			{
 				return;
 			}
 			u32 hashIdx = key % m_HashCount;
@@ -3601,13 +4355,16 @@ namespace rage {
 			m_FirstFreeBucket = nextFree;
 			m_entries++;
 		}
-		void Delete(_KeyType key) {
+		void Delete(_KeyType key)
+		{
 			u32 hashIdx = key % m_HashCount;
 			u32* prevBucket = &m_Hash[hashIdx];
 			u32 bucket = m_Hash[hashIdx];
-			while (bucket != NONE) {
+			while (bucket != NONE)
+			{
 				Bucket& b = m_Buckets[bucket];
-				if (b.hash == key) {
+				if (b.hash == key)
+				{
 					m_entries--;
 					// Patch self out of chain; this may mark the entire chain free.
 					*prevBucket = b.next;
@@ -3617,50 +4374,64 @@ namespace rage {
 					m_FirstFreeBucket = bucket;
 					return;
 				}
-				else {
+				else
+				{
 					prevBucket = &b.next;
 					bucket = b.next;
 				}
 			}
 		}
-		bool IsInitialized() const { return m_Hash && m_Buckets; }
-		u32 GetCount() { return m_entries; }
+		bool IsInitialized() const
+		{
+			return m_Hash && m_Buckets;
+		}
+		u32 GetCount()
+		{
+			return m_entries;
+		}
 	private:
 		static constexpr u32 NONE = 0xFFFFFFFF;
-		struct Bucket { _KeyType hash; u32 value; u32 next; };
+		struct Bucket
+		{
+			_KeyType hash; u32 value; u32 next;
+		};
 		Bucket* m_Buckets;
 		u32* m_Hash;
 		u32 m_HashCount, m_FirstFreeBucket;
 		u32 m_entries;
 	};
 	typedef fwNameRegistrarDef<u32> fwNameRegistrar;
-	#define POOL_FLAG_ISFREE 0x80
-	#define POOL_FLAG_REFERENCEMASK 0x7f
-	class fwBasePool {
+#define POOL_FLAG_ISFREE 0x80
+#define POOL_FLAG_REFERENCEMASK 0x7f
+	class fwBasePool
+	{
 	public:
-		void* New() {
-			if (m_nFirstFreeIndex == -1) {
+		void* New()
+		{
+			if (m_nFirstFreeIndex == -1)
+			{
 				return NULL;
 			}
 			s32 freeIndex = m_nFirstFreeIndex;
-			s32 *nextFree = (s32*)(m_aStorage + freeIndex * m_nStorageSize);
+			s32* nextFree = (s32*)(m_aStorage + freeIndex * m_nStorageSize);
 			m_nFirstFreeIndex = *nextFree;
 			if (m_nFirstFreeIndex == -1)
 				m_nLastFreeIndex = -1;
-			void *result = (void*) nextFree;
+			void* result = (void*)nextFree;
 			SetIsFree(freeIndex, false);
 			SetReference(freeIndex, GetReference(freeIndex) + 1);
 			m_numSlotsUsed++;
 			return result;
 		}
-		void* New(s32 index) {
+		void* New(s32 index)
+		{
 			const u32 i = (index >> 8);
 			SetIsFree(i, false);
-			SetReference(i, (u8) (index & 255) );
+			SetReference(i, (u8)(index & 255));
 			u8* pT = &m_aStorage[i * m_nStorageSize];
 			// Locate the object in the free list
-			index>>=8;
-			s32 *prev = &m_nFirstFreeIndex;
+			index >>= 8;
+			s32* prev = &m_nFirstFreeIndex;
 			while (*prev != -1 && *prev != index)
 				prev = (s32*)(m_aStorage + *prev * m_nStorageSize);
 			// Patch the free list around the item we just allocated
@@ -3672,46 +4443,79 @@ namespace rage {
 			return (void*)pT;
 		}
 		typedef bool (*Callback)(void* item, void* data);
-		void ForAll(Callback cb, void* data) {
+		void ForAll(Callback cb, void* data)
+		{
 			s32 size = GetSize();
-			while (size--) {
+			while (size--)
+			{
 				void* pItem = GetSlot(size);
-				if (pItem) {
+				if (pItem)
+				{
 					if (!cb(pItem, data))
 						return;
 				}
 			}
 		}
-		__forceinline void* GetSlot(s32 index) {
+		__forceinline void* GetSlot(s32 index)
+		{
 			return const_cast<void*>(reinterpret_cast<fwBasePool*>(this)->GetSlot(index));
 		}
-		void* GetAt(s32 index) {
+		void* GetAt(s32 index)
+		{
 			const u32 i = (index >> 8);
 			return m_aFlags[i] == (index & 0xFF) ? (void*)&m_aStorage[i * m_nStorageSize] : nullptr;
 		}
-		static __forceinline u64 GetNonZeroMask(u32 x) { // returns (x ? ~0 : 0) without branching
+		static __forceinline u64 GetNonZeroMask(u32 x)
+		{ // returns (x ? ~0 : 0) without branching
 			return (u64)(((s64)(x) | -(s64)(x)) >> (sizeof(u64) * 8 - 1));
 		}
-		__forceinline const void* GetSlot(s32 index) const {
+		__forceinline const void* GetSlot(s32 index) const
+		{
 			const u64 mask = ~GetNonZeroMask(m_aFlags[index] & POOL_FLAG_ISFREE);
 			const u64 addr = reinterpret_cast<u64>(m_aStorage + index * m_nStorageSize);
 			const void* const result = reinterpret_cast<const void*>(addr & mask);
 			return result;
 		}
-		void SetIsFree(s32 index, bool bIsFree) { 
+		void SetIsFree(s32 index, bool bIsFree)
+		{
 			bIsFree ? (m_aFlags[index] |= POOL_FLAG_ISFREE) : (m_aFlags[index] &= ~POOL_FLAG_ISFREE);
 		}
-		void SetReference(s32 index, u8 nReference) {
-			m_aFlags[index] = (m_aFlags[index] & ~POOL_FLAG_REFERENCEMASK) | ( ( (nReference & POOL_FLAG_REFERENCEMASK) > 1 ? (nReference & POOL_FLAG_REFERENCEMASK) : 1 ) );
+		void SetReference(s32 index, u8 nReference)
+		{
+			m_aFlags[index] = (m_aFlags[index] & ~POOL_FLAG_REFERENCEMASK) | (((nReference & POOL_FLAG_REFERENCEMASK) > 1 ? (nReference & POOL_FLAG_REFERENCEMASK) : 1));
 		}
-		u64 GetStorageSize() const { return m_nStorageSize; }
-		s32 GetSize() const { return m_nSize; }
-		s32 GetNoOfUsedSpaces() const { return m_numSlotsUsed; }
-		s32 GetNoOfFreeSpaces() const { return m_nSize - m_numSlotsUsed; }
-		s32 GetPoolSize() const { return m_nSize; }
-		bool GetIsFree(s32 index) const { return (m_aFlags[index] & POOL_FLAG_ISFREE) != 0; }
-		u8 GetReference(s32 index) const { return (m_aFlags[index] & POOL_FLAG_REFERENCEMASK); }
-		u8 GetFlags(s32 index) const { return (m_aFlags[index]); }
+		u64 GetStorageSize() const
+		{
+			return m_nStorageSize;
+		}
+		s32 GetSize() const
+		{
+			return m_nSize;
+		}
+		s32 GetNoOfUsedSpaces() const
+		{
+			return m_numSlotsUsed;
+		}
+		s32 GetNoOfFreeSpaces() const
+		{
+			return m_nSize - m_numSlotsUsed;
+		}
+		s32 GetPoolSize() const
+		{
+			return m_nSize;
+		}
+		bool GetIsFree(s32 index) const
+		{
+			return (m_aFlags[index] & POOL_FLAG_ISFREE) != 0;
+		}
+		u8 GetReference(s32 index) const
+		{
+			return (m_aFlags[index] & POOL_FLAG_REFERENCEMASK);
+		}
+		u8 GetFlags(s32 index) const
+		{
+			return (m_aFlags[index]);
+		}
 		u8* m_aStorage;
 		u8* m_aFlags;
 		s32 m_nSize;
@@ -3722,20 +4526,43 @@ namespace rage {
 		s32 m_bOwnsArrays : 2;
 	};
 	template <class T>
-	class fwPool : public fwBasePool {
+	class fwPool : public fwBasePool
+	{
 	public:
-		T* New() { return static_cast<T*>(fwBasePool::New()); }
-		T* New(s32 index) { return static_cast<T*>(fwBasePool::New(index)); }
-		T* GetAt(s32 index) { return static_cast<T*>(fwBasePool::GetAt(index)); }
-		T* GetSlot(s32 index) { return static_cast<T*>(fwBasePool::GetSlot(index)); }
-		const T* GetSlot(s32 index) const { return static_cast<const T*>(fwBasePool::GetSlot(index)); }
+		T* New()
+		{
+			return static_cast<T*>(fwBasePool::New());
+		}
+		T* New(s32 index)
+		{
+			return static_cast<T*>(fwBasePool::New(index));
+		}
+		T* GetAt(s32 index)
+		{
+			return static_cast<T*>(fwBasePool::GetAt(index));
+		}
+		T* GetSlot(s32 index)
+		{
+			return static_cast<T*>(fwBasePool::GetSlot(index));
+		}
+		const T* GetSlot(s32 index) const
+		{
+			return static_cast<const T*>(fwBasePool::GetSlot(index));
+		}
 		// DO NOT CALL THIS, it links to a pointer in the game, and we just used a recreation. It SHOULD call delete inside rage, but it does NOT.
 		// It WILL crash
-		void DeleteAll() { ForAll(DeleteAllCallback, NULL); } 
-		static bool DeleteAllCallback(void* item, void* /*data*/) { delete (T*)item; return true; }
+		void DeleteAll()
+		{
+			ForAll(DeleteAllCallback, NULL);
+		}
+		static bool DeleteAllCallback(void* item, void* /*data*/)
+		{
+			delete (T*)item; return true;
+		}
 	};
 	template <typename T, typename S>
-	class fwGenericAssetDef {
+	class fwGenericAssetDef
+	{
 	public:
 		typedef S strObjectNameType;
 		T* m_pObject;
@@ -3744,18 +4571,30 @@ namespace rage {
 	};
 	typedef pgDictionary<grcTexture> fwTxd;
 	template <typename T>
-	class fwAssetDef : public fwGenericAssetDef<T, strStreamingObjectName> {};
-	class fwAssetStoreBase : public strStreamingModule {
+	class fwAssetDef : public fwGenericAssetDef<T, strStreamingObjectName>
+	{};
+	class fwAssetStoreBase : public strStreamingModule
+	{
 	public:
-		virtual s32 GetSize() const {return 0;}
-		virtual s32 GetNumUsedSlots() const {return 0;}
+		virtual s32 GetSize() const
+		{
+			return 0;
+		}
+		virtual s32 GetNumUsedSlots() const
+		{
+			return 0;
+		}
 	};
 	template <typename T, typename S = fwAssetDef<T>>
-	class fwAssetStore : public fwAssetStoreBase {
+	class fwAssetStore : public fwAssetStoreBase
+	{
 	public:
 		typedef fwPool<S> Pool;
 		virtual ~fwAssetStore() = default;
-		strStreamingModule* GetStreamingModule() { return this; }
+		strStreamingModule* GetStreamingModule()
+		{
+			return this;
+		}
 		virtual void Shutdown() = 0;
 		virtual void* GetPtr(strLocalIndex index) = 0;
 		virtual strLocalIndex Register(const char* name) = 0;
@@ -3778,11 +4617,18 @@ namespace rage {
 		fwNameRegistrar m_reg;
 		bool m_SizeFinalized;
 
-		void InsertHashKey(u32 key, int idx) { m_reg.Insert(key, idx); }
-		void RemoveHashKey(u32 key) { m_reg.Delete(key); }
+		void InsertHashKey(u32 key, int idx)
+		{
+			m_reg.Insert(key, idx);
+		}
+		void RemoveHashKey(u32 key)
+		{
+			m_reg.Delete(key);
+		}
 	};
 	template <typename T, typename S = fwAssetDef<T>>
-	class fwAssetRscStore : public fwAssetStore<T, S> {
+	class fwAssetRscStore : public fwAssetStore<T, S>
+	{
 	public:
 		virtual bool LoadFile(strLocalIndex index, const char* pFilename) = 0;
 		virtual void Set(strLocalIndex index, T* m_pObject) = 0;
@@ -3790,21 +4636,28 @@ namespace rage {
 		virtual void PlaceResource(strLocalIndex index, datResourceMap& map, datResourceInfo& header) = 0;
 		virtual void SetResource(strLocalIndex index, datResourceMap& map) = 0;
 		virtual void* Defragment(strLocalIndex index, datResourceMap& map, bool& flush) = 0;
-		virtual bool CanPlaceAsynchronously( strLocalIndex UNUSED_PARAM(objIndex) ) const { return true; }
+		virtual bool CanPlaceAsynchronously(strLocalIndex UNUSED_PARAM(objIndex)) const
+		{
+			return true;
+		}
 		virtual void PlaceAsynchronously(strLocalIndex objIndex, strStreamingLoader::StreamingFile& file, datResourceInfo& rsc) = 0;
 		virtual pgBase* GetResource(strLocalIndex index) const = 0;
-		S* GetSlot(strLocalIndex index) {
+		S* GetSlot(strLocalIndex index)
+		{
 			return (S*)nullptr;
 			//return m_pool.GetSlot(index.Get());
 		}
-		T* Get(strLocalIndex index)  {
+		T* Get(strLocalIndex index)
+		{
 			S* pDef = GetSlot(index);
 			return pDef->m_pObject;
 		}
 	};
-	class fwTxdDef : public fwAssetDef<fwTxd> {
+	class fwTxdDef : public fwAssetDef<fwTxd>
+	{
 	public:
-		strLocalIndex GetParentId() const {
+		strLocalIndex GetParentId() const
+		{
 			return strLocalIndex(m_parentId);
 		}
 		s32	m_parentId;
@@ -3814,7 +4667,8 @@ namespace rage {
 		u16 m_bIsBoundHD : 1;
 		u16 m_padding : 12;
 	};
-	class fwTxdStore : public fwAssetRscStore<fwTxd, fwTxdDef> {
+	class fwTxdStore : public fwAssetRscStore<fwTxd, fwTxdDef>
+	{
 	public:
 		virtual void Set(strLocalIndex index, fwTxd* m_pObject) = 0;
 		virtual void Remove(strLocalIndex index) = 0;
@@ -3826,8 +4680,10 @@ namespace rage {
 		virtual bool LoadFile(strLocalIndex index, const char* pFilename) = 0;
 		virtual bool Load(strLocalIndex index, void* pData, int size) = 0;
 		virtual strLocalIndex Register(const char* name) = 0;
-		grcTexture* GetTexture(strLocalIndex index, int dictionaryEntry) {
-			if (index.IsValid()) {
+		grcTexture* GetTexture(strLocalIndex index, int dictionaryEntry)
+		{
+			if (index.IsValid())
+			{
 				fwTxd* txd = Get(index);
 				if (txd)
 					return txd->GetEntry(dictionaryEntry);
@@ -3837,26 +4693,46 @@ namespace rage {
 	};
 }
 //rageSec
-namespace rage {
-	class gameSkeleton {
+namespace rage
+{
+	class gameSkeleton
+	{
 	public:
 		typedef void (*fnInitFunction)(u32);
 		typedef void (*fnShutdownFunction)(u32);
 		typedef void (*fnUpdateFunction)();
-		virtual ~gameSkeleton() {}
-		void SetCurrentInitType(u32 initType) { m_CurrentInitType = initType; }
-		void SetCurrentShutdownType(u32 shutdownType) { m_CurrentShutdownType = shutdownType; }
-		void SetCurrentDependencyLevel(u32 dependencyLevel) { m_CurrentDependencyLevel = dependencyLevel; }
+		virtual ~gameSkeleton()
+		{}
+		void SetCurrentInitType(u32 initType)
+		{
+			m_CurrentInitType = initType;
+		}
+		void SetCurrentShutdownType(u32 shutdownType)
+		{
+			m_CurrentShutdownType = shutdownType;
+		}
+		void SetCurrentDependencyLevel(u32 dependencyLevel)
+		{
+			m_CurrentDependencyLevel = dependencyLevel;
+		}
 		virtual void Init(u32 initMode) = 0;
 		virtual void Shutdown(u32 shutdownMode) = 0;
 		virtual void Update(u32 updateMode) = 0;
 		static constexpr u32 DEFAULT_MAX_SYSTEMS_REGISTERED = 128;
 		static constexpr u32 MAX_DEPENDENCY_LEVELS = 32;
 		static constexpr u32 MAX_NESTED_UPDATE_GROUPS = 32;
-		struct systemData {
-			systemData() {}
-			bool InitialisesThisMode(u32 initMode) const { return ((m_InitTypes & initMode) != 0); }
-			bool ShutdownsThisMode(u32 shutdownMode) const { return ((m_ShutdownTypes & shutdownMode) != 0); }
+		struct systemData
+		{
+			systemData()
+			{}
+			bool InitialisesThisMode(u32 initMode) const
+			{
+				return ((m_InitTypes & initMode) != 0);
+			}
+			bool ShutdownsThisMode(u32 shutdownMode) const
+			{
+				return ((m_ShutdownTypes & shutdownMode) != 0);
+			}
 			fnInitFunction     m_InitFunction;
 			fnShutdownFunction m_ShutdownFunction;
 			u32           m_InitDependencyLevel;
@@ -3865,37 +4741,51 @@ namespace rage {
 			u32           m_ShutdownTypes;
 			atHashString       m_SystemName;
 		};
-		struct dependency {
-			dependency(u32 level) : dependencyLevel(level), next(0) {}
+		struct dependency
+		{
+			dependency(u32 level) : dependencyLevel(level), next(0)
+			{}
 			u32 dependencyLevel;
 			atArray<u32> sysData;
 			dependency* next;
 		};
-		struct mode {
-			mode(u32 type) : modeType(type), head(0), next(0) {}
+		struct mode
+		{
+			mode(u32 type) : modeType(type), head(0), next(0)
+			{}
 			u32 modeType;
 			dependency* head;
 			mode* next;
 		};
-		struct updateBase {
-			updateBase(const atHashString& name, bool addTimebar, float timebarBudget) : m_AddTimebar(addTimebar), m_TimebarBudget(timebarBudget), m_Name(name), m_Next(0) {}
-			virtual ~updateBase() {}
+		struct updateBase
+		{
+			updateBase(const atHashString& name, bool addTimebar, float timebarBudget) : m_AddTimebar(addTimebar), m_TimebarBudget(timebarBudget), m_Name(name), m_Next(0)
+			{}
+			virtual ~updateBase()
+			{}
 			virtual void Update() = 0;
 			bool m_AddTimebar;
 			float m_TimebarBudget;
 			atHashString m_Name;
 			updateBase* m_Next;
 		};
-		struct updateElement : public updateBase {
-			updateElement() : updateBase(atHashString(), false, 0.0f) {}
-			updateElement(const atHashString& name, bool addTimebar, float timebarBudget, fnUpdateFunction updateFunction) : updateBase(name, addTimebar, timebarBudget), m_UpdateFunction(updateFunction) {}
+		struct updateElement : public updateBase
+		{
+			updateElement() : updateBase(atHashString(), false, 0.0f)
+			{}
+			updateElement(const atHashString& name, bool addTimebar, float timebarBudget, fnUpdateFunction updateFunction) : updateBase(name, addTimebar, timebarBudget), m_UpdateFunction(updateFunction)
+			{}
 			fnUpdateFunction m_UpdateFunction;
 		};
-		struct updateGroup : public updateBase {
-			updateGroup(const atHashString& name, bool addTimebar, float timebarBudget) : updateBase(name, addTimebar, timebarBudget), m_Head(0) {}
-			~updateGroup() {
+		struct updateGroup : public updateBase
+		{
+			updateGroup(const atHashString& name, bool addTimebar, float timebarBudget) : updateBase(name, addTimebar, timebarBudget), m_Head(0)
+			{}
+			~updateGroup()
+			{
 				updateBase* element = m_Head;
-				while (element) {
+				while (element)
+				{
 					updateBase* next = element->m_Next;
 					delete element;
 					element = next;
@@ -3903,19 +4793,25 @@ namespace rage {
 			}
 			updateBase* m_Head;
 		};
-		struct updateMode {
-			updateMode(u32 type) : m_ModeType(type), m_Head(0), m_Next(0) {}
-			~updateMode() {
+		struct updateMode
+		{
+			updateMode(u32 type) : m_ModeType(type), m_Head(0), m_Next(0)
+			{}
+			~updateMode()
+			{
 				updateBase* element = m_Head;
-				while (element) {
+				while (element)
+				{
 					updateBase* next = element->m_Next;
 					delete element;
 					element = next;
 				}
 			}
-			void Update() {
+			void Update()
+			{
 				updateBase* element = m_Head;
-				while (element) {
+				while (element)
+				{
 					element->Update();
 					element = element->m_Next;
 				}
@@ -3924,9 +4820,11 @@ namespace rage {
 			updateBase* m_Head;
 			updateMode* m_Next;
 		};
-		const mode* GetMode(const mode* modeRoot, u32 modeType) const {
+		const mode* GetMode(const mode* modeRoot, u32 modeType) const
+		{
 			const mode* currMode = modeRoot;
-			while (currMode && currMode->modeType != modeType) {
+			while (currMode && currMode->modeType != modeType)
+			{
 				currMode = currMode->next;
 			}
 			return currMode;
@@ -3946,24 +4844,29 @@ namespace rage {
 //fiXXXXXXX
 namespace rage {
 	#define fiHandleInvalid	((fiHandle)-1)
-	inline bool fiIsValidHandle(fiHandle h) {
+	inline bool fiIsValidHandle(fiHandle h)
+	{
 		return h != fiHandleInvalid;
 	}
-	enum fiSeekWhence {
+	enum fiSeekWhence
+	{
 		seekSet, // Position is relative to start of file
 		seekCur, // Position is relative to current file position (can be negative)
 		seekEnd  // Position is relative to end of file. Reliable operation is only guaranteed if pos is zero or negative
 	};
 	const int RAGE_MAX_PATH = 256;
-	struct fiFindData {
+	struct fiFindData
+	{
 		char m_Name[RAGE_MAX_PATH];	// Name of the file
 		u64 m_Size;			// Size of the file
 		u64 m_LastWriteTime;// Last time the file was written
 		u32 m_Attributes;	// Bitfield using the FILE_ATTRIBUTE_... values
 	};
-	class fiDevice {
+	class fiDevice
+	{
 	public:
-		enum RootDeviceId {
+		enum RootDeviceId
+		{
 			UNKNOWN,
 			OPTICAL,
 			HARDDRIVE,
@@ -3972,7 +4875,8 @@ namespace rage {
 			MEMORY,
 		};
 		static constexpr u32 HARDDRIVE_LSN = 0x40000000;
-		virtual ~fiDevice() {}
+		virtual ~fiDevice()
+		{}
 		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
 		virtual fiHandle OpenBulk(const char* filename, u64& outBias) const = 0;
 		virtual fiHandle OpenBulkDrm(const char* filename, u64& outBias, const void* pDrmKey) const = 0;
@@ -4000,29 +4904,61 @@ namespace rage {
 		virtual fiHandle FindFileBegin(const char* directoryName, fiFindData& outData) const = 0;
 		virtual bool FindFileNext(fiHandle handle, fiFindData& outData) const = 0;
 		virtual int FindFileEnd(fiHandle handle) const = 0;
-		virtual const fiDevice* GetLowLevelDevice() const { return this; }
+		virtual const fiDevice* GetLowLevelDevice() const
+		{
+			return this;
+		}
 		virtual char* FixRelativeName(char* dest, int destSize, const char* src) const = 0;
 		virtual bool SetEndOfFile(fiHandle handle) const = 0;
 		virtual u32 GetAttributes(const char* filename) const = 0;
-		virtual bool PrefetchDir(const char* /*directory*/) const { return true; }
+		virtual bool PrefetchDir(const char* /*directory*/) const
+		{
+			return true;
+		}
 		virtual bool SetAttributes(const char* filename, u32 attributes) const = 0;
 		virtual RootDeviceId GetRootDeviceId(const char* /*name*/) const = 0;
 		virtual bool SafeRead(fiHandle handle, void* outBuffer, int size) const = 0;
 		virtual bool SafeWrite(fiHandle handle, const void* buffer, int size) const = 0;
 		virtual int GetResourceInfo(const char* name, void* outHeader) const = 0;
-		virtual u32 GetEncryptionKey() const { return 0; }
-		virtual u64 GetBulkOffset(const char*) const { return 0; }
-		virtual u32 GetPhysicalSortKey(const char*) const { return HARDDRIVE_LSN; }
-		virtual bool IsRpf() const { return false; }
-		virtual bool IsMaskingAnRpf() const { return false; }
-		virtual const fiDevice* GetRpfDevice() const { return this; }
-		virtual bool IsCloud() const { return false; }
-		virtual u32 GetPackfileIndex() const { return 0; }
+		virtual u32 GetEncryptionKey() const
+		{
+			return 0;
+		}
+		virtual u64 GetBulkOffset(const char*) const
+		{
+			return 0;
+		}
+		virtual u32 GetPhysicalSortKey(const char*) const
+		{
+			return HARDDRIVE_LSN;
+		}
+		virtual bool IsRpf() const
+		{
+			return false;
+		}
+		virtual bool IsMaskingAnRpf() const
+		{
+			return false;
+		}
+		virtual const fiDevice* GetRpfDevice() const
+		{
+			return this;
+		}
+		virtual bool IsCloud() const
+		{
+			return false;
+		}
+		virtual u32 GetPackfileIndex() const
+		{
+			return 0;
+		}
 		virtual const char* GetDebugName() const = 0;
 	};
-	class fiDeviceRelative : public fiDevice {
+	class fiDeviceRelative : public fiDevice
+	{
 	public:
-		virtual ~fiDeviceRelative() {}
+		virtual ~fiDeviceRelative()
+		{}
 		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
 		virtual fiHandle OpenBulk(const char* filename, u64& bias) const = 0;
 		virtual fiHandle OpenBulkDrm(const char* filename, u64& outBias, const void* pDrmKey) const = 0;
@@ -4066,14 +5002,17 @@ namespace rage {
 		s32 m_filenameOffset;
 		bool m_IsReadOnly;
 	};
-	class fiDeviceCrc : public fiDeviceRelative {
+	class fiDeviceCrc : public fiDeviceRelative
+	{
 	public:
-		virtual ~fiDeviceCrc() {}
+		virtual ~fiDeviceCrc()
+		{}
 		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
 		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const = 0;
 		virtual int Close(fiHandle handle) const = 0;
 	};
-	class fiStream {
+	class fiStream
+	{
 	public:
 		const fiDevice* m_Device;
 		fiHandle m_Handle;
@@ -4083,101 +5022,257 @@ namespace rage {
 			m_Length,	// amount of info in buffer during read
 			m_Size;		// total size of the buffer
 	};
-	struct fiPackEntry {
-		bool IsDir() const { return m_FileOffset == FileOffset_IsDir; }
-		bool IsResource() const { return m_IsResource; }
-		bool IsFile() const { return !IsDir() && !IsResource(); }
-		bool IsCompressed() const { return m_ConsumedSize != 0; }
-		u32 GetConsumedSize() const { return m_ConsumedSize ? (u32)m_ConsumedSize : u.file.m_UncompressedSize; }
-		u32 GetUncompressedSize() const { return IsResource() ? u32(m_ConsumedSize) : u.file.m_UncompressedSize; }
-		u32 GetFileOffset() const { return u32(m_FileOffset) << FileOffset_Shift; }
-		void SetFileOffset(u32 offset) { m_FileOffset = offset >> FileOffset_Shift; }
-		int GetVersion() const { return IsResource() ? (int)u.resource.m_Info.GetVersion() : 0; }
+	struct fiPackEntry
+	{
+		bool IsDir() const
+		{
+			return m_FileOffset == FileOffset_IsDir;
+		}
+		bool IsResource() const
+		{
+			return m_IsResource;
+		}
+		bool IsFile() const
+		{
+			return !IsDir() && !IsResource();
+		}
+		bool IsCompressed() const
+		{
+			return m_ConsumedSize != 0;
+		}
+		u32 GetConsumedSize() const
+		{
+			return m_ConsumedSize ? (u32)m_ConsumedSize : u.file.m_UncompressedSize;
+		}
+		u32 GetUncompressedSize() const
+		{
+			return IsResource() ? u32(m_ConsumedSize) : u.file.m_UncompressedSize;
+		}
+		u32 GetFileOffset() const
+		{
+			return u32(m_FileOffset) << FileOffset_Shift;
+		}
+		void SetFileOffset(u32 offset)
+		{
+			m_FileOffset = offset >> FileOffset_Shift;
+		}
+		int GetVersion() const
+		{
+			return IsResource() ? (int)u.resource.m_Info.GetVersion() : 0;
+		}
 
-		static constexpr u64 FileOffset_IsDir = (1<<23)-1;
+		static constexpr u64 FileOffset_IsDir = (1 << 23) - 1;
 		static constexpr int FileOffset_Shift = 9;
 		static constexpr u32 MaxConsumedSize = 0xFFFFFF;
 		u64 m_NameOffset : 16,
 			m_ConsumedSize : 24,
 			m_FileOffset : 23,
 			m_IsResource : 1;
-		union {
-			struct {
+		union
+		{
+			struct
+			{
 				u32 m_UncompressedSize; // For files; file is compressed if m_ConsumedSize is nonzero.  Resources are always compressed.
 				u32 m_Encrypted; // Encryption key ID, or 0 if not encrypted. Only compressed files will be encrypted for now?
 			} file;
-			struct {
+			struct
+			{
 				u32 m_DirectoryIndex; // For directories; first index in pack array of the directory
 				u32 m_DirectoryCount; // For directories; count of entries in the directory.
 			} directory;
-			struct {
+			struct
+			{
 				datResourceInfo m_Info;
 			} resource;
 		} u;
 	};
-	class fiCollection : public fiDevice {
+	class fiCollection : public fiDevice
+	{
 	public:
-		fiCollection() : m_isStreaming(true) {}
-		virtual void Shutdown() {}
-		virtual fiHandle OpenBulkFromHandle(u32 handle,u64 &offset) const = 0;
+		fiCollection() : m_isStreaming(true)
+		{}
+		virtual void Shutdown()
+		{}
+		virtual fiHandle OpenBulkFromHandle(u32 handle, u64& offset) const = 0;
 		virtual const fiPackEntry& GetEntryInfo(u32 handle) const = 0;
-		virtual u32 GetEntryPhysicalSortKey(u32 handle,bool uncached) const = 0;
-		virtual const char *GetEntryName(u32 handle) const = 0;
-		virtual const char *GetEntryFullName(u32 handle,char *dest,int destSize) const = 0;		// Slower
-		virtual int GetEntryIndex(const char *name) const = 0;
+		virtual u32 GetEntryPhysicalSortKey(u32 handle, bool uncached) const = 0;
+		virtual const char* GetEntryName(u32 handle) const = 0;
+		virtual const char* GetEntryFullName(u32 handle, char* dest, int destSize) const = 0;		// Slower
+		virtual int GetEntryIndex(const char* name) const = 0;
 		virtual u32 GetBasePhysicalSortKey() const = 0;
 		virtual bool Prefetch(u32 handle) const = 0;
-		virtual bool IsPackfile() const { return false; }
-		virtual bool IsStreaming() const { return m_isStreaming; }
-		virtual void SetStreaming(bool val) { m_isStreaming = val; }
+		virtual bool IsPackfile() const
+		{
+			return false;
+		}
+		virtual bool IsStreaming() const
+		{
+			return m_isStreaming;
+		}
+		virtual void SetStreaming(bool val)
+		{
+			m_isStreaming = val;
+		}
 
 		bool m_isStreaming;
 		static constexpr u32 EntryMask = 0xFFFF;
 		static constexpr int ArchiveShift = 16;
 		static constexpr u32 ArchiveMask = 0xFFFF;
 	};
-	class fiPackfile : public fiCollection {
+	class fiPackfile : public fiCollection
+	{
 	public:
-		virtual ~fiPackfile() {}
-		virtual void Shutdown() {}
-		virtual const fiPackEntry* FindEntry(const char* name) const { return nullptr; }
-		virtual fiHandle Open(const char* filename, bool readOnly) const { return nullptr; }
-		virtual fiHandle OpenDirect(const char* filename, bool readOnly) const { return nullptr; }
-		virtual fiHandle Create(const char* filename) const { return nullptr; }
-		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const { return NULL; }
-		virtual int Write(fiHandle handle, const void* buffer, int bufferSize) const { return NULL; }
-		virtual int Seek(fiHandle handle, int offset, fiSeekWhence whence) const { return NULL; }
-		virtual u64 Seek64(fiHandle handle, s64 offset, fiSeekWhence whence) const { return NULL; }
-		virtual int Size(fiHandle handle) const { return NULL; }
-		virtual u64 Size64(fiHandle handle) const { return NULL; }
-		virtual int Close(fiHandle handle) const { return NULL; }
-		virtual u64 GetFileSize(const char* filename) const { return NULL; }
-		virtual u64 GetFileTime(const char* filename) const { return NULL; }
-		virtual bool SetFileTime(const char* filename, u64 timestamp) const { return false; }
-		virtual u32 GetAttributes(const char* filename) const { return NULL; }
-		virtual fiHandle OpenBulk(const char* filename, u64& outBias) const { return nullptr; }
-		virtual int ReadBulk(fiHandle handle, u64 offset, void* outBuffer, int bufferSize) const { return NULL; }
-		virtual int CloseBulk(fiHandle handle) const { return NULL; }
-		virtual fiHandle FindFileBegin(const char* directoryName, fiFindData& outData) { return NULL; }
-		virtual bool FindFileNext(fiHandle handle, fiFindData& outData) { return NULL; }
-		virtual int FindFileEnd(fiHandle handle) { return NULL; }
-		virtual int GetResourceInfo(const char* name, datResourceInfo& outHeader) { return NULL; }
-		virtual u64 GetBulkOffset(const char* name) { return NULL; }
-		virtual u32 GetPhysicalSortKey(const char* pName) { return NULL; }
-		virtual u32 GetPackfileIndex() const { return m_SelfIndex; }
-		virtual u32 GetEncryptionKey() const { return m_KeyId; }
+		virtual ~fiPackfile()
+		{}
+		virtual void Shutdown()
+		{}
+		virtual const fiPackEntry* FindEntry(const char* name) const
+		{
+			return nullptr;
+		}
+		virtual fiHandle Open(const char* filename, bool readOnly) const
+		{
+			return nullptr;
+		}
+		virtual fiHandle OpenDirect(const char* filename, bool readOnly) const
+		{
+			return nullptr;
+		}
+		virtual fiHandle Create(const char* filename) const
+		{
+			return nullptr;
+		}
+		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const
+		{
+			return NULL;
+		}
+		virtual int Write(fiHandle handle, const void* buffer, int bufferSize) const
+		{
+			return NULL;
+		}
+		virtual int Seek(fiHandle handle, int offset, fiSeekWhence whence) const
+		{
+			return NULL;
+		}
+		virtual u64 Seek64(fiHandle handle, s64 offset, fiSeekWhence whence) const
+		{
+			return NULL;
+		}
+		virtual int Size(fiHandle handle) const
+		{
+			return NULL;
+		}
+		virtual u64 Size64(fiHandle handle) const
+		{
+			return NULL;
+		}
+		virtual int Close(fiHandle handle) const
+		{
+			return NULL;
+		}
+		virtual u64 GetFileSize(const char* filename) const
+		{
+			return NULL;
+		}
+		virtual u64 GetFileTime(const char* filename) const
+		{
+			return NULL;
+		}
+		virtual bool SetFileTime(const char* filename, u64 timestamp) const
+		{
+			return false;
+		}
+		virtual u32 GetAttributes(const char* filename) const
+		{
+			return NULL;
+		}
+		virtual fiHandle OpenBulk(const char* filename, u64& outBias) const
+		{
+			return nullptr;
+		}
+		virtual int ReadBulk(fiHandle handle, u64 offset, void* outBuffer, int bufferSize) const
+		{
+			return NULL;
+		}
+		virtual int CloseBulk(fiHandle handle) const
+		{
+			return NULL;
+		}
+		virtual fiHandle FindFileBegin(const char* directoryName, fiFindData& outData)
+		{
+			return NULL;
+		}
+		virtual bool FindFileNext(fiHandle handle, fiFindData& outData)
+		{
+			return NULL;
+		}
+		virtual int FindFileEnd(fiHandle handle)
+		{
+			return NULL;
+		}
+		virtual int GetResourceInfo(const char* name, datResourceInfo& outHeader)
+		{
+			return NULL;
+		}
+		virtual u64 GetBulkOffset(const char* name)
+		{
+			return NULL;
+		}
+		virtual u32 GetPhysicalSortKey(const char* pName)
+		{
+			return NULL;
+		}
+		virtual u32 GetPackfileIndex() const
+		{
+			return m_SelfIndex;
+		}
+		virtual u32 GetEncryptionKey() const
+		{
+			return m_KeyId;
+		}
 		virtual const fiPackEntry& GetEntryInfo(u32 handle) = 0;
-		virtual fiHandle OpenBulkFromHandle(u32 handle, u64& offset) { return NULL; }
-		virtual u32 GetEntryPhysicalSortKey(u32 handle, bool) { return NULL; }
-		virtual const char* GetEntryName(u32 handle) { return ""; }
-		virtual const char* GetEntryFullName(u32 handle, char* dest, int destSize) { return ""; }
-		virtual u32 GetBasePhysicalSortKey() { return NULL; }
-		virtual int GetEntryIndex(const char* name) { return NULL; }
-		virtual bool IsRpf() { return false; }
-		virtual const char* GetDebugName() { return ""; }
-		virtual bool Prefetch(u32) const { return true; }
-		virtual bool IsPackfile() const { return true; }
-		virtual RootDeviceId GetRootDeviceId(const char* /*name*/) const {
+		virtual fiHandle OpenBulkFromHandle(u32 handle, u64& offset)
+		{
+			return NULL;
+		}
+		virtual u32 GetEntryPhysicalSortKey(u32 handle, bool)
+		{
+			return NULL;
+		}
+		virtual const char* GetEntryName(u32 handle)
+		{
+			return "";
+		}
+		virtual const char* GetEntryFullName(u32 handle, char* dest, int destSize)
+		{
+			return "";
+		}
+		virtual u32 GetBasePhysicalSortKey()
+		{
+			return NULL;
+		}
+		virtual int GetEntryIndex(const char* name)
+		{
+			return NULL;
+		}
+		virtual bool IsRpf()
+		{
+			return false;
+		}
+		virtual const char* GetDebugName()
+		{
+			return "";
+		}
+		virtual bool Prefetch(u32) const
+		{
+			return true;
+		}
+		virtual bool IsPackfile() const
+		{
+			return true;
+		}
+		virtual RootDeviceId GetRootDeviceId(const char* /*name*/) const
+		{
 			if (m_ForceOnOdd)
 				return OPTICAL;
 			return m_Device->GetRootDeviceId(m_Fullname.c_str());
@@ -4214,16 +5309,24 @@ namespace rage {
 	};
 }
 //ioXXXXXXX
-namespace rage {
-	struct ioPad {
-		enum { MAX_PADS = 4 };
+namespace rage
+{
+	struct ioPad
+	{
+		enum
+		{
+			MAX_PADS = 4
+		};
 	};
 }
 //netXXXXXX
-namespace rage {
-	class netStatus {
+namespace rage
+{
+	class netStatus
+	{
 	public:
-		enum StatusCode {
+		enum StatusCode
+		{
 			NET_STATUS_NONE,
 			NET_STATUS_PENDING,
 			NET_STATUS_FAILED,
@@ -4231,7 +5334,8 @@ namespace rage {
 			NET_STATUS_CANCELED,
 			NET_STATUS_COUNT
 		};
-		union {
+		union
+		{
 			u32 m_Status;
 			StatusCode m_StatusCode;
 		};
@@ -4239,10 +5343,13 @@ namespace rage {
 	};
 }
 //parXXXXXX
-namespace rage {
-	class parAttribute {
+namespace rage
+{
+	class parAttribute
+	{
 	public:
-		enum Flags {
+		enum Flags
+		{
 			FLAG_OWNS_NAME_STR,
 			FLAG_OWNS_VALUE_STR,
 			FLAG_HIGH_PRECISION,
@@ -4250,7 +5357,8 @@ namespace rage {
 			FLAG_HEXADECIMAL,
 		};
 		const char* m_Name;
-		union {
+		union
+		{
 			const char* m_String;
 			s64 m_Int64;
 			double m_Double;
@@ -4259,18 +5367,21 @@ namespace rage {
 		u8 m_Type;
 		atFixedBitSet8 m_Flags;
 	};
-	class parAttributeList {
+	class parAttributeList
+	{
 	public:
 		atArray<parAttribute> m_Attributes;
 		u8 m_UserData1, m_UserData2;
 		atFixedBitSet16 m_Flags;
 	};
-	class parElement {
+	class parElement
+	{
 	public:
 		const char* m_Name;
 		parAttributeList m_Attributes;
 	};
-	class parTreeNode {
+	class parTreeNode
+	{
 	public:
 	protected:
 		friend class parTree;
@@ -4281,7 +5392,8 @@ namespace rage {
 		atArray<char, u32> m_DataArray;
 	};
 	typedef atArray<char*> parNameTable;
-	class parTree {
+	class parTree
+	{
 	public:
 		parTreeNode* m_Root;
 		parNameTable m_NameTable;
@@ -4291,12 +5403,14 @@ namespace rage {
 }
 //rlXXXXXXX
 namespace rage {
-	class rlGamerId {
+	class rlGamerId
+	{
 	public:
 		u64 m_Id;
 	};
 	#define RL_MAX_BUF_FOR_UTF_CHARS(i) ((i*4)+1) // 4-byte UTF8
-	enum {
+	enum
+	{
 		RL_MAX_LOCAL_GAMERS = 1,
 		RL_MAX_NAME_BUF_SIZE = 17,   // social club names can be up to 16 characters + 1 for null terminator
 		RL_PRESENCE_MAX_BUF_SIZE = 256,	// For Steam: max value length passed to SetRichPresence() is k_cchMaxRichPresenceValueLength (256 chars)
@@ -4353,20 +5467,26 @@ namespace rage {
 		RL_MAX_SESSION_STATUS_BUF_SIZE = RL_MAX_BUF_FOR_UTF_CHARS(RL_MAX_SESSION_STATUS_LENGTH), // 64 UTF-8 characters + null terminator
 		RL_MAX_SESSION_IMAGE_BUF_SIZE = (160 * 1024), // 160 KiB
 	};
-	class rlMatchingFilter {
+	class rlMatchingFilter
+	{
 	public:
-		u32* GetValue(u32 conditionIndex) {
+		u32* GetValue(u32 conditionIndex)
+		{
 			return (m_ConditionMask & (1 << conditionIndex)) ? &m_ConditionVals[conditionIndex] : NULL;
 		}
-		u32 GetConditionCount() {
+		u32 GetConditionCount()
+		{
 			return m_ConditionCount;
 		}
-		u32 GetGameModeAttribute() {
+		u32 GetGameModeAttribute()
+		{
 			return ((m_SessionPurpose & 0xFFFF) << 16) | (m_GameMode & 0xFFFF);
 		}
-		const char* GetSessionAttrFieldNameForCondition(u32 conditionIndex) {
+		const char* GetSessionAttrFieldNameForCondition(u32 conditionIndex)
+		{
 			const u32 idx = m_SessionAttrIndicesForConditions[conditionIndex];
-			if (!idx) {
+			if (!idx)
+			{
 				return "";
 			}
 			return m_SessionAttrNames[idx];
@@ -4399,9 +5519,11 @@ namespace rage {
 		//has been provided.
 		u32 m_ConditionMask;
 	};
-	class rlRosTitleSecrets {
+	class rlRosTitleSecrets
+	{
 	public:
-		enum {
+		enum
+		{
 			SECRET_VERSION = 11,
 			VERSION_OFFSET = 0,
 			VERSION_SIZE = 1,
@@ -4416,7 +5538,8 @@ namespace rage {
 		};
 		u8 m_Secret[TOTAL_SIZE];
 	};
-	enum rlRosEnvironment {
+	enum rlRosEnvironment
+	{
 		// DO NOT CHANGE THE ORDER OF THESE ENVIRONMENTS - BACKWARDS COMPATIBILITY
 		RLROS_ENV_UNKNOWN = -1,
 		RLROS_ENV_RAGE,
@@ -4427,7 +5550,8 @@ namespace rage {
 		RLROS_ENV_CERT_2,
 		RLROS_ENV_CI_RAGE
 	};
-	enum {
+	enum
+	{
 		RLROS_MAX_PLATFORM_NAME_SIZE = 16,  //Length including terminating null   
 		RLROS_MAX_TICKET_SIZE = 512, //String length of base64 ticket data, including terminating null.
 		RLROS_MAX_SESSION_TICKET_SIZE = 128, //String length of base64 session ticket data, including terminating null.
@@ -4444,7 +5568,8 @@ namespace rage {
 	//  Controls how responses should be encrypted/signed by the server based on
 	//  client expectations
 	//NOTE: This enum must match the RosSecurityFlags enum on server
-	enum rlRosSecurityFlags {
+	enum rlRosSecurityFlags
+	{
 		//The original encryption/signature settings. If using RLROS_ENCRYPTION_TITLE:
 		//1. Response headers are not signed
 		//2. A plaintext sha1 hash of the encrypted block is appended to each encrypted block
@@ -4494,7 +5619,8 @@ namespace rage {
 		| RLROS_SECURITY_HMAC_REQUEST_HEADERS
 		| RLROS_SECURITY_STRUCTURED_HEADER_HMAC
 	};
-	class rlRosTitleId {
+	class rlRosTitleId
+	{
 	public:
 		rlRosTitleId(const char* titleName,
 			const char* titleDirectoryName,
@@ -4503,7 +5629,8 @@ namespace rage {
 			const char* titleSecretsBase64,
 			const rlRosEnvironment env,
 			const u8* publicRsaKey,
-			const u32 publicRsaKeyLen) {}
+			const u32 publicRsaKeyLen)
+		{}
 		char m_TitleName[RLROS_MAX_TITLE_NAME_SIZE];
 		int m_TitleVersion;
 		int m_ScVersion;
@@ -4519,12 +5646,15 @@ namespace rage {
 		char m_HostNamePrefix[64];
 		rlRosEnvironment m_ForcedEnv;
 	};
-	class rlTitleId {
+	class rlTitleId
+	{
 	public:
-		rlTitleId(const rlRosTitleId& rosTitleId) : m_RosTitleId(rosTitleId) {}
+		rlTitleId(const rlRosTitleId& rosTitleId) : m_RosTitleId(rosTitleId)
+		{}
 		rlRosTitleId m_RosTitleId;
 	};
-	class rlPc {
+	class rlPc
+	{
 	public:
 		char m_Delegator[32];
 		int m_SocialClubVersionNum[4];
@@ -4562,23 +5692,36 @@ namespace rage {
 		char m_AdditionalJoinAttr[rgsc::RGSC_ADDITIONAL_SESSION_ATTR_BUF_SIZE];
 		char m_MetaDataPath[rgsc::RGSC_MAX_PATH];
 	};
-	enum rlProfileStatsPriorityLevel {
+	enum rlProfileStatsPriorityLevel
+	{
 		RL_PROFILESTATS_MIN_PRIORITY = 0,
 		RL_PROFILESTATS_MAX_PRIORITY = 15
 	};
-	enum rlProfileStatsType {
-		RL_PROFILESTATS_TYPE_INVALID    = -1,
-		RL_PROFILESTATS_TYPE_FLOAT      = 3,
-		RL_PROFILESTATS_TYPE_INT32      = 4,
-		RL_PROFILESTATS_TYPE_INT64      = 0
+	enum rlProfileStatsType
+	{
+		RL_PROFILESTATS_TYPE_INVALID = -1,
+		RL_PROFILESTATS_TYPE_FLOAT = 3,
+		RL_PROFILESTATS_TYPE_INT32 = 4,
+		RL_PROFILESTATS_TYPE_INT64 = 0
 	};
-	class rlProfileStatsValue {
+	class rlProfileStatsValue
+	{
 	public:
-		rlProfileStatsType GetType() const { return m_Type; }
-		bool IsValid() const { return m_Type != RL_PROFILESTATS_TYPE_INVALID; }
-		void Clear() { m_Type = RL_PROFILESTATS_TYPE_INVALID; }
+		rlProfileStatsType GetType() const
+		{
+			return m_Type;
+		}
+		bool IsValid() const
+		{
+			return m_Type != RL_PROFILESTATS_TYPE_INVALID;
+		}
+		void Clear()
+		{
+			m_Type = RL_PROFILESTATS_TYPE_INVALID;
+		}
 	private:
-		union ValueUnion {
+		union ValueUnion
+		{
 			float m_Float;
 			s32 m_Int32;
 			s64 m_Int64;
@@ -4587,28 +5730,43 @@ namespace rage {
 		rlProfileStatsType m_Type;
 	};
 	typedef u8 rlProfileStatsPriority;
-	struct rlProfileDirtyStat {
+	struct rlProfileDirtyStat
+	{
 		rlProfileDirtyStat()
 			: m_StatId(0)
 			, m_StatValue()
-			, m_StatPriority(RL_PROFILESTATS_MIN_PRIORITY) {}
-		rlProfileDirtyStat(const int statId, const rlProfileStatsValue statValue, const rlProfileStatsPriority statPriority) {
+			, m_StatPriority(RL_PROFILESTATS_MIN_PRIORITY)
+		{}
+		rlProfileDirtyStat(const int statId, const rlProfileStatsValue statValue, const rlProfileStatsPriority statPriority)
+		{
 			Reset(statId, statValue, statPriority);
 		}
-		int GetStatId() const { return m_StatId; }
-		rlProfileStatsPriority GetPriority() const { return m_StatPriority; }
-		rlProfileStatsValue GetValue() const { return m_StatValue; }
-		void Clear() {
+		int GetStatId() const
+		{
+			return m_StatId;
+		}
+		rlProfileStatsPriority GetPriority() const
+		{
+			return m_StatPriority;
+		}
+		rlProfileStatsValue GetValue() const
+		{
+			return m_StatValue;
+		}
+		void Clear()
+		{
 			m_StatId = 0;
 			m_StatValue.Clear();
 			m_StatPriority = RL_PROFILESTATS_MIN_PRIORITY;
 		}
-		void Reset(const int statId, const rlProfileStatsValue statValue, const rlProfileStatsPriority statPriority) {
+		void Reset(const int statId, const rlProfileStatsValue statValue, const rlProfileStatsPriority statPriority)
+		{
 			m_StatId = statId;
 			m_StatValue = statValue;
 			m_StatPriority = statPriority;
 		}
-		rlProfileDirtyStat& operator=(const rlProfileDirtyStat& rhs) {
+		rlProfileDirtyStat& operator=(const rlProfileDirtyStat& rhs)
+		{
 			Reset(rhs.m_StatId, rhs.m_StatValue, rhs.m_StatPriority);
 			return *this;
 		}
@@ -4617,21 +5775,34 @@ namespace rage {
 		rlProfileStatsValue m_StatValue;
 		rlProfileStatsPriority m_StatPriority;
 	};
-	class rlProfileStatsDirtyIterator {
+	class rlProfileStatsDirtyIterator
+	{
 	public:
 		rlProfileStatsDirtyIterator()
 			: m_FlushedCount(0)
 		{}
-		virtual ~rlProfileStatsDirtyIterator() {}
-		virtual bool GetCurrentStat(rlProfileDirtyStat& stat) const { return false; }
-		virtual void Next() {}
-		virtual bool AtEnd() const { return false; }
-		u32 GetFlushedCount() const { return m_FlushedCount; }
+		virtual ~rlProfileStatsDirtyIterator()
+		{}
+		virtual bool GetCurrentStat(rlProfileDirtyStat& stat) const
+		{
+			return false;
+		}
+		virtual void Next()
+		{}
+		virtual bool AtEnd() const
+		{
+			return false;
+		}
+		u32 GetFlushedCount() const
+		{
+			return m_FlushedCount;
+		}
 	private:
 		friend class rlProfileStatsWriter;
 		u32 m_FlushedCount;
 	};
-	class rlProfileStatsClient {
+	class rlProfileStatsClient
+	{
 	public:
 		friend class rlProfileStats;
 		friend class rlProfileStatsFlushTask;
@@ -4644,7 +5815,8 @@ namespace rage {
 		// what the delay should be
 		const static u32 ms_DefaultFlushDelaySecs = 60 * 5;
 	};
-	struct rlRosResult {
+	struct rlRosResult
+	{
 		rlRosResult()
 			: m_Succeeded(true), m_Code(0), m_CodeEx(0), m_Ctx(0), m_Location(0), m_Msg(0)
 		{}
@@ -4655,7 +5827,8 @@ namespace rage {
 		const char* m_Location;
 		const char* m_Msg;
 	};
-	enum ConnectReason {
+	enum ConnectReason
+	{
 		CR_INVALID,
 		CR_ELASTIC,
 		CR_CDN_UPLOAD_PHOTO,
@@ -4702,7 +5875,8 @@ namespace rage {
 		CR_MESSAGE_DISTRIBUTION_SERVER,
 		CR_COUNT
 	};
-	enum netHttpAbortReason {
+	enum netHttpAbortReason
+	{
 		NET_HTTPABORT_NONE = 0,
 		NET_HTTPABORT_COMMIT_FAILED = 1,
 		NET_HTTPABORT_CANCELED = 2,
@@ -4730,29 +5904,36 @@ namespace rage {
 		NET_HTTPABORT_READ_BODY_ONCE_FAILED = 24,
 		NET_HTTPABORT_XBOX_AUTH_TOKEN_FAILED = 25,
 	};
-	class netIpV4Address {
+	class netIpV4Address
+	{
 	public:
-		union {
+		union
+		{
 			u32 pck;
-			struct {
+			struct
+			{
 				u8 f4, f3, f2, f1;
 			};
 		} m_Ip;
 	};
-	class netIpAddress {
+	class netIpAddress
+	{
 	public:
 		netIpV4Address m_IpAddress;
 	};
-	class netSocketAddress {
+	class netSocketAddress
+	{
 	public:
 		netIpAddress m_Ip;
 		u16 m_Port;
 	};
-	class netTcpAsyncOp {
+	class netTcpAsyncOp
+	{
 		friend class netTcp;
 		friend class netHttpRequest;
 	public:
-		enum OpType {
+		enum OpType
+		{
 			OP_INVALID = -1,
 			OP_CONNECT,
 			OP_SSL_CONNECT,
@@ -4763,23 +5944,28 @@ namespace rage {
 		OpType m_Type;
 		int m_SktId;
 		int m_LastError;
-		enum ConnectState {
+		enum ConnectState
+		{
 			STATE_SOCKET_CONNECT,
 			STATE_SSL_CONNECT
 		};
-		enum SslSocketOp {
+		enum SslSocketOp
+		{
 			SSL_SOCKET_OP_READ,
 			SSL_SOCKET_OP_WRITE
 		};
-		union {
-			struct {
+		union
+		{
+			struct
+			{
 				u8 m_AddrBuf[sizeof(netSocketAddress)];
 				netSocketAddress* m_Addr;
 				int* m_CallerSktId;
 				ConnectReason m_ConnectReason;
 				ConnectState m_State;
 			} m_Connect;
-			struct {
+			struct
+			{
 				u8 m_AddrBuf[sizeof(netSocketAddress)];
 				netSocketAddress* m_Addr;
 				int* m_CallerSktId;
@@ -4789,12 +5975,14 @@ namespace rage {
 				const char* m_DomainName;
 				ConnectReason m_ConnectReason;
 			} m_SslConnect;
-			struct {
+			struct
+			{
 				void* m_Buf;
 				u32 m_SizeofBuf;
 				u32 m_NumRcvd;
 			} m_RcvBuf;
-			struct {
+			struct
+			{
 				const void* m_Buf;
 				u32 m_SizeofBuf;
 				u32 m_NumSent;
@@ -4805,7 +5993,8 @@ namespace rage {
 		u32 m_Id;
 		inlist_node<netTcpAsyncOp> m_ListLink;
 	};
-	enum netHttpVerb {
+	enum netHttpVerb
+	{
 		NET_HTTP_VERB_INVALID,
 		NET_HTTP_VERB_GET,
 		NET_HTTP_VERB_POST,
@@ -4814,7 +6003,8 @@ namespace rage {
 		NET_HTTP_VERB_HEAD,
 		NET_HTTP_VERBS_COUNT
 	};
-	class netTimeout {
+	class netTimeout
+	{
 	public:
 		static constexpr u32 DEFAULT_LONG_FRAME_THRESHOLD_MS = (3 * 1000);
 		u32 m_CurTime;
@@ -4822,32 +6012,38 @@ namespace rage {
 		int m_Timeout;
 		int m_Countdown;
 	};
-	enum netTcpResult {
+	enum netTcpResult
+	{
 		NETTCP_RESULT_DISCONNECTED = -4,
 		NETTCP_RESULT_TIMED_OUT,
 		NETTCP_RESULT_ERROR,
 		NETTCP_RESULT_CANCELED,
 		NETTCP_RESULT_OK
 	};
-	class netHttpRequest {
+	class netHttpRequest
+	{
 	public:
-		static constexpr u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH  = 1044;
-		enum TransferEncoding {
+		static constexpr u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH = 1044;
+		enum TransferEncoding
+		{
 			TRANSFER_ENCODING_NORMAL,
 			TRANSFER_ENCODING_CHUNKED,
 		};
-		enum UriScheme {
+		enum UriScheme
+		{
 			URISCHEME_INVALID,
 			URISCHEME_HTTP,
 			URISCHEME_HTTPS,
 		};
-		struct Chunk {
+		struct Chunk
+		{
 			datGrowBuffer m_Data;
 			netTcpAsyncOp m_TcpOp;
 			netStatus m_Status; // when not using m_TcpOp, such as when IXHR2 is used.
 			inlist_node<Chunk> m_ListLink;
 		};
-		enum SendState {
+		enum SendState
+		{
 			SENDSTATE_NONE,
 			SENDSTATE_WAIT_UNTIL_READY,
 			SENDSTATE_RESOLVE_HOST,
@@ -4860,7 +6056,8 @@ namespace rage {
 			SENDSTATE_SUCCEEDED,
 			SENDSTATE_ERROR
 		};
-		enum RecvState {
+		enum RecvState
+		{
 			RECVSTATE_NONE,
 			RECVSTATE_RECEIVING_HEADER,
 			RECVSTATE_RECEIVED_HEADER,
@@ -4886,7 +6083,7 @@ namespace rage {
 		u32 m_BounceBufLen;
 		u32 m_RequestId;
 		netHttpVerb m_HttpVerb;
-		mutable int m_HttpStatusCode; 
+		mutable int m_HttpStatusCode;
 		UriScheme m_UriScheme;
 		char* m_RawUri;
 		const char* m_RawHost;
@@ -4929,29 +6126,65 @@ namespace rage {
 		netHttpRequest* m_Prev;
 		WOLFSSL_CTX* m_SslCtx;
 	};
-	class netHttpFilter {
+	class netHttpFilter
+	{
 		friend class netHttpRequest;
 	public:
-		virtual ~netHttpFilter() {}
-		virtual bool CanFilterRequest() const { return false; }
-		virtual bool CanFilterResponse() const { return false; }
-		virtual u32 DelayMs() const { return 0; }
-		virtual bool CanIntercept() const { return false; }
-		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output) { return false; }
-		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending) { return false; }
-		virtual const char* GetUserAgentString() const { return NULL; }
-		virtual bool ProcessRequestHeader(class netHttpRequest* request) { return false; }
-		virtual bool ProcessResponseHeader(const int statusCode, const char* header) { return false; }
-		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived) {}
-		virtual bool AllowSucceeded(class netHttpRequest* request) { return false; }
-		virtual void DisableHttpDump(bool /*bDisabled*/) {}
+		virtual ~netHttpFilter()
+		{}
+		virtual bool CanFilterRequest() const
+		{
+			return false;
+		}
+		virtual bool CanFilterResponse() const
+		{
+			return false;
+		}
+		virtual u32 DelayMs() const
+		{
+			return 0;
+		}
+		virtual bool CanIntercept() const
+		{
+			return false;
+		}
+		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output)
+		{
+			return false;
+		}
+		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending)
+		{
+			return false;
+		}
+		virtual const char* GetUserAgentString() const
+		{
+			return NULL;
+		}
+		virtual bool ProcessRequestHeader(class netHttpRequest* request)
+		{
+			return false;
+		}
+		virtual bool ProcessResponseHeader(const int statusCode, const char* header)
+		{
+			return false;
+		}
+		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived)
+		{}
+		virtual bool AllowSucceeded(class netHttpRequest* request)
+		{
+			return false;
+		}
+		virtual void DisableHttpDump(bool /*bDisabled*/)
+		{}
 		const netHttpRequest* m_HttpRequest;
 	};
-	class Sha1 {
+	class Sha1
+	{
 	public:
 		static constexpr u8 SHA1_DIGEST_LENGTH = 20; // 160-bit digest
 		static constexpr u8 SHA1_BLOCK_LENGTH = 64;	// 512-bit block
-		struct SHA1_CTX {
+		struct SHA1_CTX
+		{
 			u32 state[5];
 			u64 count;
 			u8 buffer[SHA1_BLOCK_LENGTH];
@@ -4961,23 +6194,32 @@ namespace rage {
 		u8 m_Key[Sha1::SHA1_BLOCK_LENGTH];
 		u32 m_KeyLen;
 	};
-	class Rc4Context {
+	class Rc4Context
+	{
 	public:
 		u8 m_X, m_Y;
 		u8 m_State[256];
 		bool m_IsValid;
 	};
-	enum rlRosHttpEncryption {
+	enum rlRosHttpEncryption
+	{
 		RLROS_ENCRYPTION_NONE,
 		RLROS_ENCRYPTION_TITLE
 	};
 	typedef s32 PlayerAccountId;
 	typedef s64 RockstarId;
-	class rlRosHttpUserAgentHeader {
+	class rlRosHttpUserAgentHeader
+	{
 	public:
-		enum { MAX_USER_AGENT_LEN = 160 };
+		enum
+		{
+			MAX_USER_AGENT_LEN = 160
+		};
 	private:
-		enum { RANDOM_PREFIX_LEN = 4 };
+		enum
+		{
+			RANDOM_PREFIX_LEN = 4
+		};
 		rlRosHttpEncryption m_Encryption;
 		char m_TitleName[RLROS_MAX_TITLE_NAME_SIZE];
 		char m_PlatformName[RLROS_MAX_PLATFORM_NAME_SIZE];
@@ -4987,11 +6229,13 @@ namespace rage {
 		bool m_IsValid : 1;
 	};
 	template <int MAX_KEY_SIZE>
-	struct EncryptionKey {
+	struct EncryptionKey
+	{
 		u8 m_Key[MAX_KEY_SIZE];
 		u32 m_KeyLength;
 	};
-	enum  {
+	enum
+	{
 		RLSC_MAX_AVATAR_URL_CHARS = 160,
 		RLSC_MAX_COUNTRY_CODE_CHARS = 3,
 		RLSC_MAX_DATE_CHARS = 32,
@@ -5008,7 +6252,8 @@ namespace rage {
 		RLSC_MAX_MACHINETOKEN_CHARS = 129,
 		RLSC_MAX_LINKTOKEN_CHARS = 512
 	};
-	struct rlScAccountInfo {
+	struct rlScAccountInfo
+	{
 		int m_Age;
 		char m_AvatarUrl[RLSC_MAX_AVATAR_URL_CHARS];
 		char m_CountryCode[RLSC_MAX_COUNTRY_CODE_CHARS];
@@ -5021,7 +6266,8 @@ namespace rage {
 		RockstarId m_RockstarId;
 		char m_ZipCode[RLSC_MAX_ZIP_CODE_CHARS];
 	};
-	enum rlRosPrivilegeId {
+	enum rlRosPrivilegeId
+	{
 		RLROS_PRIVILEGEID_NONE = 0, // Unused
 		RLROS_PRIVILEGEID_CREATE_TICKET = 1, // Can create ROS tickets
 		RLROS_PRIVILEGEID_PROFILE_STATS_WRITE = 2, // Can write profile stats
@@ -5050,14 +6296,16 @@ namespace rage {
 		RLROS_PRIVILEGEID_UNLOCK_SPECIAL_EDITION = 25, // If true, grant special edition content
 		RLROS_PRIVILEGEID_CONTENT_CREATOR = 26, // If true, allows user to create/update/delete Ugc content bypassing owner and profanity checks 
 		RLROS_PRIVILEGEID_CONDUCTOR = 27, // If true, allows user to access game servers (through conductor)
-		RLROS_NUM_PRIVILEGEID  
+		RLROS_NUM_PRIVILEGEID
 	};
-	struct rlRosCredentials {
+	struct rlRosCredentials
+	{
 		static constexpr u32 SESSION_KEY_SIZE = 32;
 		static constexpr u32 CLOUD_KEY_SIZE = 32;
 		typedef EncryptionKey<SESSION_KEY_SIZE> SessionKey;
 		typedef EncryptionKey<CLOUD_KEY_SIZE> CloudKey;
-		struct PrivilegeInfo {
+		struct PrivilegeInfo
+		{
 			bool m_IsValid : 1;
 			bool m_IsGranted : 1;
 			bool m_HasEndDate : 1;
@@ -5072,33 +6320,68 @@ namespace rage {
 		rlScAccountInfo m_RockstarAcct;
 		atFixedBitSet<RLROS_NUM_PRIVILEGEID> m_Privileges;
 	};
-	struct rlRosContentSignature {
+	struct rlRosContentSignature
+	{
 		u8 m_ContentSignature[RLROS_MAX_RSA_ENCRYPTED_SIZE];
 		u32 m_Length;
 	};
-	class rlRosHttpFilter : public netHttpFilter {
-		struct VerifySignatureDelegate {
+	class rlRosHttpFilter : public netHttpFilter
+	{
+		struct VerifySignatureDelegate
+		{
 			char m_Delegate[32]; // Fuck impl for atDelegate. It's so retarded, I refuse to do it. SMD
 		};
 	public:
-		virtual ~rlRosHttpFilter() {}
-		virtual bool CanFilterRequest() const { return false; }
-		virtual bool CanFilterResponse() const  { return false; }
-		virtual bool CanIntercept() const { return false; }
-		virtual u32 DelayMs() const { return 0; }
-		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output) { return false; }
-		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending) { return false; }
-		virtual const char* GetUserAgentString() const { return NULL; }
-		virtual bool ProcessRequestHeader(class netHttpRequest* request) { return false; }
-		virtual bool ProcessResponseHeader(const int statusCode, const char* header) {}
-		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived) {}
-		virtual bool AllowSucceeded(class netHttpRequest* request) { return false; }
+		virtual ~rlRosHttpFilter()
+		{}
+		virtual bool CanFilterRequest() const
+		{
+			return false;
+		}
+		virtual bool CanFilterResponse() const
+		{
+			return false;
+		}
+		virtual bool CanIntercept() const
+		{
+			return false;
+		}
+		virtual u32 DelayMs() const
+		{
+			return 0;
+		}
+		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output)
+		{
+			return false;
+		}
+		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending)
+		{
+			return false;
+		}
+		virtual const char* GetUserAgentString() const
+		{
+			return NULL;
+		}
+		virtual bool ProcessRequestHeader(class netHttpRequest* request)
+		{
+			return false;
+		}
+		virtual bool ProcessResponseHeader(const int statusCode, const char* header)
+		{}
+		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived)
+		{}
+		virtual bool AllowSucceeded(class netHttpRequest* request)
+		{
+			return false;
+		}
 		//These constants must EXACTLY match the values used on the backend.
-		enum {
+		enum
+		{
 			KEY_LEN = 16,
 			SALT_LEN = 16
 		};
-		struct RequestData {
+		struct RequestData
+		{
 			rlRosHttpEncryption m_Encryption;
 			rlRosSecurityFlags m_OriginalSecurityFlags;
 			rlRosSecurityFlags m_SecurityFlags;
@@ -5110,8 +6393,10 @@ namespace rage {
 			u8 m_HeaderHmacDigest[Sha1::SHA1_DIGEST_LENGTH];
 		};
 		RequestData m_Request;
-		struct ResponseData {
-			enum {
+		struct ResponseData
+		{
+			enum
+			{
 				KEY_OFFSET = 0,
 				BLOCK_SIZE_OFFSET = KEY_OFFSET + KEY_LEN,
 				BLOCK_SIZE_LEN = 4,
@@ -5140,37 +6425,60 @@ namespace rage {
 		virtual const char* GetTaskName() const {return #name;}
 	#define RL_TASK_USE_CHANNEL(tag)\
 		virtual const diagChannel* GetDiagChannel() const {return nullptr;}
-	class rlTaskBase {
+	class rlTaskBase
+	{
 		friend class rlTaskManager;
 	public:
-		enum FinishType {
+		enum FinishType
+		{
 			FINISH_FAILED,
 			FINISH_SUCCEEDED,
 			FINISH_CANCELED
 		};
-		enum ShutdownBehaviour {
+		enum ShutdownBehaviour
+		{
 			CANCEL_ON_SHUTDOWN,
 			EXECUTE_ON_SHUTDOWN,
 		};
-		virtual ~rlTaskBase() {}
-		virtual const char* GetTaskName() const { return NULL; }
-		virtual void Start() {}
-		virtual void Update(const u32 timeStepMs) {}
-		virtual bool IsCancelable() const { return false; }
-		virtual const diagChannel* GetDiagChannel() const { return nullptr; }
-		virtual ShutdownBehaviour GetShutdownBehaviour() { return CANCEL_ON_SHUTDOWN; }
+		virtual ~rlTaskBase()
+		{}
+		virtual const char* GetTaskName() const
+		{
+			return NULL;
+		}
+		virtual void Start()
+		{}
+		virtual void Update(const u32 timeStepMs)
+		{}
+		virtual bool IsCancelable() const
+		{
+			return false;
+		}
+		virtual const diagChannel* GetDiagChannel() const
+		{
+			return nullptr;
+		}
+		virtual ShutdownBehaviour GetShutdownBehaviour()
+		{
+			return CANCEL_ON_SHUTDOWN;
+		}
 	protected:
-		virtual void Finish(const FinishType finishType) {}
-		virtual void Finish(const FinishType finishType, const int resultCode) {}
-		virtual void DoCancel()  {}
+		virtual void Finish(const FinishType finishType)
+		{}
+		virtual void Finish(const FinishType finishType, const int resultCode)
+		{}
+		virtual void DoCancel()
+		{}
 	public:
-		enum State {
+		enum State
+		{
 			STATE_INVALID = -1,
 			STATE_CONFIGURED,
 			STATE_STARTED,
 			STATE_FINISHED
 		};
-		enum Flags {
+		enum Flags
+		{
 			FLAG_CANCELING = 0x01,
 			FLAG_CANCELED = 0x02,
 		};
@@ -5191,7 +6499,8 @@ namespace rage {
 		rlTaskBase(const rlTaskBase&);
 		rlTaskBase& operator=(const rlTaskBase&);
 	};
-	class rlTaskManager {
+	class rlTaskManager
+	{
 		friend class rlTaskBase;
 	public:
 		sysMemAllocator* m_Allocator;
@@ -5205,98 +6514,186 @@ namespace rage {
 		bool m_Initialized : 1;
 	};
 	template <typename CTX>
-	class rlTask : public rlTaskBase {
+	class rlTask : public rlTaskBase
+	{
 		friend class rlTaskBase;
 	public:
 		rlTask()
 			: m_Ctx(NULL)
 		{}
 	protected:
-		virtual void Finish(const FinishType finishType) {
+		virtual void Finish(const FinishType finishType)
+		{
 			this->Finish(finishType, 0);
 		}
-		virtual void Finish(const FinishType finishType, const int resultCode) {
+		virtual void Finish(const FinishType finishType, const int resultCode)
+		{
 			this->rlTaskBase::Finish(finishType, resultCode);
 			m_Ctx = NULL;
 		}
 		//Context on which the task operates.
 		CTX* m_Ctx;
 	};
-	class rlHttpTask : public rlTaskBase {
+	class rlHttpTask : public rlTaskBase
+	{
 	public:
 		static constexpr int MAX_MULTIPART_BOUNDARY_LENGTH = 32;
 		static constexpr int MAX_MULTIPART_BOUNDARY_BUF_SIZE = MAX_MULTIPART_BOUNDARY_LENGTH + 1;
 		RL_TASK_DECL(rlHttpTask);
 		RL_TASK_USE_CHANNEL(rline_http);
 		virtual ~rlHttpTask() = default;
-		virtual bool IsCancelable() const { return true; }
-		virtual void DoCancel() {}
-		virtual void Start() {}
-		virtual void Update(const u32 timeStep) {}
-		virtual void Finish(const FinishType finishType, const int resultCode = 0) {}
+		virtual bool IsCancelable() const
+		{
+			return true;
+		}
+		virtual void DoCancel()
+		{}
+		virtual void Start()
+		{}
+		virtual void Update(const u32 timeStep)
+		{}
+		virtual void Finish(const FinishType finishType, const int resultCode = 0)
+		{}
 	protected:
-		virtual bool UseHttps() const { return false; }
-		virtual SSL_CTX* GetSslCtx() const { return nullptr; }
-		virtual const char* GetUrlHostName(char* /*hostnameBuf*/, const u32 /*sizeofBuf*/) const { return NULL; }
-		virtual bool GetServicePath(char* /*svcPath*/, const u32 /*maxLen*/) const { return false; }
-		virtual bool ProcessResponse(const char* response, int& resultCode) { return false; }
+		virtual bool UseHttps() const
+		{
+			return false;
+		}
+		virtual SSL_CTX* GetSslCtx() const
+		{
+			return nullptr;
+		}
+		virtual const char* GetUrlHostName(char* /*hostnameBuf*/, const u32 /*sizeofBuf*/) const
+		{
+			return NULL;
+		}
+		virtual bool GetServicePath(char* /*svcPath*/, const u32 /*maxLen*/) const
+		{
+			return false;
+		}
+		virtual bool ProcessResponse(const char* response, int& resultCode)
+		{
+			return false;
+		}
 	};
-	class rlRosHttpTask : public rlHttpTask {
+	class rlRosHttpTask : public rlHttpTask
+	{
 		friend class rlRosSaxReader;
 	public:
 		RL_TASK_USE_CHANNEL(rline_ros);
 		RL_TASK_DECL(rlRosHttpTask);
 		virtual ~rlRosHttpTask() = default;
-		enum rlRosHttpServices {
+		enum rlRosHttpServices
+		{
 			GAME_SERVICES,
 			LAUNCHER_SERVICES
 		};
-		virtual bool UseHttps() const { return false; }
-		virtual SSL_CTX* GetSslCtx() const { return nullptr; }
-		virtual rlRosSecurityFlags GetSecurityFlags() const  { return rlRosSecurityFlags::RLROS_SECURITY_NONE; }
-		virtual const char* GetUrlHostName(char* hostnameBuf, const u32 sizeofBuf) const { return NULL; }
-		virtual bool ProcessResponse(const char* response, int& resultCode) { return false; }
-		virtual bool GetServicePath(char* svcPath, const u32 maxLen) const { return false; }
-		virtual const char* GetServiceMethod() const { return NULL; }
-		virtual bool ProcessSuccess(const rlRosResult& result, const parTreeNode* node, int& resultCode) { return false; }
-		virtual void ProcessError(const rlRosResult& result, const parTreeNode* node, int& resultCode) {}
-		virtual bool SaxStartElement(const char* name) { return false; }
-		virtual bool SaxAttribute(const char* name, const char* val) { return false; }
-		virtual bool SaxCharacters(const char* ch, const int start, const int length) { return false; }
-		virtual bool SaxEndElement(const char* name) { return false; }
-		virtual bool UseFilter() const { return false; }
-		virtual const char* GetServiceSet() const { return NULL; }
+		virtual bool UseHttps() const
+		{
+			return false;
+		}
+		virtual SSL_CTX* GetSslCtx() const
+		{
+			return nullptr;
+		}
+		virtual rlRosSecurityFlags GetSecurityFlags() const
+		{
+			return rlRosSecurityFlags::RLROS_SECURITY_NONE;
+		}
+		virtual const char* GetUrlHostName(char* hostnameBuf, const u32 sizeofBuf) const
+		{
+			return NULL;
+		}
+		virtual bool ProcessResponse(const char* response, int& resultCode)
+		{
+			return false;
+		}
+		virtual bool GetServicePath(char* svcPath, const u32 maxLen) const
+		{
+			return false;
+		}
+		virtual const char* GetServiceMethod() const
+		{
+			return NULL;
+		}
+		virtual bool ProcessSuccess(const rlRosResult& result, const parTreeNode* node, int& resultCode)
+		{
+			return false;
+		}
+		virtual void ProcessError(const rlRosResult& result, const parTreeNode* node, int& resultCode)
+		{}
+		virtual bool SaxStartElement(const char* name)
+		{
+			return false;
+		}
+		virtual bool SaxAttribute(const char* name, const char* val)
+		{
+			return false;
+		}
+		virtual bool SaxCharacters(const char* ch, const int start, const int length)
+		{
+			return false;
+		}
+		virtual bool SaxEndElement(const char* name)
+		{
+			return false;
+		}
+		virtual bool UseFilter() const
+		{
+			return false;
+		}
+		virtual const char* GetServiceSet() const
+		{
+			return NULL;
+		}
 		rlRosHttpFilter m_Filter;
 	private:
 		int m_LocalGamerIndex;
 		rlRosHttpServices m_Service;
 		parTree** m_ParserTree;
 	};
-	class rlProfileStatsWriteStatsTask : public rlRosHttpTask {
+	class rlProfileStatsWriteStatsTask : public rlRosHttpTask
+	{
 	public:
 		RL_TASK_DECL(rlProfileStatsWriteStatsTask);
 		RL_TASK_USE_CHANNEL(rline_profilestats);
-		virtual ~rlProfileStatsWriteStatsTask() {}
+		virtual ~rlProfileStatsWriteStatsTask()
+		{}
 	protected:
-		virtual const char* GetServiceMethod() const { return "ProfileStats.asmx/WriteStats"; }
-		virtual bool ProcessSuccess(const rlRosResult& result, const parTreeNode* node, int& resultCode) { return false; }
+		virtual const char* GetServiceMethod() const
+		{
+			return "ProfileStats.asmx/WriteStats";
+		}
+		virtual bool ProcessSuccess(const rlRosResult& result, const parTreeNode* node, int& resultCode)
+		{
+			return false;
+		}
 	private:
 		friend class rlProfileStatsFlushTask;
 		int* m_NumWritten;
 		int* m_SecsUntilNextWrite;
 		int* m_MaxSubmissionBinarySize;
 	};
-	class rlProfileStatsFlushTask : public rlTask<rlProfileStatsClient> {
+	class rlProfileStatsFlushTask : public rlTask<rlProfileStatsClient>
+	{
 	public:
 		RL_TASK_DECL(rlProfileStatsFlushTask);
 		RL_TASK_USE_CHANNEL(rline_profilestats);
-		virtual ~rlProfileStatsFlushTask() {}
-		virtual void Start() {}
-		virtual void Update(const u32 timestep) {}
+		virtual ~rlProfileStatsFlushTask()
+		{}
+		virtual void Start()
+		{}
+		virtual void Update(const u32 timestep)
+		{}
 	protected:
-		virtual void Finish(const FinishType finishType, const int resultCode = 0) {}
-		virtual bool IsCancelable() const { return true; }
-		virtual void DoCancel() {}
+		virtual void Finish(const FinishType finishType, const int resultCode = 0)
+		{}
+		virtual bool IsCancelable() const
+		{
+			return true;
+		}
+		virtual void DoCancel()
+		{}
 	private:
 		rlProfileStatsWriteStatsTask m_WriteStatsTask;
 		int m_NumWritten;
@@ -5306,56 +6703,90 @@ namespace rage {
 	};
 }
 //scrXXXXXX
-namespace rage {
-	enum scrProgramId { srcpidNONE };
-	union scrValue {
-		enum ValueType { UNKNOWN, BOOL, INT, FLOAT, VECTOR, TEXT_LABEL, STRING, OBJECT };
-		enum VarArgType { VA_INT, VA_FLOAT, VA_STRINGPTR, VA_VECTOR };
+namespace rage
+{
+	enum scrProgramId
+	{
+		srcpidNONE
+	};
+	union scrValue
+	{
+		enum ValueType
+		{
+			UNKNOWN, BOOL, INT, FLOAT, VECTOR, TEXT_LABEL, STRING, OBJECT
+		};
+		enum VarArgType
+		{
+			VA_INT, VA_FLOAT, VA_STRINGPTR, VA_VECTOR
+		};
 		int Int;
 		unsigned Uns;
 		float Float;
 		const char* String;
 		scrValue* Reference;
 		size_t Any;
-		bool operator==(const scrValue& that) {
+		bool operator==(const scrValue& that)
+		{
 			return Int == that.Int;
 		}
 	};
 	typedef scrValue* scrReference;
 	typedef size_t scrAny;
-	enum scrThreadId : int {
+	enum scrThreadId : int
+	{
 		THREAD_INVALID = 0,
 	};
-	class scrVector {
+	class scrVector
+	{
 	public:
-		scrVector() {}
-		scrVector(float x, float y, float z) : x(x), y(y), z(z) {}
-		scrVector(const Vector3& v) : x(v.x), y(v.y), z(v.z) {}
+		scrVector()
+		{}
+		scrVector(float x, float y, float z) : x(x), y(y), z(z)
+		{}
+		scrVector(const Vector3& v) : x(v.x), y(v.y), z(v.z)
+		{}
 
-		void set(float sx, float sy, float sz) {
+		void set(float sx, float sy, float sz)
+		{
 			x = sx;
 			y = sy;
 			z = sz;
 		}
-		scrVector& operator=(const Vector3& v) {
+		scrVector& operator=(const Vector3& v)
+		{
 			x = v.x; y = v.y; z = v.z;
 			return *this;
 		}
-		operator Vector3() const {
+		operator Vector3() const
+		{
 			return Vector3(x, y, z);
 		}
 
 		float x, xPad, y, yPad, z, zPad;
 	};
-	#define MAX_CALLSTACK 16
-	class scrThread {
+#define MAX_CALLSTACK 16
+	class scrThread
+	{
 	public:
-		enum { c_DefaultStackSize = 512 }; // static constexpr causes missing symbol under gcc 4.1.1 debug builds.
-		// Presume it's something to do with its use as a default parameter.
-		enum { c_NativeInsnLength = 4 }; // Length of OP_NATIVE insn in case caller needs PC of *next* insn.
-		enum State { RUNNING, BLOCKED, ABORTED, HALTED };
-		enum Priority { THREAD_PRIO_HIGHEST, THREAD_PRIO_NORMAL, THREAD_PRIO_LOWEST, THREAD_PRIO_MANUAL_UPDATE = 100 };
-		struct Serialized {
+		enum
+		{
+			c_DefaultStackSize = 512
+		}; // static constexpr causes missing symbol under gcc 4.1.1 debug builds.
+// Presume it's something to do with its use as a default parameter.
+		enum
+		{
+			c_NativeInsnLength = 4
+		}; // Length of OP_NATIVE insn in case caller needs PC of *next* insn.
+		enum State
+		{
+			RUNNING, BLOCKED, ABORTED, HALTED
+		};
+		enum Priority
+		{
+			THREAD_PRIO_HIGHEST, THREAD_PRIO_NORMAL, THREAD_PRIO_LOWEST, THREAD_PRIO_MANUAL_UPDATE = 100
+		};
+		struct Serialized
+		{
 			scrThreadId m_ThreadId; // +0 Unique thread ID (always increasing)
 			scrProgramId m_Prog; // +4 Stored by hashcode rather than pointer so load/save can work
 			State m_State; // +8 Current thread state
@@ -5372,13 +6803,16 @@ namespace rage {
 			s8 m_CallDepth;
 			atRangeArray<int, MAX_CALLSTACK> m_CallStack;
 		};
-		struct Global {
+		struct Global
+		{
 			int BasicType; // enumerant in scrValue
 			int Offset; // Base address of this variable
 			u32 Hash; // Hashed name of this variable (as per scrComputeHash)
 		};
-		struct Info {
-			Info(scrValue* resultPtr, int parameterCount, const scrValue* params) : ResultPtr(resultPtr), ParamCount(parameterCount), Params(params), BufferCount(0) {}
+		struct Info
+		{
+			Info(scrValue* resultPtr, int parameterCount, const scrValue* params) : ResultPtr(resultPtr), ParamCount(parameterCount), Params(params), BufferCount(0)
+			{}
 			// Return result, if applicable
 			scrValue* ResultPtr;
 			// Parameter count
@@ -5387,17 +6821,23 @@ namespace rage {
 			const scrValue* Params;
 			// Temp storage for managing copyin/copyout of Vector3 parameters
 			int BufferCount;
-			enum { MAX_VECTOR3 = 4 };
+			enum
+			{
+				MAX_VECTOR3 = 4
+			};
 			scrValue* Orig[MAX_VECTOR3];
 			scrVector Buffer[MAX_VECTOR3];
-			scrVector& GetVector3(int& N) {
+			scrVector& GetVector3(int& N)
+			{
 				scrValue* v = Params[N++].Reference;
 				Orig[BufferCount] = v;
 				Buffer[BufferCount].set(v[0].Float, v[1].Float, v[2].Float);
 			}
-			void CopyReferencedParametersOut() {
+			void CopyReferencedParametersOut()
+			{
 				int bc = BufferCount;
-				while (bc--) {
+				while (bc--)
+				{
 					Orig[bc][0].Float = Buffer[bc].x;
 					Orig[bc][1].Float = Buffer[bc].y;
 					Orig[bc][2].Float = Buffer[bc].z;
@@ -5405,11 +6845,20 @@ namespace rage {
 			}
 		};
 		virtual ~scrThread() = default;
-		virtual void Reset(scrProgramId program, const void* argStruct, int argStructSize) {}
-		virtual State Run(int insnCount) { return m_Serialized.m_State; }
-		virtual State Update(int insnCount) { return m_Serialized.m_State; }
-		virtual void Kill() {}
-		struct ThreadStack {
+		virtual void Reset(scrProgramId program, const void* argStruct, int argStructSize)
+		{}
+		virtual State Run(int insnCount)
+		{
+			return m_Serialized.m_State;
+		}
+		virtual State Update(int insnCount)
+		{
+			return m_Serialized.m_State;
+		}
+		virtual void Kill()
+		{}
+		struct ThreadStack
+		{
 			scrThread* m_Owner;
 			int m_StackSize;
 			scrValue* m_Stack;
@@ -5424,7 +6873,7 @@ namespace rage {
 		char m_ScriptName[64];
 	};
 	typedef void(*scrCmd)(scrThread::Info*);
-	const int MAX_LEGIT_OPS = (11*1024*1024); //	Used as the size of the atFixedArray called Program in rage\script\tools\scriptcompiler\node.h
+	const int MAX_LEGIT_OPS = (11 * 1024 * 1024); //	Used as the size of the atFixedArray called Program in rage\script\tools\scriptcompiler\node.h
 
 	// These configure the size of each opcode page
 	static constexpr u32 scrPageShift = 14;
@@ -5441,12 +6890,14 @@ namespace rage {
 	static constexpr u32 scrGlobalsPageSize = (1 << scrGlobalsPageShift);
 	static constexpr u32 scrGlobalsPageMask = (scrGlobalsPageSize - 1);
 
-	class scrProgram : public pgBase {
+	class scrProgram : public pgBase
+	{
 		friend class scrThread;
 	public:
 		static const int RORC_VERSION = 12;
 
-		enum {
+		enum
+		{
 			MAX_GLOBAL_BLOCKS_SHIFT = (24 - 6),
 			MAX_GLOBAL_BLOCKS = (64),
 			GLOBAL_SIZE_MASK = ((1 << (MAX_GLOBAL_BLOCKS_SHIFT)) - 1)
@@ -5471,29 +6922,63 @@ namespace rage {
 		u32 StringHeapSize; // +72 (zero if compiled)
 		atMap<s32, bool>* m_programBreakpoints; // +76 (zero if compiled)
 
-		u8* GetCode(u32 index) {
-			if (index < OpcodeSize) {
+		u8* GetCode(u32 index)
+		{
+			if (index < OpcodeSize)
+			{
 				return &Table[index >> scrPageShift][index & scrPageMask];
 			}
 			return nullptr;
 		}
-		const scrValue* GetStatics() const { return Statics; }
-		int GetStaticSize() const { return StaticSize; }
-		int GetStringHeapSize() const { return StringHeapSize; }
-		u32 GetHashCode() const { return HashCode; }
-		u32 GetNativeSize() const { return NativeSize; }
-		const u64* GetNatives() const { return Natives; }
-		u32 GetStringHeapCount() const { return (StringHeapSize + scrStringMask) >> scrStringShift; }
-		u32 GetStringHeapChunkSize(u32 i) { return i == GetStringHeapCount() - 1 ? StringHeapSize - (i << scrStringShift) : scrStringSize; }
-		u32 GetGlobalsPageCount() const { return ((GlobalSizeAndBlock & GLOBAL_SIZE_MASK) + scrGlobalsPageMask) >> scrGlobalsPageShift; }
-		u32 GetGlobalsPageChunkSize(u32 i) { return i == GetGlobalsPageCount() - 1 ? (GlobalSizeAndBlock & GLOBAL_SIZE_MASK) - (i << scrGlobalsPageShift) : scrGlobalsPageSize; }
+		const scrValue* GetStatics() const
+		{
+			return Statics;
+		}
+		int GetStaticSize() const
+		{
+			return StaticSize;
+		}
+		int GetStringHeapSize() const
+		{
+			return StringHeapSize;
+		}
+		u32 GetHashCode() const
+		{
+			return HashCode;
+		}
+		u32 GetNativeSize() const
+		{
+			return NativeSize;
+		}
+		const u64* GetNatives() const
+		{
+			return Natives;
+		}
+		u32 GetStringHeapCount() const
+		{
+			return (StringHeapSize + scrStringMask) >> scrStringShift;
+		}
+		u32 GetStringHeapChunkSize(u32 i)
+		{
+			return i == GetStringHeapCount() - 1 ? StringHeapSize - (i << scrStringShift) : scrStringSize;
+		}
+		u32 GetGlobalsPageCount() const
+		{
+			return ((GlobalSizeAndBlock & GLOBAL_SIZE_MASK) + scrGlobalsPageMask) >> scrGlobalsPageShift;
+		}
+		u32 GetGlobalsPageChunkSize(u32 i)
+		{
+			return i == GetGlobalsPageCount() - 1 ? (GlobalSizeAndBlock & GLOBAL_SIZE_MASK) - (i << scrGlobalsPageShift) : scrGlobalsPageSize;
+		}
 	};
 	template <typename T>
-	class scrCommandHash {
+	class scrCommandHash
+	{
 	private:
 		static constexpr int ToplevelSize = 256; // Must be power of two
 		static constexpr int PerBucket = 7;
-		struct Bucket {
+		struct Bucket
+		{
 			sysObfuscated<Bucket*, false> obf_Next;
 			T Data[PerBucket];
 			sysObfuscated<u32, false> obf_Count;
@@ -5501,19 +6986,24 @@ namespace rage {
 			u64 plainText_Hashes[PerBucket];
 		};
 	public:
-		void RegistrationComplete(bool val) {
+		void RegistrationComplete(bool val)
+		{
 			m_bRegistrationComplete = val;
 		}
-		void Init() {
+		void Init()
+		{
 			m_Occupancy = 0;
 			m_bRegistrationComplete = false;
 			for (int i{}; i < ToplevelSize; i++)
 				m_Buckets[i] = NULL;
 		}
-		void Kill() {
-			for (int i = 0; i < ToplevelSize; i++) {
+		void Kill()
+		{
+			for (int i = 0; i < ToplevelSize; i++)
+			{
 				Bucket* b = m_Buckets[i];
-				while (b) {
+				while (b)
+				{
 					char* old = (char*)b;
 					b = b->obf_Next.Get();
 					delete[] old;
@@ -5522,9 +7012,11 @@ namespace rage {
 			}
 			m_Occupancy = 0;
 		}
-		T Lookup(u64 hashcode) {
+		T Lookup(u64 hashcode)
+		{
 			Bucket* b = m_Buckets[hashcode & (ToplevelSize - 1)];
-			while (b) {
+			while (b)
+			{
 				for (u32 i{}; i != b->obf_Count.Get(); i++)
 					if (b->obf_Hashes[i].Get() == hashcode)
 						return b->Data[i];
@@ -5536,14 +7028,15 @@ namespace rage {
 		int m_Occupancy;
 		bool m_bRegistrationComplete;
 	};
-	class tlsContext {
+	class tlsContext
+	{
 	public:
 		char gap0[180];
 		std::uint8_t m_unk_byte; // 0xB4
 		char gapB5[3];
 		sysMemAllocator* m_allocator; // 0xB8
 		sysMemAllocator* m_allocator2; // 0xC0 - Same as 0xB8
-		sysMemAllocator*m_allocator3; // 0xC8 - Same as 0xB8
+		sysMemAllocator* m_allocator3; // 0xC8 - Same as 0xB8
 		uint32_t m_console_smth; // 0xD0
 		char gapD4[188];
 		uint64_t m_unk; // 0x190
@@ -5551,21 +7044,25 @@ namespace rage {
 		scrThread* m_script_thread; // 0x858
 		bool m_is_script_thread_active; // 0x860
 
-		static tlsContext* get() {
+		static tlsContext* get()
+		{
 			constexpr std::uint32_t TlsIndex = 0x0;
 			return *reinterpret_cast<tlsContext**>(__readgsqword(0x58) + TlsIndex);
 		}
 	};
 	constexpr int i = offsetof(tlsContext, m_script_thread);
 }
-struct SContentLockData {
+struct SContentLockData
+{
 	static const u8 MAX_CONTENT_LOCK_SUBSYSTEM_CBS = 15; // can store up to MAX_CONTENT_LOCK_SUBSYSTEM_CBS indices, will need to bump m_callBackIndices storage type
 	static const s8 INVALID_CONTENT_LOCK_CB_INDEX = -1;
 	bool m_locked : 1;
 	u16 m_callBackIndices : MAX_CONTENT_LOCK_SUBSYSTEM_CBS;
 };
-struct SLoadingScreenState {
-	void Reset() {
+struct SLoadingScreenState
+{
+	void Reset()
+	{
 		m_modified = false;
 		m_displayed = false;
 		m_doneAPostFrame = false;
@@ -5574,7 +7071,8 @@ struct SLoadingScreenState {
 	bool m_displayed : 1; // Did we display them?
 	bool m_doneAPostFrame : 1; // Have we done one whole frame after the load?
 };
-enum eMapChangeStates {
+enum eMapChangeStates
+{
 	MCS_INVALID = -1,
 	MCS_NONE,
 	MCS_INIT,
@@ -5582,12 +7080,14 @@ enum eMapChangeStates {
 	MCS_END,
 	MCS_COUNT
 };
-struct sOverlayInfo {
+struct sOverlayInfo
+{
 	u32 m_content;
 	rage::atHashString m_nameId;
 	rage::atHashString m_changeSet;
 	rage::atHashString m_changeSetGroupToExecuteWith;
-	enum State {
+	enum State
+	{
 		INACTIVE,
 		WILL_ACTIVATE,
 		ACTIVE,
@@ -5596,17 +7096,20 @@ struct sOverlayInfo {
 	State m_state;
 	s8 m_version;
 };
-struct ContentChangeSetGroup {
+struct ContentChangeSetGroup
+{
 	rage::atHashString m_NameHash;
 	rage::atArray<rage::atHashString> m_ContentChangeSets;
 };
-enum eExtraContentPackType {
+enum eExtraContentPackType
+{
 	EXTRACONTENT_TU_PACK,
 	EXTRACONTENT_LEVEL_PACK,
 	EXTRACONTENT_COMPAT_PACK,
 	EXTRACONTENT_PAID_PACK
 };
-struct SSetupData {
+struct SSetupData
+{
 	rage::atString m_deviceName;
 	rage::atString m_datFile;
 	rage::atString m_timeStamp;
@@ -5623,15 +7126,26 @@ struct SSetupData {
 	bool m_isLevelPack;
 	int	m_subPackCount;
 };
-struct SActiveChangeSet {
+struct SActiveChangeSet
+{
 	rage::atHashString m_group;
 	rage::atHashString m_changeSetName;
 };
-class CMountableContent {
+class CMountableContent
+{
 public:
-	enum eDeviceType { DT_INVALID = 0, DT_FOLDER, DT_PACKFILE, DT_XCONTENT, DT_DLC_DISC, DT_NUMTYPES };
-	enum eContentStatus { CS_NONE = 0, CS_SETUP_READ, CS_FULLY_MOUNTED, CS_CORRUPTED, CS_INVALID_SETUP, CS_SETUP_MISSING, CS_UPDATE_REQUIRED, CS_COUNT };
-	enum eMountResult { MR_MOUNTED = 0, MR_INIT_FAILED, MR_MOUNT_FAILED, MR_CONTENT_CORRUPTED };
+	enum eDeviceType
+	{
+		DT_INVALID = 0, DT_FOLDER, DT_PACKFILE, DT_XCONTENT, DT_DLC_DISC, DT_NUMTYPES
+	};
+	enum eContentStatus
+	{
+		CS_NONE = 0, CS_SETUP_READ, CS_FULLY_MOUNTED, CS_CORRUPTED, CS_INVALID_SETUP, CS_SETUP_MISSING, CS_UPDATE_REQUIRED, CS_COUNT
+	};
+	enum eMountResult
+	{
+		MR_MOUNTED = 0, MR_INIT_FAILED, MR_MOUNT_FAILED, MR_CONTENT_CORRUPTED
+	};
 	rage::fiDevice* m_pDevice;
 	rage::fiDeviceCrc* m_pCrcDevice;
 	rage::fiDeviceCrc* m_pCrcDeviceTU;
@@ -5648,10 +7162,12 @@ public:
 	bool m_permanent : 1;
 	bool m_isShippedContent : 1;
 };
-class CExtraContentManager : public rage::datBase {
+class CExtraContentManager : public rage::datBase
+{
 public:
-	enum eSpecialTrigger {
-		ST_XMAS				= 1<<0
+	enum eSpecialTrigger
+	{
+		ST_XMAS = 1 << 0
 	};
 	rage::atArray<sOverlayInfo*> m_overlayInfo;
 	rage::atArray<sOverlayInfo*> m_pendingOverlays;
@@ -5659,13 +7175,14 @@ public:
 	rage::atArray<rage::atString> m_corruptedContent;
 	rage::atArray<u32> m_savegameInstalledPackages;
 	rage::atBinaryMap<SContentLockData, u32> m_contentLocks;
-	rage::atFixedArray<char[32], SContentLockData::MAX_CONTENT_LOCK_SUBSYSTEM_CBS> m_onContentLockStateChangedCBs;	
-	rage::rlGamerId m_currentGamerId;	
+	rage::atFixedArray<char[32], SContentLockData::MAX_CONTENT_LOCK_SUBSYSTEM_CBS> m_onContentLockStateChangedCBs;
+	rage::rlGamerId m_currentGamerId;
 	s32 m_localGamerIndex;
 	eMapChangeStates m_currMapChangeState;
 	SLoadingScreenState m_loadingScreenState;
 };
-class CNetworkAssetVerifier {
+class CNetworkAssetVerifier
+{
 public:
 	bool m_bJapaneseBuild;
 	rage::sysObfuscated<u32> m_fileChecksum;

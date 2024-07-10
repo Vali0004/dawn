@@ -1,14 +1,29 @@
 #pragma once
 #include "hooks_base.h"
+#include "menu/menu.h"
 
+namespace dwn::renderer
+{
+	inline LRESULT renderer::wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		gui::flip_bit(uMsg == WM_KEYUP && wParam == VK_INSERT);
+
+		return CallWindowProcA(g_renderer->m_wndproc, hWnd, uMsg, wParam, lParam);
+	}
+}
 namespace dwn::hooking
 {
 	inline etc::hook_vtbl* g_grcSwapChain{};
 	inline HRESULT grcSwapChainPresent(rage::grcSwapChain* current, u32 syncInterval, u32 flags)
 	{
-		if (renderer::get())
+		if (g_running && renderer::get())
 		{
-			renderer::get()->present();
+			renderer::get()->begin_frame();
+			if (renderer::gui::is_open())
+			{
+				renderer::menu::render();
+			}
+			renderer::get()->end_frame();
 		}
 
 		return g_grcSwapChain->original<pointers::types::grcSwapChainPresentT>(8)(current, syncInterval, flags);
@@ -17,11 +32,11 @@ namespace dwn::hooking
 	inline HRESULT grcSwapChainResizeBuffers(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags)
 	{
 		HRESULT result{};
-		ImGui_ImplDX11_InvalidateDeviceObjects();
+		renderer::destroy(true);
 		result = g_grcSwapChain->original<pointers::types::grcSwapChainResizeBuffersT>(13)(current, bufferCount, width, height, newFormat, swapChainFlags);
 		if (SUCCEEDED(result))
 		{
-			ImGui_ImplDX11_CreateDeviceObjects();
+			renderer::create();
 		}
 
 		return result;

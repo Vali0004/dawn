@@ -4,7 +4,7 @@
 #include "logger.h"
 #include "amd64_disassembler.h"
 #include "hooking/etc/detour.h"
-#include "hooking/renderer.h"
+#include "renderer/renderer.h"
 
 namespace dwn::exception::etc
 {

@@ -1,7 +1,5 @@
 #pragma once
 #include "memory/pointers.h"
-#include "menu/fonts.h"
-#include "menu/elements.h"
 #include "commands/list.h"
 #include "commands/cmd_util.h"
 #include "util.h"
@@ -79,119 +77,50 @@ namespace dwn::renderer
 		}
 	}
 
+	void draw_text_right(directx::font& f, const char* text, const Vector2 position, const Color color)
+	{
+		const Vector2 string_size{ get_string_size(f, text) / get()->m_display_size };
+		const Vector2 pos{ position.x - string_size.x, position.y };
+		get()->draw_text(f, text, pos, color);
+	}
+	inline float g_drawbase{};
 	namespace menu
 	{
+		inline directx::font arial_22{};
+		inline directx::font arial_23{};
+		inline directx::font arialbd_22{};
+		inline directx::font arialbd_23{};
+		inline directx::font ariali_22{};
+		inline directx::font ariali_23{};
+		inline directx::font arialbi_22{};
+		inline directx::font arialbi_23{};
 		inline void init()
 		{
-			static auto&& io{ ImGui::GetIO() };
-			static auto&& style{ ImGui::GetStyle() };
-			static auto&& colors{ style.Colors };
-
-			io.MouseDrawCursor = gui::g_open;
-			style.WindowTitleAlign = { 0.f, 0.5f };
-			style.WindowRounding = 5.5f;
-			style.ChildRounding = 0.1f;
-			style.FrameRounding = 4.f;
-			style.GrabRounding = 3.f;
-			style.PopupRounding = 5.5f;
-			style.ScrollbarRounding = 12.f;
-			style.ScrollbarSize = 9.f;
-			style.FrameBorderSize = 0.f;
-			style.WindowBorderSize = 1.f;
-			style.IndentSpacing = 27.f;
-			style.AntiAliasedLines = true;
-			style.AntiAliasedFill = true;
-			style.AntiAliasedLinesUseTex = true;
-			style.WindowMenuButtonPosition = ImGuiDir_Right;
-
-			colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_TextSelectedBg] = ImColor(49, 151, 253, 255);
-			colors[ImGuiCol_TextDisabled] = ImColor(40, 40, 40, 255);
-			colors[ImGuiCol_WindowBg] = ImColor(15, 15, 15, 255);
-			colors[ImGuiCol_ChildBg] = ImColor(20, 20, 20, 255);
-			colors[ImGuiCol_PopupBg] = ImColor(20, 20, 20, 255);
-			colors[ImGuiCol_Border] = ImColor(255, 95, 140, 255);
-			colors[ImGuiCol_BorderShadow] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_FrameBg] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_FrameBgHovered] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_FrameBgActive] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_TitleBg] = ImColor(43, 43, 43, 255);
-			colors[ImGuiCol_TitleBgActive] = ImColor(49, 49, 49, 255);
-			colors[ImGuiCol_TitleBgCollapsed] = ImColor(0, 0, 0, 130);
-			colors[ImGuiCol_MenuBarBg] = ImColor(30, 30, 30, 255);
-			colors[ImGuiCol_ScrollbarBg] = ImColor(50, 50, 50, 255);
-			colors[ImGuiCol_ScrollbarGrab] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_ScrollbarGrabActive] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_CheckMark] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_SliderGrab] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_SliderGrabActive] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_Button] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_ButtonHovered] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_ButtonActive] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_Header] = ImColor(94, 94, 94, 130);
-			colors[ImGuiCol_HeaderHovered] = ImColor(97, 97, 97, 94);
-			colors[ImGuiCol_HeaderActive] = ImColor(94, 94, 94, 130);
-			colors[ImGuiCol_Separator] = ImColor(41, 41, 41, 255);
-			colors[ImGuiCol_SeparatorHovered] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_SeparatorActive] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_ResizeGrip] = ImColor(66, 66, 66, 255);
-			colors[ImGuiCol_ResizeGripHovered] = ImColor(80, 80, 80, 255);
-			colors[ImGuiCol_ResizeGripActive] = ImColor(90, 90, 90, 255);
-			colors[ImGuiCol_Tab] = ImColor(50, 50, 50, 255);
-			colors[ImGuiCol_TabHovered] = ImColor(80, 80, 80, 255);
-			colors[ImGuiCol_TabActive] = ImColor(80, 80, 80, 255);
-			colors[ImGuiCol_TabUnfocused] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_TabUnfocusedActive] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_PlotLines] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_PlotLinesHovered] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_PlotHistogram] = ImColor(230, 179, 0, 255);
-			colors[ImGuiCol_PlotHistogramHovered] = ImColor(255, 153, 0, 255);
-			colors[ImGuiCol_DragDropTarget] = ImColor(255, 255, 0, 230);
-			colors[ImGuiCol_NavHighlight] = ImColor(255, 255, 255, 255);
-			colors[ImGuiCol_NavWindowingHighlight] = ImColor(255, 255, 255, 179);
-			colors[ImGuiCol_NavWindowingDimBg] = ImColor(204, 204, 204, 50);
-			colors[ImGuiCol_ModalWindowDimBg] = ImColor(204, 204, 204, 90);
-
-			ImFontConfig cfg{};
-			cfg.FontDataOwnedByAtlas = false;
-
-			stdfs::path win_fonts{ R"(C:\Windows\Fonts)" };
-			ImFont* font = io.Fonts->AddFontFromFileTTF((win_fonts / "arial.ttf").string().c_str(), 19.f, &cfg);
-
-			//fonts::g_font_mgr.add_font_to_atlas(io.Fonts, fonts::font(win_fonts / "arial.ttf", 19.f, cfg));
-			//fonts::g_font_mgr.add_font_to_atlas(io.Fonts, fonts::font(win_fonts / "arialbd.ttf", 19.f, cfg));
+			arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 22.f, get()->m_device);
+			arial_23 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 23.f, get()->m_device);
+			arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 22.f, get()->m_device);
+			arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 23.f, get()->m_device);
+			ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 22.f, get()->m_device);
+			ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 23.f, get()->m_device);
+			arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 22.f, get()->m_device);
+			arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 23.f, get()->m_device);
+		}
+		inline void uninit()
+		{
+			directx::destroy_font(arial_22);
+			directx::destroy_font(arial_23);
+			directx::destroy_font(arialbd_22);
+			directx::destroy_font(arialbd_23);
+			directx::destroy_font(ariali_22);
+			directx::destroy_font(ariali_23);
+			directx::destroy_font(arialbi_22);
+			directx::destroy_font(arialbi_23);
 		}
 
 		int g_current_player{};
 		namespace main
 		{
-			inline void render_self()
-			{
-				tab_bar("self_bar", [] {
-					tab_item("Movement", [] {
-						checkbox("No Clip", features::g_features.m_no_clip.m_toggle);
-					});
-				});
-			}
-
-			inline void render_network()
-			{
-				tab_bar("network_bar", [] {
-					tab_item("Players", [] {
-						list_box("##player_listbox", ImVec2(200.f, 220.f), [] {
-							for (int i{}; i != NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(); ++i)
-							{
-								selectable(PLAYER::GET_PLAYER_NAME(i), g_current_player == i, [i] {
-									g_current_player = i;
-								});
-							}
-						});
-					});
-				});
-			}
-
-			inline void render_settings()
+			/*inline void render_settings()
 			{
 				tab_bar("settings_bar", [] {
 					tab_item("Command tests", [] {
@@ -283,43 +212,44 @@ namespace dwn::renderer
 						g_running = false;
 					});
 				});
-			}
-
-			inline void render_bar()
-			{
-				tab_item("Self", &render_self);
-				tab_item("Network", &render_network);
-				tab_item("Settings", &render_settings);
-			}
+			}*/
 
 			inline void render()
 			{
-				window("dawn.", gui::g_open, [] {
-					//tab_bar("main_bar", &render_bar);
-				}, ImGuiWindowFlags_NoDecoration);
+				g_drawbase = 0.01f;
+
+				get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.0694f }, { 0, 186, 255, 255 });
+				g_drawbase += 0.0694f;
+
+				get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
+
+				get()->draw_text(arialbd_23, "Home", { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+				draw_text_right(arialbd_23, "1/5", { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+				g_drawbase += 0.02f;
+
+				for (size_t i{ 5 }; i; --i)
+				{
+					get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, i == 5 ? directx::Color{ 255, 255, 255, 255 } : directx::Color{ 0, 0, 0, 130 });
+					get()->draw_text(arial_22, "Hello, world!", { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, i == 5 ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 });
+					g_drawbase += 0.02f;
+				}
+
+				get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
+				get()->draw_text(arial_22, "Public", { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+
+				draw_text_right(arial_22, "v1.0", { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+
+				g_drawbase += 0.02f;
 			}
 		}
 
 		inline void tick()
 		{
-			/*if (!util::gta::in_loading_screen())
-			{
-				rage::run_as_thread("main_persistent"_j, [] {
-
-					features::on_tick();
-				});
-			}
-			else
-			{
-				features::on_tick();
-			}*/
 			features::on_tick();
 		}
 
 		inline void render()
 		{
-			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
-			set_next_window({ 50.f, 50.f, 650.f - 15.f, 410.f }, ImGuiCond_Once);
 			main::render();
 		}
 	}

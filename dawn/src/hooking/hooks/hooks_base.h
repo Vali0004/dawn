@@ -1,6 +1,6 @@
 #pragma once
 #include "memory/pointers.h"
-#include "hooking/renderer.h"
+#include "renderer/renderer.h"
 #include "hooking/etc/detour.h"
 #include "hooking/etc/vmt.h"
 #include "exception_handler/handler.h"

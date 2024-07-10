@@ -29,3 +29,5 @@
 *.sarif
 *.user
 .vs
+*.fxc
+*.cso

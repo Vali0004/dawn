@@ -10,43 +10,10 @@
 
 namespace dwn::hooking
 {
-	inline bool g_run_script_patches{ true };
-	inline void patch_opcodes(rage::scrProgram* pt, rage::scrThread::Serialized* ser, const u32 scriptHash, const std::string& ptr, const u32 offset, const std::vector<std::optional<u8>>& patch)
-	{
-		if (ser->m_Prog == scriptHash)
-		{
-			std::vector<std::optional<u8>> bytes{ memory::get_bytes_from_ida_mem_signature(ptr) };
-
-			for (u32 i{}; i != pt->OpcodeSize - bytes.size(); i++)
-			{
-				if (u8* codeAddr{ pt->GetCode(i) })
-				{
-					if (memory::does_memory_match(codeAddr, bytes.data(), bytes.size()))
-					{
-						u32 ip{ i + offset };
-						memcpy(pt->GetCode(ip), patch.data(), patch.size());
-					}
-				}
-			}
-		}
-	}
-
 	inline etc::hook<pointers::types::scrThreadRunT>* g_scrThreadRun{};
 	inline rage::scrThread::State scrThreadRun(rage::scrValue* stack, rage::scrValue* globals, rage::scrProgram* pt, rage::scrThread::Serialized* ser)
 	{
-		if (ser->m_Prog == "valentinerpreward2"_j)
-		{
-			return ser->m_State = rage::scrThread::ABORTED;
-		}
-
-		if (g_run_script_patches)
-		{
-			// Patch invalid vehicle. This check is for if a vehicle is a DLC vehicle, and we are able to load it in story mode.
-			//patch_opcodes(pt, ser, "shop_controller"_j, "2D 01 04 00 00 2C ? ? ? 56 ? ? 71", 5, { 0x71, 0x2E, 0x01, 0x01 });
-			g_run_script_patches = false;
-		}
-
-		if (ser->m_Prog == "freemode"_j || ser->m_Prog == "main_persistent"_j)
+		if (pt->HashCode == "freemode"_j || pt->HashCode == "main_persistent"_j)
 		{
 			renderer::menu::tick();
 		}
@@ -175,7 +142,7 @@ namespace dwn::hooking
 			_this->set_func(13, grcSwapChainResizeBuffers);
 		});
 
-		//make_hook("scrThread::Run", scrThreadRun);
+		make_hook("scrThread::Run", scrThreadRun);
 
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);
 

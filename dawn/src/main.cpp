@@ -110,6 +110,8 @@ void routine()
 		LOG_TO_STREAM("WARNING: Exception filter not attached!");
 	}
 
+	dwn::renderer::menu::init();
+
 	while (g_running)
 	{
 		if (GetAsyncKeyState(VK_F12))
@@ -119,6 +121,8 @@ void routine()
 
 		std::this_thread::sleep_for(100ms);
 	}
+
+	dwn::renderer::menu::uninit();
 
 	dwn::hooking::remove();
 
