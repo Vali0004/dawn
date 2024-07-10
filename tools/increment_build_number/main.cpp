@@ -72,7 +72,7 @@ std::filesystem::path interpret_path(std::string path, std::string relative_path
 
 int main(int argc, char** argv)
 {
-	std::filesystem::path file_path{ interpret_path(argv[0], "../../../super_patchset/src/build_number.h") };
+	std::filesystem::path file_path{ interpret_path(argv[0], "../../../dawn/src/build_number.h") };
 	if (!std::filesystem::exists(file_path))
 	{
 		std::cerr << "Error getting canonical path or path does not exist." << std::endl;
