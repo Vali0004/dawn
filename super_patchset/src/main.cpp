@@ -66,6 +66,7 @@ void game_death()
 			exit(0);
 			abort();
 		}
+		std::this_thread::sleep_for(100ms);
 	}
 }
 void routine()

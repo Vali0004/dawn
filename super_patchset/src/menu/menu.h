@@ -181,12 +181,9 @@ namespace cs::renderer
 						list_box("##player_listbox", ImVec2(200.f, 220.f), [] {
 							for (int i{}; i != NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(); ++i)
 							{
-								if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
-								{
-									selectable(PLAYER::GET_PLAYER_NAME(i), g_current_player == i, [i] {
-										g_current_player = i;
-									});
-								}
+								selectable(PLAYER::GET_PLAYER_NAME(i), g_current_player == i, [i] {
+									g_current_player = i;
+								});
 							}
 						});
 					});

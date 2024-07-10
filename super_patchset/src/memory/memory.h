@@ -159,7 +159,9 @@ namespace cs::memory
 		u64 m_size;
 	};
 
-	inline std::optional<u8> char_to_hex(const char c)
+	typedef std::optional<u8> byte_t;
+
+	inline byte_t char_to_hex(const char c)
 	{
 		if (c >= 'a' && c <= 'f')
 			return static_cast<u8>(static_cast<s32>(c) - 87);
@@ -173,9 +175,9 @@ namespace cs::memory
 		return {};
 	}
 
-	inline std::vector<std::optional<u8>> get_bytes_from_ida_mem_signature(const std::string& ptr)
+	inline std::vector<byte_t> get_bytes_from_ida_mem_signature(const std::string& ptr)
 	{
-		std::vector<std::optional<u8>> bytes{};
+		std::vector<byte_t> bytes{};
 
 		for (size_t i{}; i != ptr.size() - 1; ++i)
 		{
@@ -205,8 +207,9 @@ namespace cs::memory
 	
 	inline mem scan_bmh(std::string name, std::string pattern, hmodule module = {})
 	{
-		std::vector<std::optional<u8>> bytes{ get_bytes_from_ida_mem_signature(pattern) };
-		s64 max_shift{ static_cast<s64>(bytes.size()) };
+		const std::vector<byte_t> bytes{ get_bytes_from_ida_mem_signature(pattern) };
+		const u64 bytes_size{ bytes.size() };
+		s64 max_shift{ static_cast<s64>(bytes_size) };
 		s64 max_idx{ max_shift - 1 };
 
 		// Get wildcard index, and store max shifable byte count
@@ -226,27 +229,29 @@ namespace cs::memory
 		shift_table.fill(max_shift);
 		for (s64 i{ wild_card_idx + 1 }; i != max_idx; ++i)
 		{
-			shift_table[*bytes[i]] = max_idx - i;
+			shift_table[bytes[i].value()] = max_idx - i;
 		}
 
 		// Start search
-		s64 cur_idx{}, end_idx{ static_cast<s64>(module.size() - bytes.size()) };
-		mem scan_begin{ module.begin() };
-		while (cur_idx != end_idx)
+		const u64 scan_end{ module.end() - bytes_size };
+		for (auto it{ module.begin() }; it <= scan_end;)
 		{
-			for (s64 sig_idx{ max_idx }; sig_idx >= 0; --sig_idx)
+			s64 sig_idx{ max_idx };
+			while (sig_idx >= 0)
 			{
-				if (bytes[sig_idx].has_value() && scan_begin.add(cur_idx + sig_idx).as<u8&>() != bytes[sig_idx].value())
+				likely if (bytes[sig_idx].has_value() && it.add(sig_idx).as<u8&>() != bytes[sig_idx].value())
 				{
-					cur_idx += shift_table[scan_begin.add(cur_idx + max_idx).as<u8&>()];
 					break;
 				}
-
-				if (!sig_idx)
-				{
-					return module.begin().add(cur_idx);
-				}
+				--sig_idx;
 			}
+
+			if (sig_idx < 0)
+			{
+				return it;
+			}
+
+			it = it.add(shift_table[it.add(max_idx).as<u8&>()]);
 		}
 
 		g_running = false;

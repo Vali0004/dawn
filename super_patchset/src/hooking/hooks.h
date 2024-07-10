@@ -175,7 +175,7 @@ namespace cs::hooking
 			_this->set_func(13, grcSwapChainResizeBuffers);
 		});
 
-		make_hook("scrThread::Run", scrThreadRun);
+		//make_hook("scrThread::Run", scrThreadRun);
 
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);
 
@@ -186,7 +186,7 @@ namespace cs::hooking
 
 		etc::persist_mh::apply_queued();
 
-		make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 3,
+		make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 4,
 		{
 			_this->set_func(1, gameSkeletonInit);
 			_this->set_func(3, gameSkeletonUpdate);

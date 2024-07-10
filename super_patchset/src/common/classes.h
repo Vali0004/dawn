@@ -370,6 +370,123 @@ namespace rage {
 	private:
 		DataT m_Elements[MaxCount];
 	};
+	template <typename _T, typename _KeyType>
+	class atBinaryMap {
+	public:
+		class Iterator {
+		public:
+			Iterator() : Map(NULL), CurIdx(0) {}
+			explicit Iterator(atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0) {}
+			Iterator& operator++() {
+				if (++CurIdx >= Map->Data.GetCount())
+					*this = Map->End();
+				return *this;
+			}
+			Iterator operator++(const int) {
+				Iterator result(*this);
+				++(*this);
+				return result;
+			}
+			_T& operator*() const {
+				return Map->Data[CurIdx].data;
+			}
+			_T* operator->() const {
+				return &Map->Data[CurIdx].data;
+			}
+			bool operator==(const Iterator& comp) const {
+				return (CurIdx == comp.CurIdx) && (Map == comp.Map);
+			}
+			bool operator!=(const Iterator& comp) const {
+				return !((CurIdx == comp.CurIdx) && (Map == comp.Map));
+			}
+			Iterator& operator=(const Iterator& rhs) {
+				Map = rhs.Map;
+				CurIdx = rhs.CurIdx;
+				return *this;
+			}
+			const _KeyType& GetKey() { return Map->Data[CurIdx].key; }
+		private:
+			atBinaryMap<_T, _KeyType>* Map;
+			int CurIdx;
+		};
+		class ConstIterator {
+		public:
+			ConstIterator() : Map(NULL), CurIdx(0) {}
+			explicit ConstIterator(const atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0) {}
+			ConstIterator& operator++() {
+				if (++CurIdx >= Map->Data.GetCount())
+					*this = Map->end();
+				return *this;
+			}
+			ConstIterator operator++(const int) {
+				ConstIterator result(*this);
+				++(*this);
+				return result;
+			}
+			const _T& operator*() const {
+				return Map->Data[CurIdx].data;
+			}
+			const _T* operator->() const {
+				return &Map->Data[CurIdx].data;
+			}
+			bool operator==(const ConstIterator& comp) const {
+				return (CurIdx == comp.CurIdx) && (Map == comp.Map);
+			}
+			bool operator!=(const ConstIterator& comp) const {
+				return !((CurIdx == comp.CurIdx) && (Map == comp.Map));
+			}
+			ConstIterator& operator=(const ConstIterator& rhs) {
+				Map = rhs.Map;
+				CurIdx = rhs.CurIdx;
+				return *this;
+			}
+			const _KeyType& GetKey() { return Map->Data[CurIdx].key; }
+		private:
+			const atBinaryMap<_T, _KeyType>* Map;
+			int CurIdx;
+		};
+		friend class Iterator;
+		friend class ConstIterator;
+		Iterator begin() {
+			if (Data.size() > 0)
+				return Iterator(*this);
+			else
+				return end();
+		}
+		Iterator end() {
+			return Iterator();
+		}
+		ConstIterator end() const {
+			return ConstIterator();
+		}
+		enum ePlaceNoneInitializer { PLACE_NONE };
+		enum ePlaceKeyInitializer { PLACE_KEY };
+		enum ePlaceDataInitializer { PLACE_DATA };
+		enum ePlaceKeyDataInitializer { PLACE_KEY_AND_DATA };
+		int GetCount() const {
+			return Data.size();
+		}
+		_T* GetItem(int i) {
+			return &Data[i].data;
+		}
+		const _T* GetItem(int i) const {
+			return &Data[i].data;
+		}
+		_KeyType* GetKey(int i) {
+			return &Data[i].key;
+		}
+		const _KeyType* GetKey(int i) const {
+			return &Data[i].key;
+		}
+		struct DataPair {
+			_KeyType key;
+			_T data;
+		};
+	protected:
+		bool Sorted;
+		char Pad[3];
+		atArray<DataPair> Data;
+	};
 	inline u32 atHash(unsigned x) { return x; }
 	inline u32 atHash(const void *x) { return (u32)(u64)x; }
 	inline u32 atHash_const_char(const char* s) {
@@ -3903,6 +4020,59 @@ namespace rage {
 		virtual u32 GetPackfileIndex() const { return 0; }
 		virtual const char* GetDebugName() const = 0;
 	};
+	class fiDeviceRelative : public fiDevice {
+	public:
+		virtual ~fiDeviceRelative() {}
+		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
+		virtual fiHandle OpenBulk(const char* filename, u64& bias) const = 0;
+		virtual fiHandle OpenBulkDrm(const char* filename, u64& outBias, const void* pDrmKey) const = 0;
+		virtual fiHandle Create(const char* filename) const = 0;
+		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const = 0;
+		virtual int ReadBulk(fiHandle handle, u64 offset, void* outBuffer, int bufferSize) const = 0;
+		virtual int Write(fiHandle handle, const void* buffer, int bufferSize) const = 0;
+		virtual int Seek(fiHandle handle, int offset, fiSeekWhence whence) const = 0;
+		virtual u64 Seek64(fiHandle handle, s64 offset, fiSeekWhence whence) const = 0;
+		virtual int Close(fiHandle handle) const = 0;
+		virtual int CloseBulk(fiHandle handle) const = 0;
+		virtual int Size(fiHandle handle) const = 0;
+		virtual u64 Size64(fiHandle handle) const = 0;
+		virtual bool Delete(const char* filename) const = 0;
+		virtual bool Rename(const char* from, const char* to) const = 0;
+		virtual bool MakeDirectory(const char* filename) const = 0;
+		virtual bool UnmakeDirectory(const char* filename) const = 0;
+		virtual u64 GetFileSize(const char* filename) const = 0;
+		virtual u64 GetFileTime(const char* filename) const = 0;
+		virtual bool SetFileTime(const char* filename, u64 timestamp) const = 0;
+		virtual fiHandle FindFileBegin(const char* filename, fiFindData& outData) const = 0;
+		virtual bool FindFileNext(fiHandle handle, fiFindData& outData) const = 0;
+		virtual int FindFileEnd(fiHandle handle) const = 0;
+		virtual bool SetEndOfFile(fiHandle handle) const = 0;
+		virtual u32 GetAttributes(const char* filename) const = 0;
+		virtual bool SetAttributes(const char* filename, u32 attributes) const = 0;
+		virtual bool PrefetchDir(const char* directory) const = 0;
+		virtual u32 GetPhysicalSortKey(const char* filename) const = 0;
+		virtual int GetResourceInfo(const char* name, datResourceInfo& info) const = 0;
+		virtual u64 GetBulkOffset(const char* name) const = 0;
+		virtual const char* GetDebugName() const = 0;
+		virtual RootDeviceId GetRootDeviceId(const char* name) const = 0;
+		virtual const fiDevice* GetLowLevelDevice() const = 0;
+		virtual char* FixRelativeName(char* dest, int destSize, const char* src) const = 0;
+		virtual bool IsMaskingAnRpf() const = 0;
+		virtual const fiDevice* GetRpfDevice() const = 0;
+	protected:
+		const fiDevice* m_pDevice;
+	public:
+		char m_path[RAGE_MAX_PATH];
+		s32 m_filenameOffset;
+		bool m_IsReadOnly;
+	};
+	class fiDeviceCrc : public fiDeviceRelative {
+	public:
+		virtual ~fiDeviceCrc() {}
+		virtual fiHandle Open(const char* filename, bool readOnly) const = 0;
+		virtual int Read(fiHandle handle, void* outBuffer, int bufferSize) const = 0;
+		virtual int Close(fiHandle handle) const = 0;
+	};
 	class fiStream {
 	public:
 		const fiDevice* m_Device;
@@ -4121,6 +4291,10 @@ namespace rage {
 }
 //rlXXXXXXX
 namespace rage {
+	class rlGamerId {
+	public:
+		u64 m_Id;
+	};
 	#define RL_MAX_BUF_FOR_UTF_CHARS(i) ((i*4)+1) // 4-byte UTF8
 	enum {
 		RL_MAX_LOCAL_GAMERS = 1,
@@ -5382,12 +5556,114 @@ namespace rage {
 			return *reinterpret_cast<tlsContext**>(__readgsqword(0x58) + TlsIndex);
 		}
 	};
+	constexpr int i = offsetof(tlsContext, m_script_thread);
 }
+struct SContentLockData {
+	static const u8 MAX_CONTENT_LOCK_SUBSYSTEM_CBS = 15; // can store up to MAX_CONTENT_LOCK_SUBSYSTEM_CBS indices, will need to bump m_callBackIndices storage type
+	static const s8 INVALID_CONTENT_LOCK_CB_INDEX = -1;
+	bool m_locked : 1;
+	u16 m_callBackIndices : MAX_CONTENT_LOCK_SUBSYSTEM_CBS;
+};
+struct SLoadingScreenState {
+	void Reset() {
+		m_modified = false;
+		m_displayed = false;
+		m_doneAPostFrame = false;
+	}
+	bool m_modified : 1; // Did we change anything?
+	bool m_displayed : 1; // Did we display them?
+	bool m_doneAPostFrame : 1; // Have we done one whole frame after the load?
+};
+enum eMapChangeStates {
+	MCS_INVALID = -1,
+	MCS_NONE,
+	MCS_INIT,
+	MCS_UPDATE,
+	MCS_END,
+	MCS_COUNT
+};
+struct sOverlayInfo {
+	u32 m_content;
+	rage::atHashString m_nameId;
+	rage::atHashString m_changeSet;
+	rage::atHashString m_changeSetGroupToExecuteWith;
+	enum State {
+		INACTIVE,
+		WILL_ACTIVATE,
+		ACTIVE,
+		NUM_OVERLAY_STATES,
+	};
+	State m_state;
+	s8 m_version;
+};
+struct ContentChangeSetGroup {
+	rage::atHashString m_NameHash;
+	rage::atArray<rage::atHashString> m_ContentChangeSets;
+};
+enum eExtraContentPackType {
+	EXTRACONTENT_TU_PACK,
+	EXTRACONTENT_LEVEL_PACK,
+	EXTRACONTENT_COMPAT_PACK,
+	EXTRACONTENT_PAID_PACK
+};
+struct SSetupData {
+	rage::atString m_deviceName;
+	rage::atString m_datFile;
+	rage::atString m_timeStamp;
+	rage::atFinalHashString m_nameHash;
+	rage::atArray<rage::atHashString> m_contentChangeSets;
+	rage::atArray<ContentChangeSetGroup> m_contentChangeSetGroups;
+	rage::atFinalHashString m_startupScript;
+	s32 m_scriptCallstackSize;
+	eExtraContentPackType m_type;
+	s32	m_order;
+	s32 m_minorOrder;
+	rage::atHashString m_dependencyPackHash;
+	rage::atString m_requiredVersion;
+	bool m_isLevelPack;
+	int	m_subPackCount;
+};
+struct SActiveChangeSet {
+	rage::atHashString m_group;
+	rage::atHashString m_changeSetName;
+};
+class CMountableContent {
+public:
+	enum eDeviceType { DT_INVALID = 0, DT_FOLDER, DT_PACKFILE, DT_XCONTENT, DT_DLC_DISC, DT_NUMTYPES };
+	enum eContentStatus { CS_NONE = 0, CS_SETUP_READ, CS_FULLY_MOUNTED, CS_CORRUPTED, CS_INVALID_SETUP, CS_SETUP_MISSING, CS_UPDATE_REQUIRED, CS_COUNT };
+	enum eMountResult { MR_MOUNTED = 0, MR_INIT_FAILED, MR_MOUNT_FAILED, MR_CONTENT_CORRUPTED };
+	rage::fiDevice* m_pDevice;
+	rage::fiDeviceCrc* m_pCrcDevice;
+	rage::fiDeviceCrc* m_pCrcDeviceTU;
+	rage::fiDeviceRelative* m_pDeviceTU;
+	rage::atArray<rage::fiPackfile*> m_subPacks;
+	SSetupData m_setupData;
+	rage::atString m_filename;
+	eDeviceType m_deviceType;
+	s32 m_packFileECIndex;
+	eContentStatus m_status;
+	rage::atArray<SActiveChangeSet> m_activeChangeSets;
+	bool m_datFileLoaded : 1;
+	bool m_usesPackfile : 1;
+	bool m_permanent : 1;
+	bool m_isShippedContent : 1;
+};
 class CExtraContentManager : public rage::datBase {
 public:
 	enum eSpecialTrigger {
 		ST_XMAS				= 1<<0
 	};
+	rage::atArray<sOverlayInfo*> m_overlayInfo;
+	rage::atArray<sOverlayInfo*> m_pendingOverlays;
+	rage::atArray<CMountableContent> m_content;
+	rage::atArray<rage::atString> m_corruptedContent;
+	rage::atArray<u32> m_savegameInstalledPackages;
+	rage::atBinaryMap<SContentLockData, u32> m_contentLocks;
+	rage::atFixedArray<char[32], SContentLockData::MAX_CONTENT_LOCK_SUBSYSTEM_CBS> m_onContentLockStateChangedCBs;	
+	rage::rlGamerId m_currentGamerId;	
+	s32 m_localGamerIndex;
+	eMapChangeStates m_currMapChangeState;
+	SLoadingScreenState m_loadingScreenState;
 };
 class CNetworkAssetVerifier {
 public:

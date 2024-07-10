@@ -47,11 +47,10 @@ namespace cs::hooking::etc
 		}
 
 	private:
-		u64 m_function;
-		u64** m_vtable;
-		std::unique_ptr<u64[]> m_vtable_new;
-		u64* m_original;
-		u64 m_num_funcs;
+		u64** m_vtable{};
+		std::unique_ptr<u64[]> m_vtable_new{};
+		u64* m_original{};
+		u64 m_num_funcs{};
 	};
 
 	inline void remove_all_vmt()
