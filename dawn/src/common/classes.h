@@ -2626,7 +2626,7 @@ namespace rage {
 		{
 			return Tail;
 		}
-		void Prepend(atDNode<_Type, _Base>& node)
+		void Prepend(atDNode<_Type, _Base>& other)
 		{
 			if (!other.Head)
 				return; // Nothing to do
@@ -2644,7 +2644,7 @@ namespace rage {
 
 			other.Empty(); // Reset other list
 		}
-		void Append(atDNode<_Type, _Base>& node)
+		void Append(atDNode<_Type, _Base>& other)
 		{
 			if (!other.Head)
 				return; // Nothing to do
@@ -2662,7 +2662,7 @@ namespace rage {
 
 			other.Empty(); // Reset other list
 		}
-		void Prepend(atDList<_Type, _Base>& other)
+		void Prepend(atDList<_Type, _Base>& node)
 		{
 			if (Head)
 			{
@@ -2675,7 +2675,7 @@ namespace rage {
 				Tail = &node;
 			}
 		}
-		void Append(atDList<_Type, _Base>& other)
+		void Append(atDList<_Type, _Base>& node)
 		{
 			if (Tail)
 			{
@@ -5807,6 +5807,357 @@ namespace rage
 		static const unsigned P2P_CRYPT_HMAC_LENGTH_IN_BYTES = (256 >> 3); // 256-bit hash
 		static const unsigned P2P_CRYPT_TRUNCATED_HMAC_LENGTH_IN_BYTES = (64 >> 3); // 64-bit truncated hash
 	};
+	enum ConnectReason
+	{
+		CR_INVALID,
+		CR_ELASTIC,
+		CR_CDN_UPLOAD_PHOTO,
+		CR_CDN_UPLOAD_VIDEO,
+		CR_ORBIS_MEDIA_DECODER,
+		CR_CLOUD,
+		CR_TELEMETRY_UNUSED,
+		CR_STATS_UNUSED,
+		CR_ENTITLEMENT,
+		CR_FACEBOOK,
+		CR_SC_CREATE_AUTH_TOKEN,
+		CR_SC_CREATE_LINK_TOKEN,
+		CR_ROS_CREATE_TICKET,
+		CR_ROS_CREDENTIALS_CHANGING,
+		CR_ROS_GET_GEOLOCATION_INFO,
+		CR_ROS_GET_NAT_DISCOVERY_SERVERS,
+		CR_SOCIAL_CLUB,
+		CR_UGC,
+		CR_CLOUD_SAVE,
+		CR_ACHIEVEMENTS,
+		CR_MATCHMAKING,
+		CR_FRIENDS,
+		CR_CREW,
+		CR_CONDUCTOR_ROUTE,
+		CR_PRESENCE,
+		CR_INBOX,
+		CR_YOUTUBE,
+		CR_SAVE_MIGRATION,
+		CR_FEED,
+		CR_REGISTER_PUSH_NOTIFICATION_DEVICE,
+		CR_GAME_SERVER,
+		CR_ITEM_DATABASE,
+		CR_POSSE,
+		CR_TEST,
+		CR_BUGSTAR,
+		CR_GOOGLE_ANALYTICS,
+		CR_DAILY_OBJECTIVES,
+		CR_SP_ACTION_PROXY,
+		CR_SESSION_SERVER,
+		CR_CASH_INVENTORY_SERVER,
+		CR_BOUNTY_SERVER,
+		CR_ANTI_CHEAT_SERVER,
+		CR_MINIGAME_SERVER,
+		CR_MESSAGE_DISTRIBUTION_SERVER,
+		CR_COUNT
+	};
+	enum netHttpAbortReason
+	{
+		NET_HTTPABORT_NONE = 0,
+		NET_HTTPABORT_COMMIT_FAILED = 1,
+		NET_HTTPABORT_CANCELED = 2,
+		NET_HTTPABORT_REQUEST_TIMED_OUT = 3,
+		NET_HTTPABORT_RESOLVE_HOST_FAILED = 4,
+		NET_HTTPABORT_RESOLVING_HOST_FAILED = 5,
+		NET_HTTPABORT_CONNECT_HOST_FAILED = 6,
+		NET_HTTPABORT_CONNECTING_HOST_FAILED = 7,
+		NET_HTTPABORT_SEND_HEADER_FAILED = 8,
+		NET_HTTPABORT_RECEIVE_HEADER_FAILED = 9,
+		NET_HTTPABORT_PROCESS_RESPONSE_HEADER_FAILED = 10,
+		NET_HTTPABORT_RESPONSE_NO_LOCATION_LENGTH = 11,
+		NET_HTTPABORT_RESPONSE_REDIRECT_FAILED = 12,
+		NET_HTTPABORT_RESPONSE_GET_LOCATION_FAILED = 13,
+		NET_HTTPABORT_RESPONSE_UNHANDLED_TRANSFER_ENCODING = 14,
+		NET_HTTPABORT_RESPONSE_PARSE_CONTENT_LENGTH_FAILED = 15,
+		NET_HTTPABORT_READ_BODY_FAILED = 16,
+		NET_HTTPABORT_CONSUME_BODY_FAILED = 17,
+		NET_HTTPABORT_CHUNK_OPERATION_FAILED = 18,
+		NET_HTTPABORT_ALLOCATE_CHUNK_FAILED = 19,
+		NET_HTTPABORT_SEND_CHUNK_FAILED = 20,
+		NET_HTTPABORT_XBL_RECEIVE_HEADER_FAILED = 21,
+		NET_HTTPABORT_XBL_RECEIVE_BODY_FAILED = 22,
+		NET_HTTPABORT_PROCESS_BOUNCE_CONTENT_FAILED = 23,
+		NET_HTTPABORT_READ_BODY_ONCE_FAILED = 24,
+		NET_HTTPABORT_XBOX_AUTH_TOKEN_FAILED = 25,
+	};
+	class netIpV4Address
+	{
+	public:
+		union
+		{
+			u32 pck;
+			struct
+			{
+				u8 f4, f3, f2, f1;
+			};
+		} m_Ip;
+	};
+	class netIpAddress
+	{
+	public:
+		netIpV4Address m_IpAddress;
+	};
+	class netSocketAddress
+	{
+	public:
+		netIpAddress m_Ip;
+		u16 m_Port;
+	};
+	class netTcpAsyncOp
+	{
+		friend class netTcp;
+		friend class netHttpRequest;
+	public:
+		enum OpType
+		{
+			OP_INVALID = -1,
+			OP_CONNECT,
+			OP_SSL_CONNECT,
+			OP_RECV_BUFFER,
+			OP_SEND_BUFFER,
+			OP_NUM_TYPES
+		};
+		OpType m_Type;
+		int m_SktId;
+		int m_LastError;
+		enum ConnectState
+		{
+			STATE_SOCKET_CONNECT,
+			STATE_SSL_CONNECT
+		};
+		enum SslSocketOp
+		{
+			SSL_SOCKET_OP_READ,
+			SSL_SOCKET_OP_WRITE
+		};
+		union
+		{
+			struct
+			{
+				u8 m_AddrBuf[sizeof(netSocketAddress)];
+				netSocketAddress* m_Addr;
+				int* m_CallerSktId;
+				ConnectReason m_ConnectReason;
+				ConnectState m_State;
+			} m_Connect;
+			struct
+			{
+				u8 m_AddrBuf[sizeof(netSocketAddress)];
+				netSocketAddress* m_Addr;
+				int* m_CallerSktId;
+				ConnectState m_State;
+				SslSocketOp m_NextSocketOp;
+				SSL_CTX* m_SslCtx;
+				const char* m_DomainName;
+				ConnectReason m_ConnectReason;
+			} m_SslConnect;
+			struct
+			{
+				void* m_Buf;
+				u32 m_SizeofBuf;
+				u32 m_NumRcvd;
+			} m_RcvBuf;
+			struct
+			{
+				const void* m_Buf;
+				u32 m_SizeofBuf;
+				u32 m_NumSent;
+			} m_SndBuf;
+		} m_Data;
+		int m_TimeoutMs;
+		netStatus m_MyStatus;
+		u32 m_Id;
+		inlist_node<netTcpAsyncOp> m_ListLink;
+	};
+	enum netHttpVerb
+	{
+		NET_HTTP_VERB_INVALID,
+		NET_HTTP_VERB_GET,
+		NET_HTTP_VERB_POST,
+		NET_HTTP_VERB_PUT,
+		NET_HTTP_VERB_DELETE,
+		NET_HTTP_VERB_HEAD,
+		NET_HTTP_VERBS_COUNT
+	};
+	class netTimeout
+	{
+	public:
+		static constexpr u32 DEFAULT_LONG_FRAME_THRESHOLD_MS = (3 * 1000);
+		u32 m_CurTime;
+		u32 m_LongFrameThresholdMs;
+		int m_Timeout;
+		int m_Countdown;
+	};
+	enum netTcpResult
+	{
+		NETTCP_RESULT_DISCONNECTED = -4,
+		NETTCP_RESULT_TIMED_OUT,
+		NETTCP_RESULT_ERROR,
+		NETTCP_RESULT_CANCELED,
+		NETTCP_RESULT_OK
+	};
+	class netHttpRequest
+	{
+	public:
+		static constexpr u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH = 1044;
+		enum TransferEncoding
+		{
+			TRANSFER_ENCODING_NORMAL,
+			TRANSFER_ENCODING_CHUNKED,
+		};
+		enum UriScheme
+		{
+			URISCHEME_INVALID,
+			URISCHEME_HTTP,
+			URISCHEME_HTTPS,
+		};
+		struct Chunk
+		{
+			datGrowBuffer m_Data;
+			netTcpAsyncOp m_TcpOp;
+			netStatus m_Status; // when not using m_TcpOp, such as when IXHR2 is used.
+			inlist_node<Chunk> m_ListLink;
+		};
+		enum SendState
+		{
+			SENDSTATE_NONE,
+			SENDSTATE_WAIT_UNTIL_READY,
+			SENDSTATE_RESOLVE_HOST,
+			SENDSTATE_RESOLVING_HOST,
+			SENDSTATE_CONNECT,
+			SENDSTATE_CONNECTING,
+			SENDSTATE_SEND_HEADER,
+			SENDSTATE_SENDING_CONTENT,
+			SENDSTATE_SENDING_TERM_CHUNK,
+			SENDSTATE_SUCCEEDED,
+			SENDSTATE_ERROR
+		};
+		enum RecvState
+		{
+			RECVSTATE_NONE,
+			RECVSTATE_RECEIVING_HEADER,
+			RECVSTATE_RECEIVED_HEADER,
+			RECVSTATE_RECEIVING_NORMAL_CONTENT,
+			RECVSTATE_RECEIVING_CHUNKED_CONTENT,
+			RECVSTATE_FINISH_CONSUMING_CONTENT,
+			RECVSTATE_SUCCEEDED,
+			RECVSTATE_ERROR
+		};
+		Chunk* m_CurChunk;
+		typedef inlist<Chunk, &Chunk::m_ListLink> ChunkList;
+		ChunkList m_QueuedChunks;
+		Chunk* m_InFlightChunk;
+		datGrowBuffer m_InBuf;
+		atStringBuilder m_InHeader;
+		atStringBuilder m_OutHeader;
+		class netHttpFilter* m_Filter;
+		fiHandle m_ResponseHandle;
+		const fiDevice* m_ResponseDevice;
+		char m_DefaultBounceBuf[DEFAULT_BOUNCE_BUFFER_MAX_LENGTH];
+		char* m_BounceBuf;
+		u32 m_BounceBufMaxLen;
+		u32 m_BounceBufLen;
+		u32 m_RequestId;
+		netHttpVerb m_HttpVerb;
+		mutable int m_HttpStatusCode;
+		UriScheme m_UriScheme;
+		char* m_RawUri;
+		const char* m_RawHost;
+		const char* m_RawPath;
+		mutable char* m_EncodedUri;
+		atStringBuilder m_QueryString;
+		atStringBuilder m_UserAgentString;
+		u32 m_InContentLen;
+		u32 m_InContentBytesRcvd;
+		u32 m_OutContentBytesSent;
+		u32 m_OutChunksBytesSent;
+		netSocketAddress m_ProxyAddr;
+		bool m_IgnoreProxy;
+		netTimeout m_Timeout;
+		int m_RedirectCount;
+		int m_Skt;
+		SendState m_SendState;
+		RecvState m_RecvState;
+		sysMemAllocator* m_Allocator;
+		u32 m_Options;
+		u32 m_ByteRangeLow;
+		u32 m_ByteRangeHigh;
+		u32 m_NumFormParams;
+		u32 m_NumQueryParams;
+		int m_NumListParamValues;
+		netIpAddress m_HostIp;
+		u16 m_HostPort;
+		netTcpAsyncOp m_ConnectTcpOp;
+		// Diagnostics
+		netHttpAbortReason m_AbortReason;
+		bool m_ChunkAllocationError;
+		netTcpResult m_TcpOpResult;
+		int m_TcpOpError;
+		TransferEncoding m_OutboundTransferEncoding;
+		netStatus* m_Status;
+		netStatus m_MyStatus;
+		netStatus m_HostResolutionStatus;
+		//For managing a linked list of requests.
+		netHttpRequest* m_Next;
+		netHttpRequest* m_Prev;
+		WOLFSSL_CTX* m_SslCtx;
+	};
+	class netHttpFilter
+	{
+		friend class netHttpRequest;
+	public:
+		virtual ~netHttpFilter()
+		{}
+		virtual bool CanFilterRequest() const
+		{
+			return false;
+		}
+		virtual bool CanFilterResponse() const
+		{
+			return false;
+		}
+		virtual u32 DelayMs() const
+		{
+			return 0;
+		}
+		virtual bool CanIntercept() const
+		{
+			return false;
+		}
+		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output)
+		{
+			return false;
+		}
+		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending)
+		{
+			return false;
+		}
+		virtual const char* GetUserAgentString() const
+		{
+			return NULL;
+		}
+		virtual bool ProcessRequestHeader(class netHttpRequest* request)
+		{
+			return false;
+		}
+		virtual bool ProcessResponseHeader(const int statusCode, const char* header)
+		{
+			return false;
+		}
+		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived)
+		{}
+		virtual bool AllowSucceeded(class netHttpRequest* request)
+		{
+			return false;
+		}
+		virtual void DisableHttpDump(bool /*bDisabled*/)
+		{}
+		const netHttpRequest* m_HttpRequest;
+	};
 	class netPeerAddress
 	{
 	public:
@@ -6475,357 +6826,6 @@ namespace rage {
 		const char* m_Ctx;
 		const char* m_Location;
 		const char* m_Msg;
-	};
-	enum ConnectReason
-	{
-		CR_INVALID,
-		CR_ELASTIC,
-		CR_CDN_UPLOAD_PHOTO,
-		CR_CDN_UPLOAD_VIDEO,
-		CR_ORBIS_MEDIA_DECODER,
-		CR_CLOUD,
-		CR_TELEMETRY_UNUSED,
-		CR_STATS_UNUSED,
-		CR_ENTITLEMENT,
-		CR_FACEBOOK,
-		CR_SC_CREATE_AUTH_TOKEN,
-		CR_SC_CREATE_LINK_TOKEN,
-		CR_ROS_CREATE_TICKET,
-		CR_ROS_CREDENTIALS_CHANGING,
-		CR_ROS_GET_GEOLOCATION_INFO,
-		CR_ROS_GET_NAT_DISCOVERY_SERVERS,
-		CR_SOCIAL_CLUB,
-		CR_UGC,
-		CR_CLOUD_SAVE,
-		CR_ACHIEVEMENTS,
-		CR_MATCHMAKING,
-		CR_FRIENDS,
-		CR_CREW,
-		CR_CONDUCTOR_ROUTE,
-		CR_PRESENCE,
-		CR_INBOX,
-		CR_YOUTUBE,
-		CR_SAVE_MIGRATION,
-		CR_FEED,
-		CR_REGISTER_PUSH_NOTIFICATION_DEVICE,
-		CR_GAME_SERVER,
-		CR_ITEM_DATABASE,
-		CR_POSSE,
-		CR_TEST,
-		CR_BUGSTAR,
-		CR_GOOGLE_ANALYTICS,
-		CR_DAILY_OBJECTIVES,
-		CR_SP_ACTION_PROXY,
-		CR_SESSION_SERVER,
-		CR_CASH_INVENTORY_SERVER,
-		CR_BOUNTY_SERVER,
-		CR_ANTI_CHEAT_SERVER,
-		CR_MINIGAME_SERVER,
-		CR_MESSAGE_DISTRIBUTION_SERVER,
-		CR_COUNT
-	};
-	enum netHttpAbortReason
-	{
-		NET_HTTPABORT_NONE = 0,
-		NET_HTTPABORT_COMMIT_FAILED = 1,
-		NET_HTTPABORT_CANCELED = 2,
-		NET_HTTPABORT_REQUEST_TIMED_OUT = 3,
-		NET_HTTPABORT_RESOLVE_HOST_FAILED = 4,
-		NET_HTTPABORT_RESOLVING_HOST_FAILED = 5,
-		NET_HTTPABORT_CONNECT_HOST_FAILED = 6,
-		NET_HTTPABORT_CONNECTING_HOST_FAILED = 7,
-		NET_HTTPABORT_SEND_HEADER_FAILED = 8,
-		NET_HTTPABORT_RECEIVE_HEADER_FAILED = 9,
-		NET_HTTPABORT_PROCESS_RESPONSE_HEADER_FAILED = 10,
-		NET_HTTPABORT_RESPONSE_NO_LOCATION_LENGTH = 11,
-		NET_HTTPABORT_RESPONSE_REDIRECT_FAILED = 12,
-		NET_HTTPABORT_RESPONSE_GET_LOCATION_FAILED = 13,
-		NET_HTTPABORT_RESPONSE_UNHANDLED_TRANSFER_ENCODING = 14,
-		NET_HTTPABORT_RESPONSE_PARSE_CONTENT_LENGTH_FAILED = 15,
-		NET_HTTPABORT_READ_BODY_FAILED = 16,
-		NET_HTTPABORT_CONSUME_BODY_FAILED = 17,
-		NET_HTTPABORT_CHUNK_OPERATION_FAILED = 18,
-		NET_HTTPABORT_ALLOCATE_CHUNK_FAILED = 19,
-		NET_HTTPABORT_SEND_CHUNK_FAILED = 20,
-		NET_HTTPABORT_XBL_RECEIVE_HEADER_FAILED = 21,
-		NET_HTTPABORT_XBL_RECEIVE_BODY_FAILED = 22,
-		NET_HTTPABORT_PROCESS_BOUNCE_CONTENT_FAILED = 23,
-		NET_HTTPABORT_READ_BODY_ONCE_FAILED = 24,
-		NET_HTTPABORT_XBOX_AUTH_TOKEN_FAILED = 25,
-	};
-	class netIpV4Address
-	{
-	public:
-		union
-		{
-			u32 pck;
-			struct
-			{
-				u8 f4, f3, f2, f1;
-			};
-		} m_Ip;
-	};
-	class netIpAddress
-	{
-	public:
-		netIpV4Address m_IpAddress;
-	};
-	class netSocketAddress
-	{
-	public:
-		netIpAddress m_Ip;
-		u16 m_Port;
-	};
-	class netTcpAsyncOp
-	{
-		friend class netTcp;
-		friend class netHttpRequest;
-	public:
-		enum OpType
-		{
-			OP_INVALID = -1,
-			OP_CONNECT,
-			OP_SSL_CONNECT,
-			OP_RECV_BUFFER,
-			OP_SEND_BUFFER,
-			OP_NUM_TYPES
-		};
-		OpType m_Type;
-		int m_SktId;
-		int m_LastError;
-		enum ConnectState
-		{
-			STATE_SOCKET_CONNECT,
-			STATE_SSL_CONNECT
-		};
-		enum SslSocketOp
-		{
-			SSL_SOCKET_OP_READ,
-			SSL_SOCKET_OP_WRITE
-		};
-		union
-		{
-			struct
-			{
-				u8 m_AddrBuf[sizeof(netSocketAddress)];
-				netSocketAddress* m_Addr;
-				int* m_CallerSktId;
-				ConnectReason m_ConnectReason;
-				ConnectState m_State;
-			} m_Connect;
-			struct
-			{
-				u8 m_AddrBuf[sizeof(netSocketAddress)];
-				netSocketAddress* m_Addr;
-				int* m_CallerSktId;
-				ConnectState m_State;
-				SslSocketOp m_NextSocketOp;
-				SSL_CTX* m_SslCtx;
-				const char* m_DomainName;
-				ConnectReason m_ConnectReason;
-			} m_SslConnect;
-			struct
-			{
-				void* m_Buf;
-				u32 m_SizeofBuf;
-				u32 m_NumRcvd;
-			} m_RcvBuf;
-			struct
-			{
-				const void* m_Buf;
-				u32 m_SizeofBuf;
-				u32 m_NumSent;
-			} m_SndBuf;
-		} m_Data;
-		int m_TimeoutMs;
-		netStatus m_MyStatus;
-		u32 m_Id;
-		inlist_node<netTcpAsyncOp> m_ListLink;
-	};
-	enum netHttpVerb
-	{
-		NET_HTTP_VERB_INVALID,
-		NET_HTTP_VERB_GET,
-		NET_HTTP_VERB_POST,
-		NET_HTTP_VERB_PUT,
-		NET_HTTP_VERB_DELETE,
-		NET_HTTP_VERB_HEAD,
-		NET_HTTP_VERBS_COUNT
-	};
-	class netTimeout
-	{
-	public:
-		static constexpr u32 DEFAULT_LONG_FRAME_THRESHOLD_MS = (3 * 1000);
-		u32 m_CurTime;
-		u32 m_LongFrameThresholdMs;
-		int m_Timeout;
-		int m_Countdown;
-	};
-	enum netTcpResult
-	{
-		NETTCP_RESULT_DISCONNECTED = -4,
-		NETTCP_RESULT_TIMED_OUT,
-		NETTCP_RESULT_ERROR,
-		NETTCP_RESULT_CANCELED,
-		NETTCP_RESULT_OK
-	};
-	class netHttpRequest
-	{
-	public:
-		static constexpr u32 DEFAULT_BOUNCE_BUFFER_MAX_LENGTH = 1044;
-		enum TransferEncoding
-		{
-			TRANSFER_ENCODING_NORMAL,
-			TRANSFER_ENCODING_CHUNKED,
-		};
-		enum UriScheme
-		{
-			URISCHEME_INVALID,
-			URISCHEME_HTTP,
-			URISCHEME_HTTPS,
-		};
-		struct Chunk
-		{
-			datGrowBuffer m_Data;
-			netTcpAsyncOp m_TcpOp;
-			netStatus m_Status; // when not using m_TcpOp, such as when IXHR2 is used.
-			inlist_node<Chunk> m_ListLink;
-		};
-		enum SendState
-		{
-			SENDSTATE_NONE,
-			SENDSTATE_WAIT_UNTIL_READY,
-			SENDSTATE_RESOLVE_HOST,
-			SENDSTATE_RESOLVING_HOST,
-			SENDSTATE_CONNECT,
-			SENDSTATE_CONNECTING,
-			SENDSTATE_SEND_HEADER,
-			SENDSTATE_SENDING_CONTENT,
-			SENDSTATE_SENDING_TERM_CHUNK,
-			SENDSTATE_SUCCEEDED,
-			SENDSTATE_ERROR
-		};
-		enum RecvState
-		{
-			RECVSTATE_NONE,
-			RECVSTATE_RECEIVING_HEADER,
-			RECVSTATE_RECEIVED_HEADER,
-			RECVSTATE_RECEIVING_NORMAL_CONTENT,
-			RECVSTATE_RECEIVING_CHUNKED_CONTENT,
-			RECVSTATE_FINISH_CONSUMING_CONTENT,
-			RECVSTATE_SUCCEEDED,
-			RECVSTATE_ERROR
-		};
-		Chunk* m_CurChunk;
-		typedef inlist<Chunk, &Chunk::m_ListLink> ChunkList;
-		ChunkList m_QueuedChunks;
-		Chunk* m_InFlightChunk;
-		datGrowBuffer m_InBuf;
-		atStringBuilder m_InHeader;
-		atStringBuilder m_OutHeader;
-		class netHttpFilter* m_Filter;
-		fiHandle m_ResponseHandle;
-		const fiDevice* m_ResponseDevice;
-		char m_DefaultBounceBuf[DEFAULT_BOUNCE_BUFFER_MAX_LENGTH];
-		char* m_BounceBuf;
-		u32 m_BounceBufMaxLen;
-		u32 m_BounceBufLen;
-		u32 m_RequestId;
-		netHttpVerb m_HttpVerb;
-		mutable int m_HttpStatusCode;
-		UriScheme m_UriScheme;
-		char* m_RawUri;
-		const char* m_RawHost;
-		const char* m_RawPath;
-		mutable char* m_EncodedUri;
-		atStringBuilder m_QueryString;
-		atStringBuilder m_UserAgentString;
-		u32 m_InContentLen;
-		u32 m_InContentBytesRcvd;
-		u32 m_OutContentBytesSent;
-		u32 m_OutChunksBytesSent;
-		netSocketAddress m_ProxyAddr;
-		bool m_IgnoreProxy;
-		netTimeout m_Timeout;
-		int m_RedirectCount;
-		int m_Skt;
-		SendState m_SendState;
-		RecvState m_RecvState;
-		sysMemAllocator* m_Allocator;
-		u32 m_Options;
-		u32 m_ByteRangeLow;
-		u32 m_ByteRangeHigh;
-		u32 m_NumFormParams;
-		u32 m_NumQueryParams;
-		int m_NumListParamValues;
-		netIpAddress m_HostIp;
-		u16 m_HostPort;
-		netTcpAsyncOp m_ConnectTcpOp;
-		// Diagnostics
-		netHttpAbortReason m_AbortReason;
-		bool m_ChunkAllocationError;
-		netTcpResult m_TcpOpResult;
-		int m_TcpOpError;
-		TransferEncoding m_OutboundTransferEncoding;
-		netStatus* m_Status;
-		netStatus m_MyStatus;
-		netStatus m_HostResolutionStatus;
-		//For managing a linked list of requests.
-		netHttpRequest* m_Next;
-		netHttpRequest* m_Prev;
-		WOLFSSL_CTX* m_SslCtx;
-	};
-	class netHttpFilter
-	{
-		friend class netHttpRequest;
-	public:
-		virtual ~netHttpFilter()
-		{}
-		virtual bool CanFilterRequest() const
-		{
-			return false;
-		}
-		virtual bool CanFilterResponse() const
-		{
-			return false;
-		}
-		virtual u32 DelayMs() const
-		{
-			return 0;
-		}
-		virtual bool CanIntercept() const
-		{
-			return false;
-		}
-		virtual bool FilterRequest(const u8* data, const u32 dataLen, const bool finalCall, datGrowBuffer& output)
-		{
-			return false;
-		}
-		virtual bool FilterResponse(const u8* data, const u32 dataLen, const bool allDataReceived, fiHandle& outputHandle, const fiDevice* outputDevice, u32* numProcessed, bool* hasDataPending)
-		{
-			return false;
-		}
-		virtual const char* GetUserAgentString() const
-		{
-			return NULL;
-		}
-		virtual bool ProcessRequestHeader(class netHttpRequest* request)
-		{
-			return false;
-		}
-		virtual bool ProcessResponseHeader(const int statusCode, const char* header)
-		{
-			return false;
-		}
-		virtual void Receive(void* buf, const u32 bufSize, u32* bytesReceived)
-		{}
-		virtual bool AllowSucceeded(class netHttpRequest* request)
-		{
-			return false;
-		}
-		virtual void DisableHttpDump(bool /*bDisabled*/)
-		{}
-		const netHttpRequest* m_HttpRequest;
 	};
 	class Sha1
 	{

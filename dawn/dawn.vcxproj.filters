@@ -153,6 +153,9 @@
     <ClInclude Include="src\renderer\renderer.h" />
     <ClInclude Include="src\renderer\state_saver.h" />
     <ClInclude Include="src\renderer\vectors.h" />
+    <ClInclude Include="src\common\virtual_pure.h" />
+    <ClInclude Include="src\menu\test_gui.h" />
+    <ClInclude Include="src\renderer\input.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

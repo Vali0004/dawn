@@ -81,9 +81,9 @@ namespace dwn::pointers
 		ptr_mgr.print();
 	}
 
-	using removeKeybaordHookT = fptr<void()>;
 	inline void remove_keyboard_hook()
 	{
+		using removeKeybaordHookT = fptr<void()>;
 		removeKeybaordHookT remove_fn{};
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("RemoveKeyboardHook", remove_fn, "48 8B 0D ? ? ? ? 48 FF 25 ? ? ? ? E9");

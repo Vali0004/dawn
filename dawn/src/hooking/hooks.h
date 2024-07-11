@@ -13,6 +13,8 @@ namespace dwn::hooking
 	inline etc::hook<pointers::types::scrThreadRunT>* g_scrThreadRun{};
 	inline rage::scrThread::State scrThreadRun(rage::scrValue* stack, rage::scrValue* globals, rage::scrProgram* pt, rage::scrThread::Serialized* ser)
 	{
+		invoke_thread_callbacks(pt->HashCode);
+
 		if (pt->HashCode == "freemode"_j || pt->HashCode == "main_persistent"_j)
 		{
 			renderer::menu::tick();
@@ -89,8 +91,8 @@ namespace dwn::hooking
 
 			LOG_TO_STREAM("Game requested RGSC import, reusing...");
 			FARPROC result = g_GetProcAddress->original()(hModule, lpProcName);
-			g_early_hook = true;
-			hook_rgsc();
+			//g_early_hook = true;
+			//hook_rgsc();
 
 			return result;
 		}
@@ -125,7 +127,7 @@ namespace dwn::hooking
 			std::this_thread::sleep_for(100ms);
 			LOG_TO_STREAM("Scanning pointers...");
 			pointers::rgsc_scan();
-			hook_rgsc();
+			//hook_rgsc();
 		}
 
 		pointers::late_scan();
