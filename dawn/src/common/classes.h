@@ -21,10 +21,12 @@
 #include "rgsc/public_interface/network_interface.h"
 #include "rgsc/public_interface/cloudsave_interface.h"
 #include "rgsc/public_interface/gamerpics_interface.h"
+#include "data/bitbuffer.h"
 #define UNUSED_PARAM(x) // I am NOT about to remove this off every virtual function
 #define TrapGE(...) 
 #define Assert(x)
 #define AssertMsg(x, m)
+using namespace rage;
 
 enum LoadingScreenMovieContext : std::uint32_t
 {
@@ -244,6 +246,16 @@ namespace rage {
 		u32 m_growIncr;  //Multiples of size to grow the buffer in.
 		fiHandle m_FiHandle;
 	};
+	template<unsigned VAL>
+	struct datBitsNeeded
+	{
+		static const u32 COUNT = VAL ? (datBitsNeeded<(VAL >> 1)>::COUNT + 1) : 0;
+	};
+	template<>
+	struct datBitsNeeded<0>
+	{
+		static const u32 COUNT = 0;
+	};
 }
 //atXXXXXXX
 namespace rage {
@@ -254,6 +266,32 @@ namespace rage {
 	template<>
 	struct CompileTimeLog2Floor<1> {
 		enum { value = 0 };
+	};
+	class atHashValue
+	{
+	public:
+		void SetHash(const u32 hash)
+		{
+			m_hash = hash;
+		}
+		u32 GetHash() const
+		{
+			return m_hash;
+		}
+		void Clear()
+		{
+			m_hash = 0;
+		}
+		bool IsNull() const
+		{
+			return m_hash == 0;
+		}
+		bool IsNotNull() const
+		{
+			return m_hash != 0;
+		}
+	protected:
+		u32 m_hash;
 	};
 	template<int, typename> class atFixedBitSetIterator;
 	template <int Size, typename Type = u32>
@@ -2453,6 +2491,274 @@ namespace rage {
 		T* m_head;
 		T* m_tail;
 		u64 m_size;
+	};
+	class atDNodeEmptyClass
+	{
+	};
+	template <typename _Type, typename _Base = atDNodeEmptyClass>
+	class atDNode : public _Base
+	{
+	public:
+		atDNode<_Type, _Base>()
+		{
+			Next = NULL; Prev = NULL;
+		}
+		~atDNode<_Type, _Base>()
+		{}
+		atDNode<_Type, _Base>(const _Type& d)
+		{
+			Data = d; Next = NULL; Prev = NULL;
+		}
+		const atDNode<_Type, _Base>* GetNext() const
+		{
+			return Next;
+		}
+		atDNode<_Type, _Base>* GetNext()
+		{
+			return Next;
+		}
+		void SetNext(atDNode<_Type, _Base>* next)
+		{
+			Next = next;
+		}
+		const atDNode<_Type, _Base>* GetPrev() const
+		{
+			return Prev;
+		}
+		atDNode<_Type, _Base>* GetPrev()
+		{
+			return Prev;
+		}
+		void SetPrev(atDNode<_Type, _Base>* prev)
+		{
+			Prev = prev;
+		}
+		void Insert(atDNode<_Type, _Base>& node)
+		{
+			node.SetNext(this);
+			node.SetPrev(Prev);
+			if (Prev)
+			{
+				Prev->SetNext(&node);
+			}
+			Prev = &node;
+		}
+		void Append(atDNode<_Type, _Base>& node)
+		{
+			node.SetNext(Next);
+			node.SetPrev(this);
+			if (Next)
+			{
+				Next->SetPrev(&node);
+			}
+			Next = &node;
+		}
+		void Detach()
+		{
+			if (Next)
+			{
+				Next->SetPrev(Prev);
+			}
+			if (Prev)
+			{
+				Prev->SetNext(Next);
+			}
+			Next = NULL;
+			Prev = NULL;
+		}
+
+	public:
+		// data stored at this node
+		_Type Data;
+
+	protected:
+		// next node in list
+		atDNode<_Type, _Base>* Next;
+		// previous node in list
+		atDNode<_Type, _Base>* Prev;
+	};
+	template <typename _Type, typename _Base = atDNodeEmptyClass>
+	class atDList
+	{
+	public:
+
+		// PURPOSE: Constructor
+		atDList<_Type, _Base>()
+		{
+			Head = NULL; Tail = NULL;
+		}
+		void Empty()
+		{
+			Head = NULL; Tail = NULL;
+		}
+		void RemoveAll()
+		{
+			for (atDNode<_Type, _Base>* pNext, *pNode = GetHead(); pNode; pNode = pNext)
+			{
+				pNext = pNode->GetNext();
+				pNode->SetNext(NULL);
+				pNode->SetPrev(NULL);
+			}
+
+			Empty();
+		}
+		void DeleteAll()
+		{
+			while (Tail)
+			{
+				atDNode<_Type, _Base>* node = PopTail();
+				delete node;
+			}
+		}
+		const atDNode<_Type, _Base>* GetHead() const
+		{
+			return Head;
+		}
+		atDNode<_Type, _Base>* GetHead()
+		{
+			return Head;
+		}
+		const atDNode<_Type, _Base>* GetTail() const
+		{
+			return Tail;
+		}
+		atDNode<_Type, _Base>* GetTail()
+		{
+			return Tail;
+		}
+		void Prepend(atDNode<_Type, _Base>& node)
+		{
+			if (!other.Head)
+				return; // Nothing to do
+
+			if (Head)
+			{
+				other.Tail->SetNext(Head); // Link other's tail to head
+				Head->SetPrev(other.Tail);
+				Head = other.Head; // Set new tail pointer
+			}
+			else
+			{
+				*this = other; // Copy
+			}
+
+			other.Empty(); // Reset other list
+		}
+		void Append(atDNode<_Type, _Base>& node)
+		{
+			if (!other.Head)
+				return; // Nothing to do
+
+			if (Head)
+			{
+				other.Head->SetPrev(Tail); // Link other's tail to head
+				Tail->SetNext(other.Head);
+				Tail = other.Tail; // Set new tail pointer
+			}
+			else
+			{
+				*this = other; // Copy
+			}
+
+			other.Empty(); // Reset other list
+		}
+		void Prepend(atDList<_Type, _Base>& other)
+		{
+			if (Head)
+			{
+				Head->Insert(node);
+				Head = &node;
+			}
+			else
+			{
+				Head = &node;
+				Tail = &node;
+			}
+		}
+		void Append(atDList<_Type, _Base>& other)
+		{
+			if (Tail)
+			{
+				Tail->Append(node);
+				Tail = &node;
+			}
+			else
+			{
+				Head = &node;
+				Tail = &node;
+			}
+		}
+		void InsertAfter(atDNode<_Type, _Base>& insertPoint, atDNode<_Type, _Base>& node)
+		{
+			insertPoint.Append(node);
+
+			if (&insertPoint == Tail)
+			{
+				Tail = &node;
+			}
+		}
+		void InsertBefore(atDNode<_Type, _Base>& insertPoint, atDNode<_Type, _Base>& node)
+		{
+			insertPoint.Insert(node);
+
+			if (&insertPoint == Head)
+			{
+				Head = &node;
+			}
+		}
+		atDNode<_Type, _Base>* PopHead()
+		{
+			atDNode<_Type, _Base>* oldHead = Head;
+
+			if (Head)
+			{
+				Head = Head->GetNext();
+
+				if (Head == NULL)
+				{
+					Tail = NULL;
+				}
+
+				oldHead->Detach();
+			}
+
+			return oldHead;
+		}
+		atDNode<_Type, _Base>* PopTail()
+		{
+			atDNode<_Type, _Base>* oldTail = Tail;
+
+			if (Tail)
+			{
+				Tail = Tail->GetPrev();
+
+				if (Tail == NULL)
+				{
+					Head = NULL;
+				}
+
+				oldTail->Detach();
+			}
+
+			return oldTail;
+		}
+		void PopNode(atDNode<_Type, _Base>& node)
+		{
+			if (&node == Head)
+			{
+				Head = node.GetNext();
+			}
+			if (&node == Tail)
+			{
+				Tail = node.GetPrev();
+			}
+			node.Detach();
+		}
+	private:
+		// beginning of the list
+		atDNode<_Type, _Base>* Head;
+		// end of the list
+		atDNode<_Type, _Base>* Tail;
 	};
 }
 //pgXXXXXXX
@@ -5322,6 +5628,16 @@ namespace rage
 //netXXXXXX
 namespace rage
 {
+	#define DEFINE_AT_RTTI(T) private: \
+		virtual T* GetIdentifier() { return nullptr; } \
+		virtual T* GetIdentifier_2() { return nullptr; } \
+		virtual uint32_t GetTypeHash() { return NULL; } \
+		virtual T* GetIfIsOfType(T* vft) { return vft; } \
+		virtual void IsOfType(T* vft) {} \
+		virtual void IsOfTypeObject(T* object) {} \
+		public: \
+		virtual void Deconstructor() {}
+
 	class netStatus
 	{
 	public:
@@ -5340,6 +5656,332 @@ namespace rage
 			StatusCode m_StatusCode;
 		};
 		int m_ResultCode;
+	};
+	typedef u16 netSequence;
+	class netLoggingInterface
+	{
+	public:
+		enum LoggingLevel
+		{
+			LOG_LEVEL_LOW, // Low importance messages
+			LOG_LEVEL_MEDIUM, // Medium importance messages
+			LOG_LEVEL_HIGH, // High importance messages
+			LOG_LEVEL_ERROR, // Error messages
+		};
+		virtual void Log(const char* logText, ...) = 0;
+		virtual void LineBreak() = 0;
+		virtual void Flush(bool waitForFlushToComplete = false) = 0;
+		virtual void Disable() = 0;
+		virtual void Enable() = 0;
+		virtual bool IsEnabled() const = 0;
+		virtual void WriteDataValue(const char* dataName, const char* dataValue, ...) = 0;
+		virtual void WriteMessageHeader(bool received, netSequence sequence, const char* messageString1, const char* messageString2, const char* playerName) = 0;
+		virtual void WritePlayerText(const char* dataName, const char* dataValue, const char* playerName) = 0;
+		virtual void WriteEventData(const char* eventName, const char* eventData, unsigned trailingLineBreaks) = 0;
+		virtual void WriteNodeHeader(const char* nodeName) = 0;
+		virtual void PostNetworkUpdate()
+		{}
+		virtual void GetDebugStatisticsText(char* buffer, const unsigned bufferSize)
+		{}
+		virtual void GetFileName(char* buffer, u32 bufferSize) const
+		{}
+	protected:
+		virtual ~netLoggingInterface()
+		{}
+	};
+	class rlGamerInfo;
+	class netPlayer
+	{
+		friend class netPlayerMgrBase;
+	public:
+		enum PlayerType
+		{
+			NETWORK_PLAYER,
+			NETWORK_BOT,
+			MAX_PLAYER_TYPES
+		};
+		static const int VOICE_CHANNEL_NONE = -1;
+		DEFINE_AT_RTTI(netPlayer)
+		virtual void Shutdown() = 0;
+		virtual bool IsPhysical() const = 0;
+		virtual const char* GetLogName() const = 0;
+		virtual void ActiveUpdate() = 0;
+		virtual void Unk58() = 0;
+		virtual bool IsHost() const = 0;
+		virtual const rlGamerInfo* GetGamerInfo() const = 0;
+	};
+	class netRelayToken
+	{
+	public:
+		static const unsigned MAX_TOKEN_BUF_SIZE = 6;
+		static const unsigned MAX_EXPORTED_SIZE_IN_BYTES = MAX_TOKEN_BUF_SIZE;
+
+		// 2 hex chars per byte + 2 for "0x", + 1 for null terminator
+		static const unsigned TO_HEX_STRING_BUFFER_SIZE = (MAX_TOKEN_BUF_SIZE * 2) + 2 + 1;
+
+		static const netRelayToken INVALID_RELAY_TOKEN;
+		u8 m_Token[MAX_TOKEN_BUF_SIZE];
+	};
+	enum netNatType
+	{
+		NET_NAT_UNKNOWN,
+		NET_NAT_OPEN,
+		NET_NAT_MODERATE,
+		NET_NAT_STRICT,
+		NET_NAT_NUM_TYPES
+	};
+	class netPeerId
+	{
+	public:
+		static const u64 NET_INVALID_PEER_ID = ~u64(0);
+		static const unsigned MAX_EXPORTED_SIZE_IN_BYTES = sizeof(u64);
+		static const unsigned TO_HEX_STRING_BUFFER_SIZE = 19;
+		u64 m_Id;
+	};
+	typedef s32 PlayerAccountId;
+	typedef s64 RockstarId;
+	class rlGamerHandle
+	{
+	public:
+		static const unsigned MAX_EXPORTED_SIZE_IN_BITS_SC =	(sizeof(u8) << 3) +	// m_Service
+			(sizeof(RockstarId) << 3) +	// m_RockstarId
+			(sizeof(u8) << 3); // m_BotIndex
+		static const unsigned MAX_EXPORTED_SIZE_IN_BYTES_SC = ((MAX_EXPORTED_SIZE_IN_BITS_SC + 7) & ~7) >> 3; // round up to nearest multiple of 8 then divide by 8
+		union Data
+		{
+			struct ScData
+			{
+				RockstarId m_RockstarId;
+			} m_ScData;
+		} m_Data;
+		u8 m_Service;
+		#define INVALID_BOT_INDEX (0)
+		#define MAX_BOT_INDEX (31)
+		u8 m_BotIndex;
+	};
+	class netCrypto
+	{
+	public:
+		class DiffieHellman
+		{
+		public:
+			static const unsigned MAX_PRIME_SIZE_IN_BITS = 1024;
+			static const unsigned MAX_PRIME_SIZE_IN_BYTES = MAX_PRIME_SIZE_IN_BITS >> 3;
+			static const unsigned MAX_GENERATOR_SIZE_IN_BYTES = MAX_PRIME_SIZE_IN_BYTES;
+			static const unsigned MAX_PUBLIC_KEY_LENGTH_IN_BYTES = MAX_PRIME_SIZE_IN_BYTES;
+			static const unsigned MAX_PRIVATE_KEY_LENGTH_IN_BYTES = MAX_PUBLIC_KEY_LENGTH_IN_BYTES;
+			static const unsigned MAX_AGREE_KEY_LENGTH_IN_BYTES = MAX_PUBLIC_KEY_LENGTH_IN_BYTES;
+			struct Impl;
+			Impl* m_pImpl;
+			bool m_Initialized;
+			bool m_GeneratedKeyPair;
+		};
+	};
+	class netP2pCrypt
+	{
+	public:
+		static const unsigned MAX_SIZEOF_OVERHEAD_IN_BYTES = (1 + 4 + 8 + 16);
+		class Key
+		{
+		public:
+			static const unsigned KEY_LENGTH_IN_BITS = 256;
+			static const unsigned KEY_LENGTH_IN_BYTES = KEY_LENGTH_IN_BITS >> 3;
+			static const unsigned MAX_EXPORTED_SIZE_IN_BYTES = KEY_LENGTH_IN_BYTES;
+			u8 m_RawKey[KEY_LENGTH_IN_BYTES];
+			bool m_IsValid;
+		};
+		class PublicKey
+		{
+		public:
+			static const unsigned KEY_LENGTH_IN_BYTES = netCrypto::DiffieHellman::MAX_PUBLIC_KEY_LENGTH_IN_BYTES;
+			static const unsigned KEY_LENGTH_IN_BITS = KEY_LENGTH_IN_BYTES << 3;
+			static const unsigned MAX_EXPORTED_SIZE_IN_BITS = datBitsNeeded<KEY_LENGTH_IN_BYTES>::COUNT + KEY_LENGTH_IN_BITS;
+			static const unsigned MAX_EXPORTED_SIZE_IN_BYTES = ((MAX_EXPORTED_SIZE_IN_BITS + 7) & ~7) >> 3; // round up to nearest multiple of 8 then divide by 8
+			u8 m_RawKey[KEY_LENGTH_IN_BYTES];
+			unsigned m_KeyLengthInBytes;
+			bool m_IsValid;
+		};
+		static const unsigned HMAC_KEY_MAX_LEN = 32;
+		static const unsigned HMAC_SALT_MAX_LEN = 32;
+		typedef u8 HmacKeySalt[HMAC_KEY_MAX_LEN + HMAC_SALT_MAX_LEN];
+		static const unsigned P2P_CRYPT_HMAC_LENGTH_IN_BYTES = (256 >> 3); // 256-bit hash
+		static const unsigned P2P_CRYPT_TRUNCATED_HMAC_LENGTH_IN_BYTES = (64 >> 3); // 64-bit truncated hash
+	};
+	class netPeerAddress
+	{
+	public:
+		netPeerId m_PeerId;
+		rlGamerHandle m_GamerHandle;
+		netP2pCrypt::Key m_Key;
+		netSocketAddress m_RelayServerAddress;
+		netRelayToken m_RelayToken;
+		netSocketAddress m_PublicAddress;
+		netSocketAddress m_PrivateAddress;
+		netNatType m_NatType;
+	};
+	struct ReceivedMessageData
+	{
+		ReceivedMessageData(const void* messageData, u32 messageDataSize, netSequence sequence, netPlayer* fromPlayer, netPlayer* toPlayer) :
+			m_MessageData(messageData),
+			m_MessageDataSize(messageDataSize),
+			m_FromPlayer(fromPlayer),
+			m_ToPlayer(toPlayer),
+			m_NetSequence(sequence)
+		{}
+
+		bool IsValid() const
+		{
+			return m_MessageData && m_FromPlayer && m_ToPlayer;
+		}
+
+		const void* m_MessageData;
+		u32 m_MessageDataSize;
+		netPlayer* m_FromPlayer;
+		netPlayer* m_ToPlayer;
+		netSequence m_NetSequence;
+	};
+	enum netMessageId
+	{
+		CMSG_TEXT_CHAT_STATUS = 0,
+		REASSIGN_NEGOTIATE_MSG = 1,
+		MSG_TRANSITION_TO_GAME_NOTIFY = 2,
+		CMSG_VOICE_STATUS = 3,
+		MSG_RESERVE_SLOTS_ACK = 4,
+		RL_MSG_SEARCH_REQUEST = 5,
+		MSG_TRANSITION_TO_ACTIVITY_START = 6,
+		MSG_SESSION_ESTABLISHED = 7,
+		CMSG_JOIN_RESPONSE = 8,
+		INFORM_OBJECT_IDS_MSG = 9,
+		MSG_TEXT_MESSAGE = 10,
+		MSG_SCRIPT_VERIFY_HOST_ACK = 11,
+		MSG_BLACKLIST = 12,
+		MSG_REQUEST_KICK_FROM_HOST = 13,
+		MSG_SCRIPT_NEW_HOST = 14,
+		NET_KEY_EXCHANGE_SESSION_OFFER = 15,
+		REASSIGN_RESPONSE_MSG = 16,
+		NET_ICE_SESSION_PONG = 17,
+		SN_MSG_MIGRATE_HOST_RESPONSE = 18,
+		RL_SESSION_DETAIL_RESPONSE = 19,
+		MSG_TRANSITION_GAMER_INSTRUCTION = 20,
+		NET_ICE_SESSION_PING = 21,
+		NON_PHYSICAL_DATA_MSG = 22,
+		MSG_SCRIPT_LEAVE = 23,
+		PLAYER_DATA_MSG = 24,
+		MSG_TRANSITION_LAUNCH = 25,
+		MSG_SCRIPT_MIGRATE_HOST_FAIL_ACK = 26,
+		MSG_TRANSITION_LAUNCH_NOTIFY = 27,
+		MSG_SCRIPT_BOT_JOIN = 28,
+		RL_MSG_QOS_PROBE_REQUEST = 29,
+		MSG_PARTY_ENTER_GAME = 30,
+		SN_MSG_SET_INVITABLE_CMD = 31,
+		CMSG_PACKED_EVENT_RELIABLES_MSGS = 32,
+		NET_MESSAGE = 33,
+		RL_SESSION_DETAIL_REQUEST = 34,
+		SN_MSG_SESSION_MEMBER_IDS = 35,
+		CMSG_TEXT_MESSAGE = 36,
+		MSG_SPLIT_UPDATE_ACK = 37,
+		REASSIGN_CONFIRM_MSG = 38,
+		NET_LAG_PING_MSG = 39,
+		NET_ICE_SESSION_DEBUG_INFO = 40,
+		REQUEST_OBJECT_IDS_MSG = 41,
+		SN_MSG_JOIN_RESPONSE = 42,
+		MSG_SCRIPT_BOT_LEAVE = 43,
+		RL_MSG_QOS_PROBE_RESPONSE = 44,
+		SN_MSG_START_MATCH_CMD = 45,
+		CROAMING_REQUEST_BUBBLE_MSG = 46,
+		MSG_CXN_REQUEST_REMOTE_TIMEOUT = 47,
+		PACKED_RELIABLES_MSG = 48,
+		MSG_SCRIPT_BOT_HANDSHAKE_ACK = 49,
+		CROAMING_INITIAL_BUBBLE_MSG = 50,
+		MSG_SCRIPT_MIGRATE_HOST = 51,
+		MSG_KICK_PLAYER = 52,
+		SN_MSG_NOT_MIGRATING = 53,
+		MSG_TRANSITION_TO_ACTIVITY_FINISH = 54,
+		MSG_TRANSITION_PARAMETER_STRING = 55,
+		NET_TIME_SYNC_MSG = 56,
+		MSG_RESERVE_SLOTS = 57,
+		MSG_PLAYER_CARD_SYNC = 58,
+		PACKED_CLONE_SYNC_ACKS_MSG = 59,
+		MSG_TRANSITION_PARAMETERS = 60,
+		MSG_PARTY_LEAVE_GAME = 61,
+		MSG_SCRIPT_VERIFY_HOST = 62,
+		CROAMING_JOIN_BUBBLE_ACK_MSG = 63,
+		MSG_SCRIPT_LEAVE_ACK = 64,
+		SN_MSG_JOIN_REQUEST = 65,
+		MSG_REQUEST_TRANSITION_PARAMETERS = 66,
+		MSG_SCRIPT_JOIN_ACK = 67,
+		NET_KEY_EXCHANGE_SESSION_ANSWER = 68,
+		NET_ICE_SESSION_PORT_OPENER = 69,
+		MSG_RADIO_STATION_SYNC = 70,
+		MSG_RADIO_STATION_SYNC_REQUEST = 71,
+		SN_MSG_CONFIG_REQUEST = 72,
+		MSG_CXN_RELAY_ADDR_CHANGED = 73,
+		NET_ICE_SESSION_ANSWER_OLD = 74, // unversioned struct - no longer used
+		MSG_SCRIPT_BOT_HANDSHAKE = 75,
+		CROAMING_JOIN_BUBBLE_MSG = 76,
+		MSG_SCRIPT_JOIN_HOST_ACK = 77,
+		CLONE_SYNC_MSG = 78,
+		CMSG_PACKED_EVENTS = 79,
+		MSG_TRANSITION_TO_GAME_START = 80,
+		MSG_CHECK_QUEUED_JOIN_REQUEST = 81,
+		MSG_SESSION_ESTABLISHED_REQUEST = 82,
+		SN_MSG_REMOVE_GAMERS_FROM_SESSION_CMD = 83,
+		SN_MSG_REQUEST_GAMER_INFO = 84,
+		NET_COMPLAINT_MSG = 85,
+		NET_ICE_SESSION_OFFER_OLD = 86,	// unversioned struct - no longer used
+		MSG_SCRIPT_HANDSHAKE = 87,
+		SN_MSG_HOST_LEFT_WHILST_JOINING_CMD = 88,
+		MSG_CHECK_QUEUED_JOIN_REQUEST_REPLY = 89,
+		SN_MSG_CHANGE_SESSION_ATTRIBUTES_CMD = 90,
+		MSG_SCRIPT_HANDSHAKE_ACK = 91,
+		MSG_SCRIPT_JOIN = 92,
+		MSG_UPDATE_ACK = 93,
+		MSG_CHECK_QUEUED_JOIN_REQUEST_INVITE_REPLY = 94,
+		SN_MSG_CONFIG_RESPONSE = 95,
+		MSG_UPDATE = 96,
+		CMSG_PLAYER_IS_TYPING = 97,
+		SN_MSG_SESSION_ACCEPT_CHAT = 98,
+		MSG_SCRIPT_BOT_JOIN_ACK = 99,
+		SN_MSG_ADD_GAMER_TO_SESSION_CMD = 100,
+		ACTIVATE_NETWORK_BOT_MSG = 101,
+		SN_MSG_MIGRATE_HOST_REQUEST = 102,
+		MSG_SCRIPT_HOST_REQUEST = 103,
+		CMSG_JOIN_REQUEST = 104,
+		SN_MSG_BASE = 105,
+		MSG_PLAYER_CARD_REQUEST = 106,
+		RL_MSG_SEARCH_RESPONSE = 107,
+		MSG_DEBUG_TIME_SCALE = 108,
+		MSG_DEBUG_TIME_PAUSE = 109,
+		MSG_DEBUG_NO_TIMEOUTS = 110,
+		MSG_DEBUG_ADD_FAIL_MARK = 111,
+		MSG_SYNC_DR_DISPLAY = 112,
+		SN_MSG_SESSION_INFO = 113,
+		SN_MSG_SESSION_INFO_RESPONSE = 114,
+		SN_MSG_SESSION_JOIN_REQUEST = 115,
+		SN_MSG_SESSION_JOIN_REQUEST_RESPONSE = 116,
+		CMSG_VOICE_CHAT_REQUEST = 117,
+		CMSG_VOICE_CHAT_REPLY = 118,
+		CMSG_VOICE_CHAT_END = 119,
+		VOICE_CHAT_USER_MSG = 120,
+		SESSION_INFO_MSG = 121,
+		REGISTER_COMPLETE_MSG = 122,
+		START_COMMAND_MSG = 123,
+		QA_NR_FOO_MSG = 124,
+		QA_NR_BAR_MSG = 125,
+		MSG_DEBUG_STALL = 126,
+		NET_ICE_SESSION_OFFER = 127,
+		NET_ICE_SESSION_ANSWER = 128,
+		MSG_LOST_HOST_CONNECTION = 129,
+		CROAMING_BUBBLE_REQUIRED_CHECK_MSG = 130,
+		CROAMING_BUBBLE_REQUIRED_RESPONSE_MSG = 131,
+		NET_ROUTE_REQUEST_MSG = 132,
+		NET_ROUTE_REPLY_MSG = 133,
+		NET_ROUTE_ERR_MSG = 134,
+		NET_ROUTE_CHANGE_REQUEST_MSG = 135,
+		NET_ROUTE_CHANGE_REPLY_MSG = 136,
+		NET_ICE_SESSION_RELAY_ROUTE_CHECK = 137,
+		// add new message ids before this
+		MSG_ID_NUM_MESSAGE_IDS
 	};
 }
 //parXXXXXX
@@ -5403,6 +6045,13 @@ namespace rage
 }
 //rlXXXXXXX
 namespace rage {
+	typedef netPeerAddress rlPeerAddress;
+	class rlPeerInfo
+	{
+	public:
+		rlPeerAddress m_PeerAddr;
+		u64 m_PeerId;
+	};
 	class rlGamerId
 	{
 	public:
@@ -6206,8 +6855,6 @@ namespace rage {
 		RLROS_ENCRYPTION_NONE,
 		RLROS_ENCRYPTION_TITLE
 	};
-	typedef s32 PlayerAccountId;
-	typedef s64 RockstarId;
 	class rlRosHttpUserAgentHeader
 	{
 	public:
@@ -7050,7 +7697,481 @@ namespace rage
 			return *reinterpret_cast<tlsContext**>(__readgsqword(0x58) + TlsIndex);
 		}
 	};
-	constexpr int i = offsetof(tlsContext, m_script_thread);
+	// script object ID defines
+	class scriptIdBase
+	{
+	public:
+		scriptIdBase() {}
+		virtual ~scriptIdBase() {}
+		//PURPOSE
+		// Initialises the script id from a script thread
+		virtual void Init(const scrThread* scriptThread)
+		{}
+		//PURPOSE
+		// Returns true if the script id has been initialised
+		virtual bool IsValid() const
+		{
+			return false;
+		}
+		//PURPOSE
+		// Generates a hash to uniquely identify this script name
+		virtual const atHashValue GetScriptNameHash() const
+		{
+			return {};
+		}
+		//PURPOSE
+		// Generates a hash to uniquely identify this script id
+		virtual atHashValue GetScriptIdHash() const
+		{
+			return {};
+		}
+		//PURPOSE
+		// Returns the string used to represent the script id in the network logs
+		virtual const char* GetLogName() const
+		{
+			return "";
+		}
+		//PURPOSE
+		// Reads the script id data from a bit buffer
+		virtual void Read(datBitBuffer* bb)
+		{}
+		//PURPOSE
+		// Writes the script id data to a bit buffer
+		virtual void Write(datBitBuffer* bb) const
+		{}
+		//PURPOSE
+		// Returns the current size of the script id data
+		virtual unsigned GetSizeOfMsgData() const
+		{
+			return 0;
+		}
+		//PURPOSE
+		// Returns the maximum size of the script id data
+		virtual unsigned GetMaximumSizeOfMsgData() const 
+		{
+			return 0;
+		}
+		//PURPOSE
+		// Logs the script id data in a network log
+		virtual void Log(netLoggingInterface* log)
+		{}
+	protected:
+		virtual void From(const scriptIdBase* other)
+		{}
+		virtual bool Equals(const scriptIdBase* other) const
+		{
+			return false;
+		}
+		virtual void SetNameFromHash()
+		{}
+	};
+	#define SIZEOF_HANDLER_OBJECT_ID (16)
+	#define INVALID_SCRIPT_OBJECT_ID (0)
+	#define SCRIPT_OBJECT_HOST_SLOT_INDEX (255)			// the slot index assigned to host created objects
+	#define SCRIPT_OBJECT_UNNETWORKED_SLOT_INDEX (254)	// the slot index assigned to non-networked script objects
+	#define MAKE_SCRIPT_OBJECT_ID(slot, index) (slot<<SIZEOF_HANDLER_OBJECT_ID | index); // builds a composite script object ID based on the specified slot and index
+	#define GET_SLOT_FROM_SCRIPT_OBJECT_ID(scriptObjectID) (scriptObjectID>>SIZEOF_HANDLER_OBJECT_ID)
+	#define GET_INDEX_FROM_SCRIPT_OBJECT_ID(scriptObjectID)(scriptObjectID&((1<<SIZEOF_HANDLER_OBJECT_ID)-1))
+	#define IS_HOST_OBJECT_ID(scriptObjectID) (GET_SLOT_FROM_SCRIPT_OBJECT_ID(scriptObjectID)==SCRIPT_OBJECT_HOST_SLOT_INDEX)
+	#define IS_UNNETWORKED_OBJECT_ID(scriptObjectID) (GET_SLOT_FROM_SCRIPT_OBJECT_ID(scriptObjectID)==SCRIPT_OBJECT_UNNETWORKED_SLOT_INDEX)
+	#define SIZEOF_SCRIPT_OBJECT_ID (32)
+	typedef u32 ScriptObjectId;
+	typedef s16 ScriptParticipantId;
+	typedef s16 ScriptSlotNumber;
+	typedef u16 HostToken;
+
+	class scriptObjInfoBase
+	{
+	public:
+		virtual ~scriptObjInfoBase() {}
+		virtual scriptIdBase& GetScriptId() = 0;
+		virtual const scriptIdBase& GetScriptId() const	= 0;
+		ScriptObjectId GetObjectId() const { return m_ScriptObjectId; }
+		HostToken GetHostToken() const { return m_HostToken; }
+		bool IsValid() const { return m_ScriptObjectId != INVALID_SCRIPT_OBJECT_ID; }
+		void Invalidate() { m_ScriptObjectId = INVALID_SCRIPT_OBJECT_ID; }
+	protected:
+		static const unsigned SIZEOF_HOST_TOKEN = 3;
+		ScriptObjectId m_ScriptObjectId; // the ID assigned to this object from a script handler
+		HostToken m_HostToken; // the token of the host that created this object
+	};
+	class scriptHandler;
+	class netObject;
+	class fwEntity;
+	class scriptHandlerObject
+	{
+	public:
+
+		virtual ~scriptHandlerObject()
+		{}
+		virtual unsigned GetType() const = 0;
+		virtual void CreateScriptInfo(const scriptIdBase& scrId, const ScriptObjectId& objectId, const HostToken hostToken) = 0;
+		virtual void SetScriptInfo(const scriptObjInfoBase& scrInfo) = 0;
+		virtual scriptObjInfoBase* GetScriptInfo() = 0;
+		virtual const scriptObjInfoBase* GetScriptInfo() const = 0;
+		virtual void SetScriptHandler(scriptHandler* handler) = 0;
+		virtual scriptHandler* GetScriptHandler() const = 0;
+		virtual void ClearScriptHandler() = 0;
+		virtual void OnRegistration(bool newObject, bool hostObject) = 0;
+		virtual void OnUnregistration() = 0;
+		virtual bool IsCleanupRequired() const = 0;
+		virtual void Cleanup() = 0;
+		virtual netObject* GetNetObject() const = 0;
+		virtual fwEntity* GetEntity() const = 0;
+		virtual bool HostObjectCanBeCreatedByClient() const
+		{
+			// if true clients are allowed to create host objects locally - this is used for certain types of objects that are all declared locally on every machine when the script starts up
+			return false;
+		}
+		bool IsHostObject() const
+		{
+			return IS_HOST_OBJECT_ID(GetScriptInfo()->GetObjectId());
+		}
+		bool IsUnnetworkedObject() const
+		{
+			return IS_UNNETWORKED_OBJECT_ID(GetScriptInfo()->GetObjectId());
+		}
+	};
+	typedef u32 ScriptResourceId;
+	typedef u16 ScriptResourceType;
+	typedef s32 ScriptResourceRef;
+	class scriptResource
+	{
+		friend scriptHandler;
+	public:
+		static const int INVALID_RESOURCE_ID = 0; // invalid ids must be 0 (which is also NULL in the scripts)
+		virtual ~scriptResource()
+		{}
+		ScriptResourceType GetType() const
+		{
+			return m_Type;
+		}
+		ScriptResourceId GetId() const
+		{
+			return m_Id;
+		}
+		void SetId(ScriptResourceId id)
+		{
+			m_Id = id;
+		}
+		const ScriptResourceRef GetReference() const
+		{
+			return m_Reference;
+		}
+		void SetReference(ScriptResourceRef ref)
+		{
+			m_Reference = ref;
+		}
+		virtual const char* GetResourceName() const = 0;
+		virtual ScriptResourceRef GetInvalidReference() const = 0;
+		virtual scriptResource* Clone() const = 0;
+		virtual bool Create() = 0;
+		virtual void Destroy() = 0;
+		virtual void Detach()
+		{
+		}
+		virtual bool DetachOnCleanup() const
+		{
+			return false;
+		}
+		virtual bool LeaveForOtherScripts() const
+		{
+			return false;
+		}
+	protected:
+		ScriptResourceType m_Type; // the type of the resource
+		ScriptResourceId m_Id; // the id of the resource assigned by the script handler it is associated with. Unique to this resource instance.
+		ScriptResourceRef m_Reference; // the reference used to identify the resource
+		inlist_node<scriptResource> m_ListLink;
+	};
+	// There are 2 indices for each player, the active and physical index. The active index is the index into the player manager's player pile and is 
+	// not consistent across the network - i.e. our player will not have the same active player index on other machines. The physical player index is the 
+	// index into the player manager's physical array and is consistent across the network. This index has a smaller range and is used in various places 
+	// in the network code (eg to set a flag in a network object's cloned state).
+	typedef u8 ActivePlayerIndex;
+	typedef u8 PhysicalPlayerIndex;
+	typedef u16 ObjectId;
+	typedef u16 NetObjFlags;
+	typedef u32 PlayerFlags;
+	typedef u16 TeamFlags;
+	typedef u16 NetworkArrayHandlerType;
+	typedef u16 NetworkEventType;
+	typedef u16 NetworkObjectType;
+	typedef u32 DataNodeFlags;
+	static const ActivePlayerIndex MAX_NUM_ACTIVE_PLAYERS = 32;
+	static const PhysicalPlayerIndex MAX_NUM_PHYSICAL_PLAYERS = 32;
+	static const PhysicalPlayerIndex MAX_NUM_SCRIPT_PARTICIPANTS = 32;
+	#define MAX_NUM_NETOBJPLAYERS (MAX_NUM_PHYSICAL_PLAYERS)
+	#define MAX_NUM_NETOBJPEDS (110)
+	#define MAX_NUM_LOCAL_NETOBJPEDS (100)
+	#define MAX_NUM_NETOBJVEHICLES (160)
+	#define MAX_NUM_LOCAL_NETOBJVEHICLES (120)
+	#define MAX_NUM_NETOBJOBJECTS (80)
+	#define MAX_NUM_NETOBJPICKUPS (80)
+	#define MAX_NUM_NETOBJPICKUPPLACEMENTS (50)
+	#define MAX_NUM_NETOBJGLASSPANE (50)
+	#define MAX_NUM_NETOBJECTS (MAX_NUM_NETOBJPLAYERS + MAX_NUM_NETOBJPEDS + MAX_NUM_NETOBJVEHICLES + MAX_NUM_NETOBJOBJECTS + MAX_NUM_NETOBJPICKUPS + MAX_NUM_NETOBJPICKUPPLACEMENTS + MAX_NUM_NETOBJGLASSPANE + MAX_NUM_NETOBJDOORS)
+	#define MAX_NUM_ACTIVE_NETWORK_SCRIPTS (50)
+	#define MAX_NUM_TEAMS (16)
+	#define MAX_NUM_PARTY_MEMBERS (RL_MAX_PARTY_SIZE)
+	#define MAX_NUM_NETOBJDOORS (20)
+	enum
+	{
+		//Maximum number of chars in the full name of an auto id.
+		//Includes null terminator.
+		AUTOID_MAX_LENOF_FULLNAME  = 255,
+	};
+	class AutoIdDescriptor
+	{
+		friend class AutoIdRegistry;
+	public:
+		virtual ~AutoIdDescriptor() {}
+		unsigned m_Level;
+		unsigned m_Id;
+		int m_Ordinal;
+		char m_Name[10];
+		const AutoIdDescriptor* m_Family;
+		AutoIdDescriptor* m_Next;
+		bool m_HasMandatedId;
+		char m_Priority;
+	};
+	typedef AutoIdDescriptor AutoIdFamily;
+	class AutoIdRegistry
+	{
+		friend class AutoIdMgr;
+	public:
+		AutoIdDescriptor* m_Head;
+		AutoIdDescriptor** m_OrderedIds;
+		int m_Count;
+		int m_MandatedIdCount;
+		unsigned m_FirstConsecutiveId;
+		unsigned m_LastConsecutiveId;
+		AutoIdRegistry* m_Next;
+	};
+	template <typename T>
+	class AutoIdRegistrar
+	{
+	public:
+
+	};
+	template <typename T>
+	class AutoIdDescriptor_T : public AutoIdDescriptor
+	{
+	public:
+		virtual ~AutoIdDescriptor_T() = default;
+	};
+	class AutoIdMgr
+	{
+	public:
+		struct IdRegCollection
+		{
+			IdRegCollection()
+				: m_Head(0),
+				m_Count(0)
+			{}
+			AutoIdRegistry* m_Head;
+			int m_Count;
+		};
+	};
+	#define AUTOID_DECL_COMMON( name )\
+		static const name::AutoIdDesc__ AutoId__;\
+		static const name::AutoIdDesc__* GetAudoIdDesc() { return &AutoId__; }\
+		static unsigned GetAutoId() { return AutoId__.GetId(); }
+	#define AUTOID_DECL_ID( name, family, id )\
+		typedef family::AutoIdRoot AutoIdRoot;\
+		enum { AutoIdLevel  = family::AutoIdLevel + 1 };\
+		struct AutoIdDesc__ : public ::rage::AutoIdDescriptor_T< AutoIdRoot >\
+		{\
+			AutoIdDesc__() : ::rage::AutoIdDescriptor_T< AutoIdRoot >( AutoIdLevel, id, family::GetAudoIdDesc() ) {}\
+		};\
+		AUTOID_DECL_COMMON(name);
+	#define NET_MESSAGE_EXPORT_COMMON(func)\
+		template<typename T>\
+		bool Export(T& bb) const\
+		{\
+			return rage::netMessage::WriteHeader(this->GetMsgId(), bb)\
+					&& this->func(bb, *this);\
+		}\
+		bool Export(void* buf, const unsigned sizeofBuf, unsigned* size = 0) const\
+		{\
+			rage::datExportBuffer bb;\
+			bb.SetReadWriteBytes(buf, sizeofBuf);\
+			const bool success = this->Export(bb);\
+			if(size){*size = success ? bb.GetNumBytesWritten() : 0;}\
+			return success;\
+		}
+	#define NET_MESSAGE_IMPORT_COMMON(func)\
+		template<typename T>\
+		bool Import(T& bb)\
+		{\
+			unsigned msgId = 0;\
+			return rage::netMessage::ReadHeader(&msgId, bb)\
+					&& this->GetMsgId() == msgId\
+					&& this->func(bb, *this);\
+		}\
+		bool Import(const void* buf, const unsigned sizeofBuf, unsigned* size = 0)\
+		{\
+			rage::datImportBuffer bb;\
+			bb.SetReadOnlyBytes(buf, sizeofBuf);\
+			const bool success = this->Import(bb);\
+			if(size){*size = success ? bb.GetNumBytesRead() : 0;}\
+			return success\
+					/*Make sure we read all the bits in the msg.*/\
+					&& (bb.GetNumBytesRead() == (int) sizeofBuf);\
+		}
+	#define NET_MESSAGE_IMPORT_STUB_COMMON(func)\
+		template<typename T>\
+		bool ImportStub(T& bb)\
+		{\
+			unsigned msgId = 0;\
+			return rage::netMessage::ReadHeader(&msgId, bb)\
+					&& this->func(bb, *this);\
+		}\
+		bool ImportStub(const void* buf, const unsigned sizeofBuf, unsigned* size = 0)\
+		{\
+			rage::datImportBuffer bb;\
+			bb.SetReadOnlyBytes(buf, sizeofBuf);\
+			const bool success = this->ImportStub(bb);\
+			if(size){*size = success ? bb.GetNumBytesRead() : 0;}\
+				return success\
+						/*Make sure we read all the bits in the msg.*/\
+						&& (bb.GetNumBytesRead() < (int) sizeofBuf);\
+		}
+	#define NET_MESSAGE_DECL_COMMON(name)\
+		static unsigned MSG_ID() { return name::GetAutoId(); }\
+		unsigned GetMsgId() const { return name::GetAutoId(); }\
+		NET_MESSAGE_EXPORT_COMMON(SerMsgPayload)\
+		NET_MESSAGE_IMPORT_COMMON(SerMsgPayload)
+	#define NET_MESSAGE_DECL(name, id)\
+		AUTOID_DECL_ID(name, rage::netMessage, id)\
+		NET_MESSAGE_DECL_COMMON(name)
+	class msgScriptJoin;
+	class msgScriptJoinAck;
+	class msgScriptJoinHostAck;
+	class msgScriptHandshake;
+	class msgScriptHandshakeAck;
+	class msgScriptLeave;
+	class msgScriptLeaveAck;
+	class msgScriptBotJoin;
+	class msgScriptBotJoinAck;
+	class msgScriptBotHandshake;
+	class msgScriptBotHandshakeAck;
+	class msgScriptBotLeave;
+	class msgScriptMigrateHost;
+	class msgScriptMigrateHostFailAck;
+	class msgScriptHostRequest;
+	class msgScriptNewHost;
+	class msgScriptVerifyHost;
+	class msgScriptVerifyHostAck;
+	class scriptHandlerNetComponent
+	{
+	public:
+		static const unsigned MAX_NUM_NET_COMPONENTS = MAX_NUM_ACTIVE_NETWORK_SCRIPTS;
+		static const int INVALID_PARTICIPANT_ID = -1;
+		static const int INVALID_SLOT = -1;
+		static const int INVALID_HOST_TOKEN = 0;
+		static const int TIME_HOSTING_BEFORE_FIRST_HOST_MIGRATION = 60000; // the length of time a new host will host the script session before attempting to migrate the host
+		static const int TIME_BETWEEN_HOST_MIGRATION_ATTEMPTS = 10000; // the length of time between host migration attempts
+		static const int TIME_BETWEEN_HOST_VERIFY_ATTEMPTS = 1000; // the length of time between local host verify attempts
+		static const int TIME_BETWEEN_HOST_REQUESTS = 250; // the length of time between the sending of host request messages
+		enum eRejectionReason 
+		{
+			REJECTED_INVALID = -1,
+			REJECTED_CANNOT_PROCESS,
+			REJECTED_NO_ROOM_IN_SCRIPT_SESSION,
+			REJECTED_NO_JOIN_IN_PROGRESS,
+			REJECTED_NO_ROOM_IN_TEAM,
+			NUM_REJECTION_REASONS
+		};
+		virtual ~scriptHandlerNetComponent() = default;
+		virtual bool Update() = 0;
+		virtual void PlayerHasJoined(const netPlayer* player) = 0;
+		virtual void PlayerHasLeft(const netPlayer* player) = 0;
+		virtual void MigrateScriptHost(const netPlayer* player) = 0;
+		virtual void HandleJoinMsg(const msgScriptJoin* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleJoinAckMsg(const msgScriptJoinAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleJoinHostAckMsg(const msgScriptJoinHostAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleHandshakeMsg(const msgScriptHandshake* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleHandshakeAckMsg(const msgScriptHandshakeAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleLeaveMsg(const msgScriptLeave* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleLeaveAckMsg(const msgScriptLeaveAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleBotJoinMsg(const msgScriptBotJoin* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleBotJoinAckMsg(const msgScriptBotJoinAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleBotHandshakeMsg(const msgScriptBotHandshake* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleBotHandshakeAckMsg(const msgScriptBotHandshakeAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleBotLeaveMsg(const msgScriptBotLeave* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleMigrateHostMsg(const msgScriptMigrateHost* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleMigrateHostFailAckMs(const msgScriptMigrateHostFailAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleHostRequestMsg(const msgScriptHostRequest* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleNewHostMsg(const msgScriptNewHost* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleVerifyHostMsg(const msgScriptVerifyHost* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void HandleVerifyHostAckMsg(const msgScriptVerifyHostAck* msg, const ReceivedMessageData* messageData) = 0;
+		virtual void RegisterHostBroadcastData(unsigned* address, unsigned size, bool HasHighFrequencyUpdates = false) = 0;
+		virtual void RegisterPlayerBroadcastData(unsigned* address, unsigned size, bool HasHighFrequencyUpdates = false) = 0;
+		virtual bool CanStartJoining() = 0;
+		virtual bool CanStartHosting() = 0;
+		virtual bool TryToAddPlayerAsParticipant(const netPlayer* player, ScriptParticipantId* participantId, ScriptSlotNumber* slotNumber, eRejectionReason* rejection) = 0;
+		virtual bool AddPlayerAsParticipant(const netPlayer* player, ScriptParticipantId participantId, ScriptSlotNumber slotNumber) = 0;
+	};
+	class scriptHandler
+	{
+	public:
+		class atDScriptObjectNode : public atDNode<scriptHandlerObject*, datBase>
+		{
+		public:
+		};
+		typedef inlist<scriptResource, &scriptResource::m_ListLink> ResourceList;
+		virtual ~scriptHandler() = 0;
+		virtual bool Update() = 0;
+		virtual bool NetworkUpdate() = 0;
+		virtual void Shutdown() = 0;
+		virtual scriptIdBase& GetScriptId() = 0;
+		virtual const scriptIdBase&	GetScriptId() const = 0;
+		scrThread* GetThread() { return m_Thread; }
+		const scrThread* GetThread() const { return m_Thread; }
+		const char* GetLogName() const { return GetScriptId().GetLogName(); }
+		scriptHandlerNetComponent* GetNetworkComponent() const{ return m_NetComponent; }
+		bool IsTerminated() const { return m_Thread == NULL; }
+		void SetNextFreeHostObjectId(ScriptObjectId id) { m_NextFreeHostObjectId = id; }
+		virtual bool RequiresANetworkComponent() const = 0;
+		virtual void CreateNetworkComponent() = 0;
+		virtual void DestroyNetworkComponent() = 0;
+		virtual bool Terminate() = 0;
+		virtual bool RegisterNewScriptObject(scriptHandlerObject &object, bool hostObject, bool networked) = 0;
+		virtual void UnregisterScriptObject(scriptHandlerObject &object) = 0;
+		virtual scriptResource* RegisterScriptResource(scriptResource& resource, bool *pbResourceHasJustBeenAddedToList = NULL) = 0;
+		virtual bool RemoveScriptResource(ScriptResourceId resourceId, bool bDetach = false, bool bAssert = true, ScriptResourceType resourceType = (ScriptResourceType)-1) = 0;
+		virtual bool RemoveScriptResource(ScriptResourceType type, const ScriptResourceRef ref, bool bDetach = false, bool bAssert = true) = 0;
+	protected:
+		virtual ScriptResourceId GetNextFreeResourceId(scriptResource& resource) { return ++m_NextFreeResourceId; }
+		virtual void RegisterExistingScriptObjectInternal(scriptHandlerObject &object) = 0;
+		virtual void CleanupScriptObject(scriptHandlerObject &object) = 0;
+		virtual bool DestroyScriptResource(scriptResource& resource) = 0;
+		virtual void RemoveOldScriptObject(scriptHandlerObject &object) = 0;
+	public:
+		inlist_node<scriptHandler> m_ListLink; // The list link used by the script handler list in the script handler manager.
+	protected:
+		scrThread* m_Thread; // the thread this handler is associated with
+		atDList<scriptHandlerObject*, datBase> m_ObjectList; // a list of objects created by the script associated with this handler
+		ResourceList m_ResourceList; // a list of resources that have been created by the script
+		scriptHandlerNetComponent* m_NetComponent; // the network component, which exists during a network game 
+		ScriptObjectId m_NextFreeHostObjectId; // the next free id to be assigned to a host script object created by the script associated with this handler.
+		ScriptObjectId m_NextFreeClientObjectId; // the next free id to be assigned to a client script object created by the script associated with this handler.
+		ScriptObjectId m_NextFreeNonNetworkedObjectId; // the next free id to be assigned to a non-networked script object created by the script associated with this handler.
+		ScriptResourceId m_NextFreeResourceId; // the next free id to be assigned to a script resource created by the script associated with this handler.
+	private:
+		scriptHandler(const scriptHandler&) {}
+	};
+
+	class scriptId : public scriptIdBase
+	{
+	public:
+		static const unsigned SCRIPT_NAME_LEN = 32;
+		static const unsigned SIZEOF_NAME_HASH = 32;
+
+		atHashValue	m_ScriptNameHash;
+		char m_ScriptName[SCRIPT_NAME_LEN];
+	};
 }
 struct SContentLockData
 {
@@ -7198,4 +8319,108 @@ public:
 	rage::sysObfuscated<u32> m_EnvironmentCRC;
 	rage::sysObfuscated<int> m_CRC;
 	rage::sysObfuscated<int> m_StaticCRC;
+};
+class CGameScriptId : public scriptId
+{
+public:
+	static const unsigned SIZEOF_TIME_STAMP = 32;
+	static const unsigned SIZEOF_POSITION_HASH = 32;
+	static const unsigned SIZEOF_INSTANCE_ID = 8;
+	virtual ~CGameScriptId()
+	{}
+	unsigned m_TimeStamp; // the time this script started, set by the host
+	unsigned m_PositionHash; // a hash generated from the script's position (only used by ambient scripts)
+	int m_InstanceId; // an id that is used to distinguish between different instances of the same script	
+	atHashValue	m_scriptIdHash; // the hash identifying this id
+};
+class CGameScriptHandler : public scriptHandler
+{
+public:
+	static const unsigned MAX_NUM_SCRIPT_HANDLERS = 83;
+	virtual bool Update() = 0;
+	virtual void Shutdown() = 0;
+	virtual bool Terminate() = 0;
+	virtual bool RequiresANetworkComponent() const { return false; }
+	virtual void CreateNetworkComponent() = 0;
+	virtual scriptResource* RegisterScriptResource(scriptResource* resource, bool *pbResourceHasJustBeenAddedToList = NULL) = 0;
+	virtual bool RemoveScriptResource(ScriptResourceId resourceId, bool bDetach = false, bool bAssert = true, ScriptResourceType resourceType = (ScriptResourceType)-1) = 0;
+	virtual bool RemoveScriptResource(ScriptResourceType type, const ScriptResourceRef ref, bool bDetach = false, bool bAssert = true) = 0;
+	virtual ScriptResourceId GetNextFreeResourceId(scriptResource* resource) = 0;
+	virtual bool DestroyScriptResource(scriptResource* resource) = 0;
+	virtual void CleanupScriptObject(scriptHandlerObject* object) = 0;
+	CGameScriptId m_ScriptId;
+};
+class CGameScriptHandlerNetComponent : public scriptHandlerNetComponent
+{
+public:
+	virtual void RemovePlayerAsParticipant(const netPlayer* player)
+	{}
+	virtual void HandleLeavingPlayer(const netPlayer* player, bool playerLeavingSession)
+	{}
+	virtual void SetNewScriptHost(const netPlayer* pPlayer, HostToken hostToken, bool bBroadcast = true)
+	{}
+	virtual bool CanStartJoining()
+	{
+		return false;
+	}
+	virtual void RestartJoiningProcess()
+	{}
+	virtual void StartPlaying()
+	{}
+	virtual bool DoLeaveCleanup()
+	{
+		return false;
+	}
+	virtual bool DoTerminationCleanup()
+	{
+		return false;
+	}
+	PlayerFlags	m_JoinEventFlags;
+	unsigned m_PendingTimestamp;
+	bool m_bScriptReady : 1;
+	bool m_bStartedPlaying: 1;
+	bool m_bDoneLeaveCleanup : 1;
+	bool m_bDoneTerminationCleanup : 1;
+	bool m_bBroadcastScriptInfo : 1;
+};
+class GtaThread : public scrThread
+{
+public:
+	static const int FORCE_CLEANUP_FLAG_PLAYER_KILLED_OR_ARRESTED = 1;
+	static const int FORCE_CLEANUP_FLAG_SP_TO_MP = 2;
+	static const int FORCE_CLEANUP_PAUSE_MENU_TERMINATED = 4;
+	enum MatchingMode
+	{
+		MATCH_SCRIPT_NAME,
+		MATCH_THREAD_ID,
+		MATCH_ALL
+	};
+	CGameScriptHandler*	m_Handler;
+	CGameScriptHandlerNetComponent*	m_NetComponent;
+	s32 m_HashOfScriptName;
+	int	ForceCleanupPC, ForceCleanupFP, ForceCleanupSP;
+	u32	m_ForceCleanupFlags;
+	u32	m_CauseOfMostRecentForceCleanup;
+	int InstanceId;
+	int EntityIndexForScriptBrain;
+	bool IsThisAMissionScript; // TRUE for a script which contains a mission
+	bool bSafeForNetworkGame; // TRUE if the script should persist when a network game is started/ended
+	bool bSetPlayerControlOnInMissionCleanup; //	TRUE (default) if the player control should be switched on when a proper mission ends
+	bool bClearHelpInMissionCleanup; //	TRUE (default) if the help text should be cleared when a proper mission ends
+	bool bIsThisAMiniGameScript; // Set by a script Command - used to decide which script can display help messages when a mini-game is in progress
+	bool bThisScriptAllowsNonMiniGameHelpMessages;
+	bool bThreadHasBeenPaused; // This script should not be executed as it has been paused (by PAUSE_GAME)
+	bool bThisScriptCanBePaused; // If false, PAUSE_GAME does not affect this script
+	bool bThisScriptCanRemoveBlipsCreatedByAnyScript;
+	bool m_bDisplayProfileData;
+	bool m_bIsHighPrio;
+	u8 m_ForceCleanupTriggered;
+	s8 ScriptBrainType;
+	u32 m_bHasUsedPedPathCommand : 1;
+	u32 m_bHasOverriddenVehicleEntering : 1;
+	u32 m_bIsARandomEventScript : 1;
+	u32 m_bIsATriggerScript : 1;
+	bool m_bExitFlagSet : 1;
+	bool m_bExitFlagResponse : 1;
+	bool m_bCleanupReplay : 1;
 };

@@ -89,8 +89,8 @@ namespace dwn::hooking
 
 			LOG_TO_STREAM("Game requested RGSC import, reusing...");
 			FARPROC result = g_GetProcAddress->original()(hModule, lpProcName);
-			//g_early_hook = true;
-			//hook_rgsc();
+			g_early_hook = true;
+			hook_rgsc();
 
 			return result;
 		}
