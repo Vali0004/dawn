@@ -8,7 +8,7 @@ namespace rage
 {
 	inline u64 CorrectHash(u64 hash)
 	{
-		for (auto& pair : g_crossmap)
+		for (auto& pair : g_table)
 		{
 			if (pair.first == hash)
 			{

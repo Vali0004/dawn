@@ -13,6 +13,10 @@ namespace dwn::hooking
 	inline etc::hook<pointers::types::scrThreadRunT>* g_scrThreadRun{};
 	inline rage::scrThread::State scrThreadRun(rage::scrValue* stack, rage::scrValue* globals, rage::scrProgram* pt, rage::scrThread::Serialized* ser)
 	{
+		if (!g_scrThreadRun)
+		{
+			return rage::scrThread::State();
+		}
 		invoke_thread_callbacks(pt->HashCode);
 
 		if (pt->HashCode == "freemode"_j || pt->HashCode == "main_persistent"_j)

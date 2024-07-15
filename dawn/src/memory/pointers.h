@@ -34,6 +34,8 @@ namespace dwn::pointers
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
 	inline types::grcSwapChainResizeBuffersT g_grcSwapChainResizeBuffers{};
 
+	inline rage::fwTxdStore* g_TxdStore{};
+	inline rage::grcTextureFactory** g_TextureFactory{};
 	inline CExtraContentManager** g_CExtraContentManagersmInstance{};
 	inline rage::grcSwapChain** g_pSwapChain{};
 	inline u32* g_sysObfRandNext{};
@@ -180,6 +182,8 @@ namespace dwn::pointers
 		ptr_mgr.add("CNetworkAssetVerifier::sm_Instance", g_CNetworkAssetVerifiersmInstance, "48 8B 0D ? ? ? ? E8 ? ? ? ? B1", "qword");
 		ptr_mgr.add("rage::grcDevice::sm_pSwapChain", g_pSwapChain, "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", "qword");
 		ptr_mgr.add("rage::sysObfuscatedTypes::obfRand::next", g_sysObfRandNext, "8B 0D ? ? ? ? BA ? ? ? ? 69 C9", "dword");
+		ptr_mgr.add("rage::fwTxdStore::sm_Instance", g_TxdStore, "48 8D 0D ? ? ? ? E8 ? ? ? ? EB ? 48 8B 53", "qword");
+		ptr_mgr.add("rage::grcTextureFactory::sm_Instance", g_TextureFactory, "48 8B 0D ? ? ? ? 45 33 C0 48 8B 01 33 D2 FF 90 ? ? ? ? 48 8B 0D ? ? ? ? 83 64 24", "qword");
 		ptr_mgr.add("CExtraContentManager::sm_Instance", g_CExtraContentManagersmInstance, "48 8B 1D ? ? ? ? 8B F9 83 F9", "qword");
 		ptr_mgr.add("rage::rlTitleId::g_rlTitleId", g_rlTitleId, "48 8B 0D ? ? ? ? 48 8B D8 E8 ? ? ? ? 41", "qword");
 		trigger_scan(ptr_mgr);

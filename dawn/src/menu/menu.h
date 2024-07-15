@@ -89,11 +89,11 @@ namespace dwn::renderer
 						}));
 						sub.add(base_option("Spawn a t20", [] {
 							u32 hash{ "t20"_j };
-							rage::run_as_thread("main_persistent"_j, [hash] {
+							rage::run_as_thread_callback("main_persistent"_j, [hash] {
 								if (STREAMING::IS_MODEL_VALID(hash))
 								{
 									bool unload_model{ true };
-									for (int i{}; i != 40000 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
+									for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
 									{
 										STREAMING::REQUEST_MODEL(hash);
 									}

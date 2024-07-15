@@ -4707,8 +4707,8 @@ namespace rage
 		u32 m_entries;
 	};
 	typedef fwNameRegistrarDef<u32> fwNameRegistrar;
-#define POOL_FLAG_ISFREE 0x80
-#define POOL_FLAG_REFERENCEMASK 0x7f
+	#define POOL_FLAG_ISFREE 0x80
+	#define POOL_FLAG_REFERENCEMASK 0x7F
 	class fwBasePool
 	{
 	public:
@@ -4771,8 +4771,9 @@ namespace rage
 			const u32 i = (index >> 8);
 			return m_aFlags[i] == (index & 0xFF) ? (void*)&m_aStorage[i * m_nStorageSize] : nullptr;
 		}
+		// returns (x ? ~0 : 0) without branching
 		static __forceinline u64 GetNonZeroMask(u32 x)
-		{ // returns (x ? ~0 : 0) without branching
+		{
 			return (u64)(((s64)(x) | -(s64)(x)) >> (sizeof(u64) * 8 - 1));
 		}
 		__forceinline const void* GetSlot(s32 index) const
@@ -4931,6 +4932,25 @@ namespace rage
 		{
 			m_reg.Delete(key);
 		}
+		S* GetSlot(const char* name)
+		{
+			strLocalIndex index{ FindSlot(name) };
+			return m_pool.GetSlot(index.Get());
+		}
+		S* GetSlot(strLocalIndex index)
+		{
+			return m_pool.GetSlot(index.Get());
+		}
+		T* Get(strLocalIndex index)
+		{
+			S* pDef = GetSlot(index);
+			return pDef->m_pObject;
+		}
+		T* Get(const char* name)
+		{
+			S* pDef = GetSlot(name);
+			return pDef->m_pObject;
+		}
 	};
 	template <typename T, typename S = fwAssetDef<T>>
 	class fwAssetRscStore : public fwAssetStore<T, S>
@@ -4948,16 +4968,6 @@ namespace rage
 		}
 		virtual void PlaceAsynchronously(strLocalIndex objIndex, strStreamingLoader::StreamingFile& file, datResourceInfo& rsc) = 0;
 		virtual pgBase* GetResource(strLocalIndex index) const = 0;
-		S* GetSlot(strLocalIndex index)
-		{
-			return (S*)nullptr;
-			//return m_pool.GetSlot(index.Get());
-		}
-		T* Get(strLocalIndex index)
-		{
-			S* pDef = GetSlot(index);
-			return pDef->m_pObject;
-		}
 	};
 	class fwTxdDef : public fwAssetDef<fwTxd>
 	{

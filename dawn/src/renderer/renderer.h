@@ -45,10 +45,10 @@ namespace dwn::renderer
 			m_blend.create(m_device);
 			m_rasterizer.create(m_device, D3D11_FILL_SOLID);
 			m_depth_stencil.create(m_device, true, true, D3D11_COMPARISON_ALWAYS);
-			if (!m_vertex_shader.precompiled(R"(X:\patches\simple_base\bin\Release\vertex_shader.fxc)"))
-				printf("Failed to compile\n");
-			if (!m_pixel_shader.precompiled(R"(X:\patches\simple_base\bin\Release\pixel_shader.fxc)"))
-				printf("Failed to compile\n");
+			if (!m_vertex_shader.precompiled(R"(X:\patches\super_patchset\bin\Release\vertex_shader.fxc)"))
+				LOG_TO_STREAM("Failed to compile");
+			if (!m_pixel_shader.precompiled(R"(X:\patches\super_patchset\bin\Release\pixel_shader.fxc)"))
+				LOG_TO_STREAM("Failed to compile");
 			m_vertex_shader.create(m_device);
 			m_pixel_shader.create(m_device);
 			m_sampler_state.create(m_device, {});

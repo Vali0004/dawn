@@ -62,23 +62,32 @@ namespace dwn::commands
 	public:
 		cmd_data(const std::string& name) : m_name(name)
 		{
+			m_once = new std::remove_pointer_t<decltype(m_once)>();
+			m_tick = new std::remove_pointer_t<decltype(m_tick)>();
+			m_render = new std::remove_pointer_t<decltype(m_render)>();
 			if constexpr (std::is_same_v<T1, cmd_functions>)
-				m_once.set(&cmd_functions::once);
+				m_once->set<cmd_functions>(&cmd_functions::once);
 			if constexpr (std::is_same_v<T2, cmd_functions>)
-				m_tick.set(&cmd_functions::tick);
+				m_tick->set<cmd_functions>(&cmd_functions::tick);
 			if constexpr (std::is_same_v<T3, cmd_functions>)
-				m_render.set(&cmd_functions::render);
+				m_render->set<cmd_functions>(&cmd_functions::render);
+		}
+		~cmd_data()
+		{
+			delete m_once;
+			delete m_tick;
+			delete m_render;
 		}
 		// This is to satisfy our templating bullshit
 		void once() {}
 		void tick() {}
 		void render() {}
-		template <typename T = T1>
-		auto get_once() { return reinterpret_cast<virtual_pure<decltype(m_once)::ReturnT, T>*>(&m_once); }
-		template <typename T = T1>
-		auto get_tick() { return reinterpret_cast<virtual_pure<decltype(m_tick)::ReturnT, T>*>(&m_tick); }
-		template <typename T = T1>
-		auto get_render() { return reinterpret_cast<virtual_pure<decltype(m_render)::ReturnT, T>*>(&m_render); }
+		template <typename T = T1, typename ...A>
+		auto get_once() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_once); }
+		template <typename T = T1, typename ...A>
+		auto get_tick() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_tick); }
+		template <typename T = T1, typename ...A>
+		auto get_render() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_render); }
 
 		template <typename C>
 		bool is_once_of() const { return m_once.template is_class<C>(); }
@@ -88,28 +97,9 @@ namespace dwn::commands
 		bool is_render_of() const { return m_render.template is_class<C>(); }
 
 		std::string m_name{};
-		virtual_pure<void, T1> m_once;
-		virtual_pure<void, T2> m_tick;
-		virtual_pure<void, T3> m_render;
+		virtual_pure<void, T1>* m_once;
+		virtual_pure<void, T2>* m_tick;
+		virtual_pure<void, T3>* m_render;
 		std::vector<cmd_container> m_containers{};
-	};
-	class single_command : public cmd_data<single_command>
-	{
-	public:
-		single_command(const std::string& name, fptr<void()> callback) :
-			cmd_data(name),
-			m_callback(callback)
-		{
-			m_once.set(&single_command::run);
-		}
-		void run()
-		{
-			if (m_callback)
-			{
-				m_callback();
-			}
-		}
-	private:
-		fptr<void()> m_callback{};
 	};
 }
