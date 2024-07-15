@@ -287,14 +287,14 @@ namespace dwn::renderer
 	{
 		rage::run_as_thread("main_persistent"_j, [] {
 			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT("commonmenu", FALSE);
-			auto dictionary{ pointers::g_TxdStore->Get("commonmenu") };
+			/*auto dictionary{pointers::g_TxdStore->Get("commonmenu")};
 			if (dictionary)
 			{
 				for (auto& txd : dictionary->m_Entries)
 				{
 					//LOG_TO_STREAM("Name: " << std::string(txd->m_Name));
 				}
-			}
+			}*/
 		});
 		handle_input();
 		g_drawbase = 0.01f;
