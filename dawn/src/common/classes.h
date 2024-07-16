@@ -4440,11 +4440,11 @@ namespace rage
 		{}
 		const char* GetModuleName() const
 		{
-			return m_ModuleName;
+			return m_ModuleName.c_str();
 		}
 		virtual const char* GetName(strLocalIndex UNUSED_PARAM(index)) const
 		{
-			return m_ModuleName;
+			return m_ModuleName.c_str();
 		}
 		virtual strLocalIndex Register(const char* name) = 0;
 		virtual strLocalIndex FindSlot(const char* name) const = 0;
@@ -4532,7 +4532,7 @@ namespace rage
 		strIndex m_indexOffset;
 		s32 m_moduleId;
 		u32 m_size;
-		const char* m_ModuleName;
+		atString m_ModuleName;
 		bool m_RequiresTempMemory;
 		bool m_canDefragment;
 		bool m_usesExtraMemory;
@@ -4762,10 +4762,10 @@ namespace rage
 				}
 			}
 		}
-		__forceinline void* GetSlot(s32 index)
+		/*__forceinline void* GetSlot(s32 index)
 		{
 			return const_cast<void*>(reinterpret_cast<fwBasePool*>(this)->GetSlot(index));
-		}
+		}*/
 		void* GetAt(s32 index)
 		{
 			const u32 i = (index >> 8);
@@ -4776,11 +4776,11 @@ namespace rage
 		{
 			return (u64)(((s64)(x) | -(s64)(x)) >> (sizeof(u64) * 8 - 1));
 		}
-		__forceinline const void* GetSlot(s32 index) const
+		__forceinline void* GetSlot(s32 index)
 		{
 			const u64 mask = ~GetNonZeroMask(m_aFlags[index] & POOL_FLAG_ISFREE);
 			const u64 addr = reinterpret_cast<u64>(m_aStorage + index * m_nStorageSize);
-			const void* const result = reinterpret_cast<const void*>(addr & mask);
+			void* result = reinterpret_cast<void*>(addr & mask);
 			return result;
 		}
 		void SetIsFree(s32 index, bool bIsFree)
@@ -4952,6 +4952,7 @@ namespace rage
 			return pDef->m_pObject;
 		}
 	};
+	constexpr int class_fw = offsetof(fwAssetStore<void*>, m_pool);
 	template <typename T, typename S = fwAssetDef<T>>
 	class fwAssetRscStore : public fwAssetStore<T, S>
 	{
