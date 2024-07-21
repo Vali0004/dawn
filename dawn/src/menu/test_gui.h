@@ -288,15 +288,14 @@ namespace dwn::renderer
 	{
 		rage::run_as_thread("main_persistent"_j, [] {
 			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT("commonmenu", FALSE);
-		});
-		rage::fwTxd* dictionary{ pointers::g_TxdStore->Get("commonmenu") };
-		/*if (dictionary)
-		{
-			//for (auto& txd : dictionary->m_Entries)
+			rage::fwTxd* dictionary{ pointers::g_TxdStore->Get("commonmenu") };
+			rage::grcTexture* txd{ dictionary->Lookup("shop_arrows_upanddown"_j) };
+			if (txd)
 			{
-				//LOG_TO_STREAM("Name: " << std::string(txd->m_Name));
+				LOG_TO_STREAM("Texture name?: " << txd->GetName());
+				LOG_TO_STREAM("Texture address: " << HEX((u64)(txd->GetCachedTexturePtr())));
 			}
-		}*/
+		});
 		handle_input();
 		g_drawbase = 0.01f;
 		draw_header();

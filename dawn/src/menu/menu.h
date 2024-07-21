@@ -176,8 +176,14 @@ namespace dwn::renderer
 						g_running = false;
 					}));
 				}));
-				sub.add(base_option("Hello, world", [] {
-					LOG_TO_STREAM("Hello!");
+				sub.add(base_option("Do a funny?", [] {
+					LOG_TO_STREAM("Do a funny.");
+					//C:\Users\Vali\Desktop\Shit\Vali\Legacy\SC-CL-SampleProject-master\projects\Bin\testscript.ysc
+					rage::strLocalIndex idx = pointers::g_StreamedScripts->Register("testscript");
+					/*if (pointers::g_StreamedScripts->LoadFile(idx, R"(C:\Users\Vali\Desktop\Shit\Vali\Legacy\SC-CL-SampleProject-master\projects\Bin\testscript.ysc)"))
+					{
+						LOG_TO_STREAM("The funny has happened.");
+					}*/
 				}));
 				sub.add(base_option("Hello, world", [] {
 					LOG_TO_STREAM("Hello!");

@@ -25,15 +25,13 @@ namespace dwn::pointers
 	inline types::CExtraContentManagerLoadContentT g_CExtraContentManagerLoadContent{};
 	inline types::CExtraContentManagerEndEnumerateContentT g_CExtraContentManagerEndEnumerateContent{};
 	inline types::CExtraContentManagerAddContentFolderT g_CExtraContentManagerAddContentFolder{};
-	inline types::AESTransformITDecryptT g_AESTransformITDecrypt{};
-	inline types::AESDecryptT g_AESDecrypt{};
-	inline types::AESisTransformITKeyT g_AESisTransformITKey{};
-	inline types::fiPackfileReInitT g_fiPackfileReInit{};
+	inline types::CExtraContentManagerGetCRCT g_CExtraContentManagerGetCRC{};
 	inline types::CommandShouldWarnOfSimpleModCheckT g_CommandShouldWarnOfSimpleModCheck{};
 	inline types::GetProcAddressT g_GetProcAddress{};
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
 	inline types::grcSwapChainResizeBuffersT g_grcSwapChainResizeBuffers{};
 
+	inline CStreamedScripts* g_StreamedScripts{};
 	inline rage::fwTxdStore* g_TxdStore{};
 	inline rage::grcTextureFactory** g_TextureFactory{};
 	inline CExtraContentManager** g_CExtraContentManagersmInstance{};
@@ -169,10 +167,7 @@ namespace dwn::pointers
 		ptr_mgr.add("CExtraContentManager::LoadContent", g_CExtraContentManagerLoadContent, "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B F9 48 8D 4D");
 		ptr_mgr.add("CExtraContentManager::EndEnumerateContent", g_CExtraContentManagerEndEnumerateContent, "48 89 5C 24 ? 57 48 83 EC ? 80 A1 ? ? ? ? ? 41 8A D8");
 		ptr_mgr.add("CExtraContentManager::AddContentFolder", g_CExtraContentManagerAddContentFolder, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B F9 48 8B DA");
-		ptr_mgr.add("rage::AES::TransformITDecrypt", g_AESTransformITDecrypt, "E8 ? ? ? ? 41 8B D4 44 39 63 28 76 3F 41 B9", "call");
-		ptr_mgr.add("rage::AES::Decrypt", g_AESDecrypt, "E8 ? ? ? ? 8B 55 F8 48 8B 43 10 48 03 D0 48 8B CB 48 89 53 18 66 44 89 22 33 D2 E8", "call");
-		ptr_mgr.add("rage::AES::isTransformITKey", g_AESisTransformITKey, "E8 ? ? ? ? 48 8B 53 20 44 8B C7 41 8B CE E8", "call");
-		ptr_mgr.add("rage::fiPackfile::ReInit", g_fiPackfileReInit, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 4C 89 60 ? 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B D9");
+		ptr_mgr.add("CExtraContentManager::GetCRC", g_CExtraContentManagerGetCRC, "48 89 5C 24 ? 55 56 57 48 83 EC ? 33 ED 8B DA");
 		ptr_mgr.add("CommandShouldWarnOfSimpleModCheck", g_CommandShouldWarnOfSimpleModCheck, "40 53 48 83 EC 30 48 8B 1D ? ? ? ? BA");
 		
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");
@@ -183,6 +178,7 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::grcDevice::sm_pSwapChain", g_pSwapChain, "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", "qword");
 		ptr_mgr.add("rage::sysObfuscatedTypes::obfRand::next", g_sysObfRandNext, "8B 0D ? ? ? ? BA ? ? ? ? 69 C9", "dword");
 		ptr_mgr.add("rage::fwTxdStore::sm_Instance", g_TxdStore, "48 8D 0D ? ? ? ? E8 ? ? ? ? EB ? 48 8B 53", "qword");
+		ptr_mgr.add("g_StreamedScripts", g_StreamedScripts, "48 8D 0D ? ? ? ? 4C 0F 45 C0 E8", "qword");
 		ptr_mgr.add("rage::grcTextureFactory::sm_Instance", g_TextureFactory, "48 8B 0D ? ? ? ? 45 33 C0 48 8B 01 33 D2 FF 90 ? ? ? ? 48 8B 0D ? ? ? ? 83 64 24", "qword");
 		ptr_mgr.add("CExtraContentManager::sm_Instance", g_CExtraContentManagersmInstance, "48 8B 1D ? ? ? ? 8B F9 83 F9", "qword");
 		ptr_mgr.add("rage::rlTitleId::g_rlTitleId", g_rlTitleId, "48 8B 0D ? ? ? ? 48 8B D8 E8 ? ? ? ? 41", "qword");

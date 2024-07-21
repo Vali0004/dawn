@@ -41,33 +41,6 @@ namespace dwn::hooking
 		return g_rlProfileStatsFlushTaskConfigure->original()(task, ctx, flushIt, status);
 	}
 
-	inline etc::hook<pointers::types::fiPackfileReInitT>* g_fiPackfileReInit{};
-	inline bool fiPackfileReInit(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)
-	{
-		bool result = g_fiPackfileReInit->original()(_This, filename, readNameHeap, headerData);
-		if (result)
-		{
-			for (int i{}; i != _This->m_EntryCount; ++i) 
-			{
-				rage::fiPackEntry& entry = _This->m_Entries[i];
-				if (entry.IsFile() && entry.m_NameOffset > 0 && entry.u.file.m_Encrypted)
-				{
-					if (g_keyId == 0x4E45504F)
-					{
-						entry.u.file.m_Encrypted = 0xFEFFFFF;
-					}
-				}
-			}
-			LOG_TO_STREAM("KeyID: " << HEX(_This->m_KeyId));
-			if (g_keyId == 0x4E45504F)
-			{
-				//_This->m_CachedDataSize = 0xFEFFFFF;
-				//_This->m_KeyId = 0xFEFFFFF;
-			}
-		}
-		return result;
-	}
-
 	inline bool g_early_hook{};
 	inline void hook_rgsc()
 	{
@@ -152,10 +125,7 @@ namespace dwn::hooking
 
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);
 
-		//make_hook("AES::isTransformITKey", AESisTransformITKey);
-		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
-		//make_hook("AES::Decrypt", AESDecrypt);
-		//make_hook("fiPackfile::ReInit", fiPackfileReInit);
+		make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
 
 		etc::persist_mh::apply_queued();
 

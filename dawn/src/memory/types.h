@@ -27,8 +27,5 @@ namespace dwn::pointers::types
 	using CExtraContentManagerLoadContentT = fptr<void(CExtraContentManager* _This, bool executeChangeSet, bool executeEarlyStartup)>;
 	using CExtraContentManagerEndEnumerateContentT = fptr<void(CExtraContentManager* _This, bool bWait, bool earlyStartup)>;
 	using CExtraContentManagerAddContentFolderT = fptr<bool(CExtraContentManager* _This, const char* path)>;
-	using AESTransformITDecryptT = fptr<void(u32 selector, void* data, u32 size)>;
-	using AESDecryptT = fptr<void(u32 keyId, u32 selector, void* data, u32 size)>;
-	using AESisTransformITKeyT = fptr<bool(u32 keyId)>;
-	using fiPackfileReInitT = fptr<bool(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)>;
+	using CExtraContentManagerGetCRCT = fptr<u32(CExtraContentManager* _This, u32 initValue)>;
 }

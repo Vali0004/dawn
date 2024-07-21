@@ -2778,7 +2778,7 @@ namespace rage {
 	{
 	public:
 	};
-#define datPadding64(count,name)	datPadding<count> name;
+	#define datPadding64(count,name)	datPadding<count> name;
 	template <typename T>
 	class pgDictionary : public pgDictionaryBase
 	{
@@ -4199,7 +4199,7 @@ namespace rage {
 		u16 m_RefCount;
 		u8 m_ResourceTypeAndConversionFlags;
 		u8 m_LayerCount;
-		u8 m_pad64[4]; // this is actually in the source.
+		datPadding64(4, m_Padding); // This is actually in the source, and I wish it wasn't...
 		grcTextureObject* m_CachedTexturePtr;
 		u32	m_PhysicalSizeAndTemplateType;
 		u32	m_HandleIndex;
@@ -4399,7 +4399,7 @@ namespace rage
 	typedef strDynamicIndex<u32> strIndex;
 	typedef strDynamicIndex<s32> strLocalIndex;
 	typedef atHashString strStreamingObjectName;
-	typedef atHashString strStreamingObjectName;
+	typedef atFinalHashString strStreamingObjectNameString;
 	enum strRefKind
 	{
 		REF_RENDER = 0,
@@ -4879,6 +4879,9 @@ namespace rage
 	typedef pgDictionary<grcTexture> fwTxd;
 	template <typename T>
 	class fwAssetDef : public fwGenericAssetDef<T, strStreamingObjectName>
+	{};
+	template <typename T>
+	class fwAssetNameDef : public fwGenericAssetDef<T, strStreamingObjectNameString>
 	{};
 	class fwAssetStoreBase : public strStreamingModule
 	{
@@ -8434,4 +8437,13 @@ public:
 	bool m_bExitFlagSet : 1;
 	bool m_bExitFlagResponse : 1;
 	bool m_bCleanupReplay : 1;
+};
+class CStreamedScripts : public rage::fwAssetRscStore<rage::scrProgram, rage::fwAssetNameDef<rage::scrProgram>>
+{
+public:
+	virtual strLocalIndex Register(const char* name) = 0;
+	virtual u32 GetStreamerReadFlags() const = 0;
+	virtual void RemoveRef(strLocalIndex index, strRefKind kind) = 0;
+	virtual int GetNumRefs(strLocalIndex index) const = 0;
+	rage::strIndex m_BGScriptPackStreamIndex;
 };
