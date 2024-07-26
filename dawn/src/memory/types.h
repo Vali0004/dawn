@@ -22,10 +22,13 @@ namespace dwn::pointers::types
 	using rlRosHttpTaskProcessResponseT = fptr<bool(rage::rlRosHttpTask* _this, const char* response, int* resultCode)>;
 	using rlRosHttpTaskProcessResponseScT = fptr<bool(rage::rlRosHttpTask* _this, const char* response, int* resultCode)>;
 	using rlProfileStatsFlushTaskConfigureT = fptr<bool(rage::rlProfileStatsFlushTask* task, rage::rlProfileStatsClient* ctx, rage::rlProfileStatsDirtyIterator* flushIt, rage::netStatus* status)>;
-	using GameTransactionBaseHttpTaskProcessResponseT = fptr<bool(void* _This, const char* response)>;
 	using GetProcAddressT = fptr<FARPROC(HMODULE hModule, LPCSTR lpProcName)>;
 	using CExtraContentManagerLoadContentT = fptr<void(CExtraContentManager* _This, bool executeChangeSet, bool executeEarlyStartup)>;
 	using CExtraContentManagerEndEnumerateContentT = fptr<void(CExtraContentManager* _This, bool bWait, bool earlyStartup)>;
 	using CExtraContentManagerAddContentFolderT = fptr<bool(CExtraContentManager* _This, const char* path)>;
 	using CExtraContentManagerGetCRCT = fptr<u32(CExtraContentManager* _This, u32 initValue)>;
+	using AESisTransformITKeyT = fptr<bool(u32 keyId)>;
+	using AESTransformITDecryptT = fptr<void(u32 selector, void* data, u32 size)>;
+	using AESDecryptT = fptr<void(u32 keyId, u32 selector, void* data, u32 size)>;
+	using fiPackfileReInitT = fptr<bool(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)>;
 }

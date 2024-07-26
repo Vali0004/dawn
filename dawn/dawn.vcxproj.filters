@@ -156,6 +156,7 @@
     <ClInclude Include="src\common\virtual_pure.h" />
     <ClInclude Include="src\menu\test_gui.h" />
     <ClInclude Include="src\renderer\input.h" />
+    <ClInclude Include="src\thread_manager\thread.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

@@ -5,15 +5,17 @@
 #include "memory/pointers.h"
 #include "renderer/input.h"
 #include "build_number.h"
+#include "command_engine/manager.h"
 using namespace rage;
 
 void game_speedup()
 {
 	SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-	std::this_thread::sleep_for(2600ms);
-	dwn::memory::pointer_manager ptr_mgr{};
+	//std::this_thread::sleep_for(2600ms);
+	/*dwn::memory::pointer_manager ptr_mgr{};
 	dwn::pointers::game_speedup_scan(ptr_mgr);
 	g_game_speedup_active = true;
+	g_game_speedup_active = false;
 
 	while (g_game_speedup_active)
 	{
@@ -55,14 +57,14 @@ void game_speedup()
 		}
 
 		std::this_thread::sleep_for(10ms);
-	}
+	}*/
 }
 void game_death()
 {
 	LOG_TO_STREAM("Game fast-exit thread created.");
 	while (g_running)
 	{
-		if (dwn::input::g_input.m_keyboard.key_pressed(VK_F4))
+		if (GetAsyncKeyState(VK_F4))
 		{
 			exit(0);
 			abort();
@@ -76,7 +78,7 @@ void routine()
 	if (g_was_injected_early)
 	{
 		std::this_thread::sleep_for(1000ms);
-		//dwn::util::spawn_detached_thread(&game_speedup);
+		dwn::util::spawn_detached_thread(&game_speedup);
 	}
 
 	dwn::pointers::g_GetProcAddress = &GetProcAddress;
@@ -89,6 +91,7 @@ void routine()
 
 	dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
 	LOG_TO_STREAM("Console created.");
+	LOG_TO_STREAM("Base address: " << HEX(dwn::memory::hmodule().begin().as<u64>()));
 
 	if (g_was_injected_early)
 	{
@@ -101,14 +104,14 @@ void routine()
 
 	if (!IsDebuggerPresent())
 	{
-		//dwn::exception::attach_handler();
-		//LOG_TO_STREAM("Attached exception handler at " << HEX((u64)dwn::exception::g_handle));
-		//LOG_TO_STREAM("Attached exception filter at " << HEX((u64)dwn::exception::g_filter_handle));
+		dwn::exception::attach_handler();
+		LOG_TO_STREAM("Attached exception handler at " << HEX((u64)dwn::exception::g_handle));
+		LOG_TO_STREAM("Attached exception filter at " << HEX((u64)dwn::exception::g_filter_handle));
 	}
 	else
 	{
 		LOG_TO_STREAM("WARNING: Exception handler not attached!");
-		//LOG_TO_STREAM("WARNING: Exception filter not attached!");
+		LOG_TO_STREAM("WARNING: Exception filter not attached!");
 	}
 
 	dwn::renderer::menu::init();

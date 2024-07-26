@@ -21,6 +21,10 @@ namespace dwn::hooking
 
 		if (pt->HashCode == "freemode"_j || pt->HashCode == "main_persistent"_j)
 		{
+			if (DLC::IS_DLC_PRESENT("DEBUG_DETECT"_j))
+			{
+				LOG_TO_STREAM("Fuck, we tripped their AntiTamper debugger BS.");
+			}
 			renderer::menu::tick();
 		}
 
@@ -126,6 +130,10 @@ namespace dwn::hooking
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);
 
 		make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
+		//make_hook("AES::isTransformITKey", AESisTransformITKey);
+		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
+		make_hook("AES::Decrypt", AESDecrypt);
+		make_hook("fiPackfile::ReInit", fiPackfileReInit);
 
 		etc::persist_mh::apply_queued();
 

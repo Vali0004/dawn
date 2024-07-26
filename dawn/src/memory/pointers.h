@@ -21,11 +21,14 @@ namespace dwn::pointers
 	inline types::rlRosHttpTaskProcessResponseT g_rlRosHttpTaskProcessResponse{};
 	inline types::rlRosHttpTaskProcessResponseScT g_rlRosHttpTaskProcessResponseSc{};
 	inline types::rlProfileStatsFlushTaskConfigureT g_rlProfileStatsFlushTaskConfigure{};
-	inline types::GameTransactionBaseHttpTaskProcessResponseT g_GameTransactionBaseHttpTaskProcessResponse{};
 	inline types::CExtraContentManagerLoadContentT g_CExtraContentManagerLoadContent{};
 	inline types::CExtraContentManagerEndEnumerateContentT g_CExtraContentManagerEndEnumerateContent{};
 	inline types::CExtraContentManagerAddContentFolderT g_CExtraContentManagerAddContentFolder{};
 	inline types::CExtraContentManagerGetCRCT g_CExtraContentManagerGetCRC{};
+	inline types::fiPackfileReInitT g_fiPackfileReInit{};
+	inline types::AESisTransformITKeyT g_AESisTransformITKey{};
+	inline types::AESTransformITDecryptT g_AESTransformITDecrypt{};
+	inline types::AESDecryptT g_AESDecrypt{};
 	inline types::CommandShouldWarnOfSimpleModCheckT g_CommandShouldWarnOfSimpleModCheck{};
 	inline types::GetProcAddressT g_GetProcAddress{};
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
@@ -84,7 +87,7 @@ namespace dwn::pointers
 	inline void remove_keyboard_hook()
 	{
 		using removeKeybaordHookT = fptr<void()>;
-		removeKeybaordHookT remove_fn{};
+		/*removeKeybaordHookT remove_fn{};
 		memory::pointer_manager ptr_mgr{};
 		ptr_mgr.add("RemoveKeyboardHook", remove_fn, "48 8B 0D ? ? ? ? 48 FF 25 ? ? ? ? E9");
 		trigger_scan(ptr_mgr);
@@ -97,7 +100,7 @@ namespace dwn::pointers
 		else
 		{
 			LOG_TO_STREAM("There is no keyboard hook!");
-		}
+		}*/
 	}
 
 	inline void wait_for_rgsc()
@@ -128,9 +131,6 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponse", g_rlRosHttpTaskProcessResponse, "48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 33 FF 4D 8B E0");	
 		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponseSc", g_rlRosHttpTaskProcessResponseSc, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 48 83 64 24", {}, { "socialclub.dll" });
 		ptr_mgr.add("rage::rlProfileStatsFlushTask::Configure", g_rlProfileStatsFlushTaskConfigure, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 DB 49 8B F9 48 8B F1 4D 85 C9 74 ? 41 83 39 ? 74 ? 48 39 99");
-		// This sig needs is pretty unreliable as it's ARX protected.
-		// Grab it from RsonReader::Init, func+random_loc "45 8B C8 45 33 C0 E9"
-		ptr_mgr.add("GameTransactionBaseHttpTask::ProcessResponse", g_GameTransactionBaseHttpTaskProcessResponse, "48 8D 64 24 ? 44 8B 04 24 48 8D 64 24 ? 48 8B 44 24");
 		ptr_mgr.add("rage::rlPc::g_rlPc", g_rlPc, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92", "qword");
 		trigger_scan(ptr_mgr);
 	}
@@ -168,6 +168,10 @@ namespace dwn::pointers
 		ptr_mgr.add("CExtraContentManager::EndEnumerateContent", g_CExtraContentManagerEndEnumerateContent, "48 89 5C 24 ? 57 48 83 EC ? 80 A1 ? ? ? ? ? 41 8A D8");
 		ptr_mgr.add("CExtraContentManager::AddContentFolder", g_CExtraContentManagerAddContentFolder, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B F9 48 8B DA");
 		ptr_mgr.add("CExtraContentManager::GetCRC", g_CExtraContentManagerGetCRC, "48 89 5C 24 ? 55 56 57 48 83 EC ? 33 ED 8B DA");
+		ptr_mgr.add("rage::fiPackfile::ReInit", g_fiPackfileReInit, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 4C 89 60 ? 55 41 56 41 57 48 8B EC 48 83 EC ? 48 8B D9");
+		ptr_mgr.add("rage::AES::isTransformITKey", g_AESisTransformITKey, "E8 ? ? ? ? 48 8B 53 20 44 8B C7 41 8B CE E8", "call");
+		ptr_mgr.add("rage::AES::TransformITDecrypt", g_AESTransformITDecrypt, "E8 ? ? ? ? 41 8B D4 44 39 63 28 76 3F 41 B9", "call");
+		ptr_mgr.add("rage::AES::Decrypt", g_AESDecrypt, "E8 ? ? ? ? 8B 55 F8 48 8B 43 10 48 03 D0 48 8B CB 48 89 53 18 66 44 89 22 33 D2 E8", "call");
 		ptr_mgr.add("CommandShouldWarnOfSimpleModCheck", g_CommandShouldWarnOfSimpleModCheck, "40 53 48 83 EC 30 48 8B 1D ? ? ? ? BA");
 		
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");

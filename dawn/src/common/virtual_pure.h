@@ -30,7 +30,7 @@ namespace dwn
 		{
 			if (m_function)
 			{
-				return (instance->*m_function)(std::forward<A>(args)...);
+				return (instance->*reinterpret_cast<mfptr<R, I, A...>>(m_function))(std::forward<A>(args)...);
 			}
 			if constexpr (std::is_same_v<R, void>)
 			{

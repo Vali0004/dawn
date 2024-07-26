@@ -88,7 +88,7 @@ namespace dwn::renderer
 							});
 						}));
 						sub.add(base_option("Spawn a t20", [] {
-							u32 hash{ "t20"_j };
+							u32 hash{ "rmodlp770"_j };
 							rage::run_as_thread_callback("main_persistent"_j, [hash] {
 								if (STREAMING::IS_MODEL_VALID(hash))
 								{
@@ -178,12 +178,11 @@ namespace dwn::renderer
 				}));
 				sub.add(base_option("Do a funny?", [] {
 					LOG_TO_STREAM("Do a funny.");
-					//C:\Users\Vali\Desktop\Shit\Vali\Legacy\SC-CL-SampleProject-master\projects\Bin\testscript.ysc
 					rage::strLocalIndex idx = pointers::g_StreamedScripts->Register("testscript");
-					/*if (pointers::g_StreamedScripts->LoadFile(idx, R"(C:\Users\Vali\Desktop\Shit\Vali\Legacy\SC-CL-SampleProject-master\projects\Bin\testscript.ysc)"))
+					if (pointers::g_StreamedScripts->LoadFile(idx, R"(X:\gta5_old\script\dev_ng\BGNG\BGScript\RELEASE\testscript.ysc)"))
 					{
 						LOG_TO_STREAM("The funny has happened.");
-					}*/
+					}
 				}));
 				sub.add(base_option("Hello, world", [] {
 					LOG_TO_STREAM("Hello!");
@@ -194,7 +193,6 @@ namespace dwn::renderer
 			font_path /= BASE_NAME;
 			font_path /= "Fonts";
 			std::string str{ (font_path / "icon_font.ttf").string() };
-			LOG_TO_STREAM("Path: " << str);
 			iconfont_22 = directx::load_font(str.data(), 22.f, get()->m_device);
 			iconfont_24 = directx::load_font(str.data(), 24.f, get()->m_device);
 			arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 22.f, get()->m_device);
@@ -205,6 +203,7 @@ namespace dwn::renderer
 			ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 23.f, get()->m_device);
 			arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 22.f, get()->m_device);
 			arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 23.f, get()->m_device);
+			gui::flip_bit(true);
 		}
 		inline void uninit()
 		{

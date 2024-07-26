@@ -280,7 +280,7 @@ namespace dwn::exception
 	{
 		g_handle = AddVectoredExceptionHandler(FALSE, handle_exception);
 
-		//g_filter_handle = SetUnhandledExceptionFilter(handle_unhandled_exception);
+		g_filter_handle = SetUnhandledExceptionFilter(handle_unhandled_exception);
 	}
 	inline void detach_handler()
 	{

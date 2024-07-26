@@ -33,20 +33,4 @@ namespace dwn::hooking
 
 		return g_rlRosHttpTaskProcessResponseSc->original()(_this, response, resultCode);
 	}
-
-	inline etc::hook<pointers::types::GameTransactionBaseHttpTaskProcessResponseT>* g_GameTransactionBaseHttpTaskProcessResponse{};
-	inline bool GameTransactionBaseHttpTaskProcessResponse(void* _This, const char* response)
-	{
-		__try
-		{
-			if (response)
-			{
-				//LOG_TO_STREAM("Response (GameTransaction): " << dwn::endl << response);
-			}
-		}
-		__except(exception::handle_exception(GetExceptionInformation()))
-		{}
-
-		return g_GameTransactionBaseHttpTaskProcessResponse->original()(_This, response);
-	}
 }

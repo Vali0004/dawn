@@ -5,7 +5,7 @@
 #define nodisc [[nodiscard]]
 #define unlikely [[unlikely]]
 #define likely [[likely]]
-#define nil NULL
+#define nil 0
 #define nilptr nullptr
 
 #define rtry try

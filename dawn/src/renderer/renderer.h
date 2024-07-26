@@ -32,6 +32,8 @@ namespace dwn::renderer
 {
 	using namespace directx;
 	inline std::unique_ptr<class renderer> g_renderer{};
+	constexpr long double M_PI{ 3.141592653589793238462643383279502884L };
+	constexpr long double M_PI_2{ 3.141592653589793238462643383279502884L / 2 };
 
 	class renderer final
 	{

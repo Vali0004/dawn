@@ -222,6 +222,7 @@
     <ClInclude Include="src\rgsc\public_interface\telemetry_interface.h" />
     <ClInclude Include="src\rgsc\public_interface\titleid_interface.h" />
     <ClInclude Include="src\simdjson\simdjson.h" />
+    <ClInclude Include="src\thread_manager\thread.h" />
     <ClInclude Include="src\util.h" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,13 @@ namespace dwn::commands
 	class cmd_container
 	{
 	public:
+		cmd_container(const std::string_view& name) :
+			m_name(name)
+		{}
+		cmd_container() :
+			m_name("")
+		{}
+
 		template <typename T>
 		void allocate(T data = T{})
 		{
@@ -27,6 +34,7 @@ namespace dwn::commands
 				m_ptr = new T(data);
 			}
 		}
+
 		void deallocate()
 		{
 			if (!m_reference)
@@ -34,6 +42,7 @@ namespace dwn::commands
 				delete m_ptr;
 			}
 		}
+
 		template <typename T>
 		T& get()
 		{
@@ -43,9 +52,17 @@ namespace dwn::commands
 			}
 			return *reinterpret_cast<T*>(m_ptr);
 		}
+
+		std::string& get_name()
+		{
+			return m_name;
+		}
+	private:
+		std::string m_name{}; // Name to reference a value by.
 		void* m_ptr{};
 		bool m_reference{};
 	};
+
 	class cmd_functions
 	{
 	public:
@@ -56,11 +73,14 @@ namespace dwn::commands
 		void render()
 		{}
 	};
+
 	template <typename T1 = cmd_functions, typename T2 = cmd_functions, typename T3 = cmd_functions>
 	class cmd_data
 	{
 	public:
-		cmd_data(const std::string& name) : m_name(name)
+		cmd_data(const std::string& name, bool doesOnceActAsInit = false) :
+			m_name(name),
+			m_does_once_act_as_init(doesOnceActAsInit)
 		{
 			m_once = new std::remove_pointer_t<decltype(m_once)>();
 			m_tick = new std::remove_pointer_t<decltype(m_tick)>();
@@ -83,23 +103,53 @@ namespace dwn::commands
 		void tick() {}
 		void render() {}
 		template <typename T = T1, typename ...A>
-		auto get_once() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_once); }
+		auto get_once() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_once); }
 		template <typename T = T1, typename ...A>
-		auto get_tick() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_tick); }
+		auto get_tick() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_tick); }
 		template <typename T = T1, typename ...A>
-		auto get_render() { return reinterpret_cast<commands::virtual_pure<void, T, A...>*>(m_render); }
+		auto get_render() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_render); }
 
 		template <typename C>
-		bool is_once_of() const { return m_once.template is_class<C>(); }
+		bool is_once_of() const { return (*m_once).template is_class<C>(); }
 		template <typename C>
-		bool is_tick_of() const { return m_tick.template is_class<C>(); }
+		bool is_tick_of() const { return (*m_tick).template is_class<C>(); }
 		template <typename C>
-		bool is_render_of() const { return m_render.template is_class<C>(); }
+		bool is_render_of() const { return (*m_render).template is_class<C>(); }
+
+		cmd_container* get_container(const std::string_view& name)
+		{
+			for (auto& container : m_containers)
+			{
+				if (!container->get_name().compare(name.data()))
+				{
+					return container;
+				}
+			}
+
+			return nullptr;
+		}
+
+		cmd_container* add_container(const std::string_view& name)
+		{
+			cmd_container* container{ new cmd_container(name) };
+			m_containers.push_back(container);
+			return container;
+		}
+
+		template <typename T>
+		cmd_container* add_container_preallocate(const std::string_view& name, T value)
+		{
+			cmd_container* container{ new cmd_container(name) };
+			container->allocate<T>(value);
+			m_containers.push_back(container);
+			return container;
+		}
 
 		std::string m_name{};
+		bool m_does_once_act_as_init{};
 		virtual_pure<void, T1>* m_once;
 		virtual_pure<void, T2>* m_tick;
 		virtual_pure<void, T3>* m_render;
-		std::vector<cmd_container> m_containers{};
+		std::vector<cmd_container*> m_containers{};
 	};
 }

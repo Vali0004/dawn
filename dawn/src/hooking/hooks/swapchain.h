@@ -28,7 +28,6 @@ namespace dwn::hooking
 			}
 			renderer::get()->end_frame();
 		}
-
 		return g_grcSwapChain->original<pointers::types::grcSwapChainPresentT>(8)(current, syncInterval, flags);
 	}
 
