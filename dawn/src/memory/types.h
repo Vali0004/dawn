@@ -31,4 +31,5 @@ namespace dwn::pointers::types
 	using AESTransformITDecryptT = fptr<void(u32 selector, void* data, u32 size)>;
 	using AESDecryptT = fptr<void(u32 keyId, u32 selector, void* data, u32 size)>;
 	using fiPackfileReInitT = fptr<bool(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)>;
+	using fwScriptGuidGetBaseFromGuidT = fptr<rage::fwExtensibleBase*(int guid)>;
 }

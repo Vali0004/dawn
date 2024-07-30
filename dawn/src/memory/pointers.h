@@ -26,6 +26,7 @@ namespace dwn::pointers
 	inline types::CExtraContentManagerAddContentFolderT g_CExtraContentManagerAddContentFolder{};
 	inline types::CExtraContentManagerGetCRCT g_CExtraContentManagerGetCRC{};
 	inline types::fiPackfileReInitT g_fiPackfileReInit{};
+	inline types::fwScriptGuidGetBaseFromGuidT g_fwScriptGuidGetBaseFromGuid{};
 	inline types::AESisTransformITKeyT g_AESisTransformITKey{};
 	inline types::AESTransformITDecryptT g_AESTransformITDecrypt{};
 	inline types::AESDecryptT g_AESDecrypt{};
@@ -43,6 +44,7 @@ namespace dwn::pointers
 	inline rage::gameSkeleton* g_gameSkeleton{};
 	inline rage::scrCommandHash<rage::scrCmd>* g_sCommandHash{};
 	inline rage::atArray<rage::scrThread*>* g_smThreads{};
+	inline rage::atRangeArray<rage::scrValue*, scrProgram::MAX_GLOBAL_BLOCKS>* g_smGlobals{};
 	inline const char** g_iVersionId{};
 	inline CNetworkAssetVerifier** g_CNetworkAssetVerifiersmInstance{};
 	inline rage::rlTitleId** g_rlTitleId{};
@@ -173,10 +175,12 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::AES::TransformITDecrypt", g_AESTransformITDecrypt, "E8 ? ? ? ? 41 8B D4 44 39 63 28 76 3F 41 B9", "call");
 		ptr_mgr.add("rage::AES::Decrypt", g_AESDecrypt, "E8 ? ? ? ? 8B 55 F8 48 8B 43 10 48 03 D0 48 8B CB 48 89 53 18 66 44 89 22 33 D2 E8", "call");
 		ptr_mgr.add("CommandShouldWarnOfSimpleModCheck", g_CommandShouldWarnOfSimpleModCheck, "40 53 48 83 EC 30 48 8B 1D ? ? ? ? BA");
+		ptr_mgr.add("rage::fwScriptGuid::GetBaseFromGuid", g_fwScriptGuidGetBaseFromGuid, "83 F9 ? 74 ? 4C 8B 0D");
 		
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");
 		ptr_mgr.add("rage::s_CommandHash", g_sCommandHash, "48 8D 0D ? ? ? ? 48 8B 14 FA", "qword");
 		ptr_mgr.add("rage::scrThread::sm_Threads", g_smThreads, "48 8B 05 ? ? ? ? 8B CF 48 8B 1C C8 39 6B", "qword");
+		ptr_mgr.add("rage::scrProgram::sm_Globals", g_smGlobals, "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF", "qword");
 		ptr_mgr.add("CDebug::m_iVersionId", g_iVersionId, "48 8D 2D ? ? ? ? 48 85 C0 0F 84", "qword");
 		ptr_mgr.add("CNetworkAssetVerifier::sm_Instance", g_CNetworkAssetVerifiersmInstance, "48 8B 0D ? ? ? ? E8 ? ? ? ? B1", "qword");
 		ptr_mgr.add("rage::grcDevice::sm_pSwapChain", g_pSwapChain, "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", "qword");

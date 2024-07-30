@@ -132,8 +132,8 @@ namespace dwn::hooking
 		make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
 		//make_hook("AES::isTransformITKey", AESisTransformITKey);
 		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
-		make_hook("AES::Decrypt", AESDecrypt);
-		make_hook("fiPackfile::ReInit", fiPackfileReInit);
+		//make_hook("AES::Decrypt", AESDecrypt);
+		//make_hook("fiPackfile::ReInit", fiPackfileReInit);
 
 		etc::persist_mh::apply_queued();
 

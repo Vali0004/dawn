@@ -157,6 +157,9 @@
     <ClInclude Include="src\menu\test_gui.h" />
     <ClInclude Include="src\renderer\input.h" />
     <ClInclude Include="src\thread_manager\thread.h" />
+    <ClInclude Include="src\thread_manager\thread_manager.h" />
+    <ClInclude Include="src\scripthookv\scripthookv.h" />
+    <ClInclude Include="src\scripthookv\module_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

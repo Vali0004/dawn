@@ -221,8 +221,11 @@
     <ClInclude Include="src\rgsc\public_interface\tasks_interface.h" />
     <ClInclude Include="src\rgsc\public_interface\telemetry_interface.h" />
     <ClInclude Include="src\rgsc\public_interface\titleid_interface.h" />
+    <ClInclude Include="src\scripthookv\module_loader.h" />
+    <ClInclude Include="src\scripthookv\scripthookv.h" />
     <ClInclude Include="src\simdjson\simdjson.h" />
     <ClInclude Include="src\thread_manager\thread.h" />
+    <ClInclude Include="src\thread_manager\thread_manager.h" />
     <ClInclude Include="src\util.h" />
   </ItemGroup>
   <ItemGroup>

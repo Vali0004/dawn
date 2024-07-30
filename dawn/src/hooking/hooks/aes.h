@@ -9,11 +9,6 @@ namespace dwn::hooking
 	{
 		if (g_spoofValues)
 		{
-			if ((u32)(*pointers::g_CExtraContentManagersmInstance) != (*pointers::g_CNetworkAssetVerifiersmInstance)->m_CRC.Get())
-			{
-				LOG_TO_STREAM("Cloud data hash mismatch.");
-				LOG_TO_STREAM("Init value: " << initValue);
-			}
 			return g_CExtraContentManagerGetCRC->original()(_This, 0);
 		}
 		return g_CExtraContentManagerGetCRC->original()(_This, initValue);

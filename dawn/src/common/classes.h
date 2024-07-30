@@ -99,7 +99,8 @@ namespace rgsc
 	//0xD6F0
 }
 //diagXXXXXX
-namespace rage {
+namespace rage
+{
 	enum diagSeverity
 	{
 		DIAG_SEVERITY_FATAL,
@@ -4620,6 +4621,7 @@ namespace rage
 //fwXXXXXXX
 namespace rage
 {
+	class fwExtensibleBase; // Fuck this impl right now
 	template<typename _KeyType>
 	class fwNameRegistrarDef
 	{
