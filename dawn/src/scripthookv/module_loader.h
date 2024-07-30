@@ -8,7 +8,7 @@ namespace dwn::shv
 	public:
 
 	private:
-
+		HMODULE m_handle{};
 	};
 	class module_loader
 	{

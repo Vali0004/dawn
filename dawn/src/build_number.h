@@ -1,2 +1,2 @@
 #pragma once
-#define BUILD "b3826"
+#define BUILD "b3827"
