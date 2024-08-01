@@ -21,191 +21,192 @@ namespace dwn
 	private:
 		void* data[a];
 	};
-	class thread
-	{
-		struct keepalive_data
-		{
-			bool set{};
-			bool* conditional{};
-			fptr<void()> callback{};
-			std::optional<std::chrono::high_resolution_clock::duration> sleep_time{};
-		};
-	public:
-		nodisc explicit thread(fptr<u32(void*)> fn, void* arg = nullptr)
-		{
-			_start(fn, arg);
-		}
-		nodisc explicit thread(fptr<u32(void*)> fn, args<2>* args = nullptr)
-		{
-			_start(fn, args);
-		}
-		thread() noexcept : m_data{}
-		{}
+    class thread
+    {
+        struct keepalive_data
+        {
+            bool set{};
+            bool* conditional{};
+            fptr<void()> callback{};
+            std::optional<std::chrono::high_resolution_clock::duration> sleep_time{};
+        };
 
-		~thread() noexcept
-		{
-			if (m_data.id != nil)
-			{
-				std::terminate();
-			}
-		}
+        struct data
+        {
+            struct
+            {
+                fptr<u32(void*)> fn;
+                void* arg;
+            } callback;
+            void* handle;
+            u32 id;
+        };
+    public:
+        nodisc explicit thread(fptr<u32(void*)> fn, void* arg = nullptr)
+        {
+            _start_debug(fn, arg);
+        }
+        nodisc explicit thread(fptr<u32(void*)> fn, args<2>* args = nullptr)
+        {
+            _start_debug(fn, args);
+        }
+        thread() noexcept : m_data{}
+        {}
 
-		// I am not typing this out, I hate it just as much as the next
-		nodisc void keepalive(bool* condition = nullptr, fptr<void()> callback = nullptr, decltype(keepalive_data::sleep_time) time = std::nullopt) noexcept
-		{
-			m_keepalive.set = true;
-			m_keepalive.conditional = condition;
-			m_keepalive.callback = callback;
-			m_keepalive.sleep_time = time;
-		}
+        ~thread() noexcept
+        {
+            if (m_data.id != nil)
+            {
+                std::terminate();
+            }
+        }
 
-		nodisc void start(bool join = {})
-		{
-			if (m_data.id == nil)
-			{
-				return;
-			}
-			else
-			{
-				if (join)
-				{
-					if (m_data.id == _Thrd_id())
-					{
-						return;
-					}
-					else
-					{
-						_Thrd_join({ m_data.handle, m_data.id }, nil);
-					}
-				}
-			}
-		}
+        nodisc void keepalive(bool* condition = nullptr, fptr<void()> callback = nullptr, decltype(keepalive_data::sleep_time) time = std::nullopt) noexcept
+        {
+            m_keepalive.set = true;
+            m_keepalive.conditional = condition;
+            m_keepalive.callback = callback;
+            m_keepalive.sleep_time = time;
+        }
 
-		nodisc void set_id(u32 value) noexcept
-		{
-			m_data.id = value;
-		}
+        nodisc void start(bool join = {})
+        {
+            if (m_data.id == nil)
+            {
+                return;
+            }
+            else
+            {
+                if (join)
+                {
+                    if (m_data.id == _Thrd_id())
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        _Thrd_join({ m_data.handle, m_data.id }, nil);
+                    }
+                }
+            }
+        }
 
-		nodisc u32 get_id() noexcept
-		{
-			return m_data.id;
-		}
+        nodisc void set_id(u32 value) noexcept
+        {
+            m_data.id = value;
+        }
 
-		nodisc void* handle()
-		{
-			return m_data.handle;
-		}
+        nodisc u32 get_id() noexcept
+        {
+            return m_data.id;
+        }
 
-	private:
-		void _start(fptr<u32(void*)> fn, void* arg)
-		{
-			args<4> thread_args{};
-			thread_args.set_arg(0, &fn);
-			thread_args.set_arg(1, arg);
-			thread_args.set_arg(2, &m_keepalive);
-			thread_args.set_arg(3, this);
-			fptr<u32(void*)> thread_callback = [](void* a) -> u32 {
-				args<4>* args{ reinterpret_cast<decltype(args)>(a) };
-				fptr<u32(void*)> function{ *reinterpret_cast<decltype(function)*>(args->get_arg(0)) };
-				void* function_arg{ args->get_arg(1) };
-				keepalive_data* keepalive{ reinterpret_cast<keepalive_data*>(args->get_arg(2)) };
-				thread* _this{ reinterpret_cast<thread*>(args->get_arg(3)) };
-				if (!function)
-				{
-					_endthreadex(0);
-					return 0;
-				}
-				u32 result{ function(function_arg) };
-				if (keepalive && keepalive->set)
-				{
-					bool conditional{ keepalive->conditional ? *keepalive->conditional : true };
-					while (conditional)
-					{
-						if (keepalive->callback)
-						{
-							keepalive->callback();
-						}
-						if (keepalive->sleep_time.has_value())
-						{
-							std::this_thread::sleep_for(keepalive->sleep_time.value());
-						}
-					}
-				}
-				if (_this)
-				{
-					_this->set_id(0);
-				}
-				_endthreadex(0);
-				return 0;
-			};
-			m_data.handle = reinterpret_cast<void*>(_beginthreadex(nilptr, nil, thread_callback, &thread_args, nil, &m_data.id));
-			if (!m_data.handle)
-			{
-				m_data.id = 0;
-			}
-		}
-		void _start_debug(fptr<u32(void*)> fn, void* arg)
-		{
-			args<4> thread_args{};
-			thread_args.set_arg(0, fn);
-			thread_args.set_arg(1, arg);
-			thread_args.set_arg(2, &m_keepalive);
-			thread_args.set_arg(3, this);
-			fptr<u32(void*)> thread_callback = [](void* a) -> u32 {
-				LOG_TO_STREAM("Thread callback called.");
-				args<4>* args{ reinterpret_cast<decltype(args)>(a) };
-				LOG_TO_STREAM("Set args.");
-				fptr<u32(void*)> function{ reinterpret_cast<decltype(function)>(args->get_arg(0)) };
-				LOG_TO_STREAM("Set function.");
-				void* function_arg{ args->get_arg(1) };
-				LOG_TO_STREAM("Set function_arg.");
-				keepalive_data* keepalive{ reinterpret_cast<keepalive_data*>(args->get_arg(2)) };
-				LOG_TO_STREAM("Set keepalive.");
-				thread* _this{ reinterpret_cast<thread*>(args->get_arg(3)) };
-				LOG_TO_STREAM("Set _this.");
-				if (!function)
-				{
-					_endthreadex(0);
-					return 0;
-				}
-				u32 result{ function(function_arg) };
-				LOG_TO_STREAM("Called callback, result is " << result << ".");
-				if (keepalive && keepalive->set)
-				{
-					bool conditional{ keepalive->conditional ? *keepalive->conditional : true };
-					while (conditional)
-					{
-						if (keepalive->callback)
-						{
-							keepalive->callback();
-						}
-						if (keepalive->sleep_time.has_value())
-						{
-							std::this_thread::sleep_for(keepalive->sleep_time.value());
-						}
-					}
-				}
-				if (_this)
-				{
-					_this->set_id(0);
-				}
-				LOG_TO_STREAM("Deallocated thread and returned 0.");
-				_endthreadex(0);
-				return 0;
-			};
-			m_data.handle = reinterpret_cast<void*>(_beginthreadex(nilptr, nil, thread_callback, &thread_args, nil, &m_data.id));
-			if (!m_data.handle)
-			{
-				m_data.id = 0;
-			}
-		}
-		struct data
-		{
-			void* handle;
-			u32 id;
-		};
+        nodisc void* handle()
+        {
+            return m_data.handle;
+        }
 
-		data m_data;
-		keepalive_data m_keepalive{};
-	};
+        data m_data{};
+        keepalive_data m_keepalive{};
+    private:
+        void _start(fptr<u32(void*)> fn, void* arg)
+        {
+            m_data.callback.fn = fn;
+            m_data.callback.arg = arg;
+            fptr<u32(void*)> thread_callback = [](void* a) -> u32 {
+                thread* _this{ reinterpret_cast<thread*>(a) };
+                fptr<u32(void*)> function{ _this->m_data.callback.fn };
+                void* function_arg{ _this->m_data.callback.arg };
+                keepalive_data* keepalive{ reinterpret_cast<keepalive_data*>(&_this->m_keepalive) };
+                if (!function)
+                {
+                    _endthreadex(0);
+                    return 0;
+                }
+                u32 result{ function(function_arg) };
+                if (keepalive && keepalive->set)
+                {
+                    bool conditional{ keepalive->conditional ? *keepalive->conditional : true };
+                    while (conditional)
+                    {
+                        if (keepalive->callback)
+                        {
+                            keepalive->callback();
+                        }
+                        if (keepalive->sleep_time.has_value())
+                        {
+                            std::this_thread::sleep_for(keepalive->sleep_time.value());
+                        }
+                        conditional = keepalive->conditional ? *keepalive->conditional : true;
+                    }
+                }
+                if (_this)
+                {
+                    _this->set_id(0);
+                }
+                _endthreadex(0);
+                return 0;
+            };
+            m_data.handle = reinterpret_cast<void*>(_beginthreadex(nilptr, nil, thread_callback, this, nil, &m_data.id));
+            if (!m_data.handle)
+            {
+                m_data.id = 0;
+            }
+        }
+
+        void _start_debug(fptr<u32(void*)> fn, void* arg)
+        {
+            m_data.callback.fn = fn;
+            m_data.callback.arg = arg;
+            fptr<u32(void*)> thread_callback = [](void* a) -> u32 {
+                thread* _this{ reinterpret_cast<thread*>(a) };
+                LOG_TO_STREAM("Set _this.");
+                fptr<u32(void*)> function{ _this->m_data.callback.fn };
+                void* function_arg{ _this->m_data.callback.arg };
+                keepalive_data* keepalive{ reinterpret_cast<keepalive_data*>(&_this->m_keepalive) };
+                LOG_TO_STREAM("Set all data from this.");
+                if (!function)
+                {
+                    _endthreadex(0);
+                    return 0;
+                }
+                u32 result{ function(function_arg) };
+                if (g_running)
+                {
+                    LOG_TO_STREAM("Called callback, result is " << result << ".");
+                }
+                if (keepalive && keepalive->set)
+                {
+                    bool conditional{ keepalive->conditional ? *keepalive->conditional : true };
+                    while (conditional)
+                    {
+                        if (keepalive->callback)
+                        {
+                            keepalive->callback();
+                        }
+                        if (keepalive->sleep_time.has_value())
+                        {
+                            std::this_thread::sleep_for(keepalive->sleep_time.value());
+                        }
+                        conditional = keepalive->conditional ? *keepalive->conditional : true;
+                    }
+                }
+                if (_this)
+                {
+                    _this->set_id(0);
+                }
+                if (g_running)
+                {
+                    LOG_TO_STREAM("Deallocated thread and returned 0.");
+                }
+                _endthreadex(0);
+                return 0;
+            };
+            m_data.handle = reinterpret_cast<void*>(_beginthreadex(nilptr, nil, thread_callback, this, nil, &m_data.id));
+            if (!m_data.handle)
+            {
+                m_data.id = 0;
+            }
+        }
+    };
 }

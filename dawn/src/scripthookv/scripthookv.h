@@ -5,6 +5,7 @@
 using KeyboardFunctionT = fptr<void(ul32 key, u16 repeats, u8 scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow)>;
 using PresentCallbackT = fptr<void(void*)>;
 
+#define SHV_FN_IMPL(fn) case #fn##_j: { return reinterpret_cast<FARPROC>(&dwn::shv::fn); } break
 namespace dwn::shv
 {
 	namespace dx
@@ -67,7 +68,7 @@ namespace dwn::shv
 
 	inline u64* nativeCall()
 	{
-		u64 paramCount{ g_args.size() };
+		int paramCount{ static_cast<int>(g_args.size()) };
 		scrValue result{};
 		auto params{ std::make_unique<scrValue[]>(paramCount) };
 		u64 argCount{};
@@ -83,6 +84,7 @@ namespace dwn::shv
 
 		return reinterpret_cast<u64*>(&result);
 	}
+
 	inline u64* getGlobalPtr(int index)
 	{
 		rage::scrValue** globalBlocks{ &(*pointers::g_smGlobals)[0] };
@@ -100,7 +102,7 @@ namespace dwn::shv
 		return;
 	}
 
-	inline void scriptWait(DWORD waitTime)
+	inline void scriptWait(ul32 waitTime)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
 	}
@@ -135,15 +137,25 @@ namespace dwn::shv
 		g_present_callbacks.erase(cb);
 	}
 
-	// TODO:
 	inline int worldGetAllVehicles(int* arr, int arrSize)
 	{
-		return 0;
+		if (!arr || arrSize <= 1)
+		{
+			return 0;
+		}
+		arr[0] = arrSize;
+		return PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), reinterpret_cast<Any*>(arr));
 	}
 
+	// TODO:
 	inline int worldGetAllPeds(int* arr, int arrSize)
 	{
-		return 0;
+		if (!arr || arrSize <= 1)
+		{
+			return 0;
+		}
+		arr[0] = arrSize;
+		return PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), reinterpret_cast<Any*>(arr), -1);
 	}
 
 	inline int worldGetAllObjects(int* arr, int arrSize)

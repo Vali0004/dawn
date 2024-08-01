@@ -6,6 +6,7 @@
 #include "renderer/input.h"
 #include "build_number.h"
 #include "command_engine/manager.h"
+#include "thread_manager/thread_manager.h"
 using namespace rage;
 
 void game_speedup()
@@ -72,7 +73,7 @@ void game_death()
 		std::this_thread::sleep_for(100ms);
 	}
 }
-void routine()
+void routine(dwn::thread* thr)
 {
 	g_was_injected_early = dwn::memory::hmodule("socialclub.dll").exists(); //TODO: Fix
 	if (g_was_injected_early)
@@ -121,28 +122,31 @@ void routine()
 		if (GetAsyncKeyState(VK_F12))
 		{
 			g_running = false;
+
+			dwn::renderer::menu::uninit();
+
+			dwn::hooking::remove();
+
+			LOG_TO_STREAM("Destroying console...");
+			dwn::konsole::destroy(dwn::g_console);
+
+			dwn::exception::detach_handler();
 		}
 
 		std::this_thread::sleep_for(100ms);
 	}
-
-	dwn::renderer::menu::uninit();
-
-	dwn::hooking::remove();
-
-	LOG_TO_STREAM("Destroying console...");
-	dwn::konsole::destroy(dwn::g_console);
-
-	dwn::exception::detach_handler();
 }
 
 DWORD WINAPI entry(void* hmod)
 {
 	g_entry = reinterpret_cast<HMODULE>(hmod);
-	dwn::util::spawn_detached_thread(&routine);
+	dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
+	dwn::g_thread_manager.create_thread(&routine);
 
 	while (g_running)
-	{}
+	{
+		dwn::g_thread_manager.update_thread_status();
+	}
 
 	FreeLibraryAndExitThread(g_entry, 0);
 	return 0;

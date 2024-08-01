@@ -7,6 +7,7 @@
 #include "hooks/http_process_response.h"
 #include "hooks/build_url.h"
 #include "hooks/aes.h"
+#include <scripthookv/scripthookv.h>
 
 namespace dwn::hooking
 {
@@ -76,6 +77,33 @@ namespace dwn::hooking
 			//hook_rgsc();
 
 			return result;
+		}
+		if (reinterpret_cast<u64>(hModule) == "dwn"_j)
+		{
+			switch (atStringHash(lpProcName))
+			{
+				SHV_FN_IMPL(scriptRegister);
+				SHV_FN_IMPL(scriptRegisterAdditionalThread);
+				SHV_FN_IMPL(scriptUnregister);
+				SHV_FN_IMPL(scriptUnregisterDepricated);
+				SHV_FN_IMPL(nativeInit);
+				SHV_FN_IMPL(nativePush64);
+				SHV_FN_IMPL(nativeCall);
+				SHV_FN_IMPL(getGlobalPtr);
+				SHV_FN_IMPL(createTexture);
+				SHV_FN_IMPL(drawTexture);
+				SHV_FN_IMPL(scriptWait);
+				SHV_FN_IMPL(keyboardHandlerRegister);
+				SHV_FN_IMPL(keyboardHandlerUnregister);
+				SHV_FN_IMPL(getGameVersion);
+				SHV_FN_IMPL(getScriptHandleBaseAddress);
+				SHV_FN_IMPL(presentCallbackRegister);
+				SHV_FN_IMPL(presentCallbackUnregister);
+				SHV_FN_IMPL(worldGetAllVehicles);
+				SHV_FN_IMPL(worldGetAllPeds);
+				SHV_FN_IMPL(worldGetAllObjects);
+				SHV_FN_IMPL(worldGetAllPickups);
+			}
 		}
 
 		return g_GetProcAddress->original()(hModule, lpProcName);
