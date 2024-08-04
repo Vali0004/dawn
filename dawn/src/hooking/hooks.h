@@ -50,7 +50,7 @@ namespace dwn::hooking
 	inline void hook_rgsc()
 	{
 		//make_hook_time_critical("RgscRetailLog::RgscRetailMsg", RgscRetailLogRgscRetailMsg);
-		make_hook_time_critical("Rgsc::Init", RgscInit);
+		//make_hook_time_critical("Rgsc::Init", RgscInit);
 		make_hook_time_critical("rlHttpTask::BuildUrl", rlHttpTaskBuildUrl);
 		make_hook_time_critical("rlHttpTask::BuildUrlSc", rlHttpTaskBuildUrlSc);
 		make_hook_time_critical("CreateTicketTask::BuildUrlSc", CreateTicketTaskBuildUrlSc);
@@ -59,8 +59,8 @@ namespace dwn::hooking
 		//make_hook_time_critical("netHttpRequest::Begin", netHttpRequestBegin);
 		make_hook_time_critical("rlRosHttpTask::ProcessResponse", rlRosHttpTaskProcessResponse);
 		make_hook_time_critical("rlRosHttpTask::ProcessResponseSc", rlRosHttpTaskProcessResponseSc);
-		make_hook_time_critical("rlProfileStatsFlushTask::Configure", rlProfileStatsFlushTaskConfigure);
-		//make_hook_time_critical("GameTransactionBaseHttpTask::ProcessResponse", GameTransactionBaseHttpTaskProcessResponse);
+		//make_hook_time_critical("rlProfileStatsFlushTask::Configure", rlProfileStatsFlushTaskConfigure);
+		////make_hook_time_critical("GameTransactionBaseHttpTask::ProcessResponse", GameTransactionBaseHttpTaskProcessResponse);
 	}
 
 	inline etc::hook<pointers::types::GetProcAddressT>* g_GetProcAddress{};
@@ -73,8 +73,8 @@ namespace dwn::hooking
 
 			LOG_TO_STREAM("Game requested RGSC import, reusing...");
 			FARPROC result = g_GetProcAddress->original()(hModule, lpProcName);
-			//g_early_hook = true;
-			//hook_rgsc();
+			g_early_hook = true;
+			hook_rgsc();
 
 			return result;
 		}
@@ -131,13 +131,13 @@ namespace dwn::hooking
 
 	inline void spawn_delayed_create()
 	{
-		if (!g_early_hook)
-		{
-			std::this_thread::sleep_for(100ms);
-			LOG_TO_STREAM("Scanning pointers...");
-			pointers::rgsc_scan();
+		//if (!g_early_hook)
+		//{
+			//std::this_thread::sleep_for(100ms);
+			//LOG_TO_STREAM("Scanning pointers...");
+			//pointers::rgsc_scan();
 			//hook_rgsc();
-		}
+		//}
 
 		pointers::late_scan();
 		LOG_TO_STREAM("Finished scanning pointers.");

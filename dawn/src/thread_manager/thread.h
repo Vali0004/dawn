@@ -44,11 +44,11 @@ namespace dwn
     public:
         nodisc explicit thread(fptr<u32(void*)> fn, void* arg = nullptr)
         {
-            _start_debug(fn, arg);
+            _start(fn, arg);
         }
         nodisc explicit thread(fptr<u32(void*)> fn, args<2>* args = nullptr)
         {
-            _start_debug(fn, args);
+            _start(fn, args);
         }
         thread() noexcept : m_data{}
         {}

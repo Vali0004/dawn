@@ -16,7 +16,7 @@ namespace dwn::hooking
 	inline rgsc::RGSC_HRESULT RgscInit(void* _this, rgsc::IConfiguration* config, rgsc::ITitleId* titleId, rgsc::RgscLanguage language, rgsc::IRgscDelegate* dlgt)
 	{
 		rgsc::RGSC_HRESULT result = g_RgscInit->original()(_this, config, titleId, language, dlgt);
-		pointers::defeat_arx();
+		//pointers::defeat_arx();
 		renderer::create();
 		return result;
 	}

@@ -15,10 +15,20 @@ namespace dwn::commands
 			sub_manager("")
 		{}
 
-		template <typename T, typename ...A>
+		template <typename T = single_command, typename ...A>
 		void add_cmd(A&&... args)
 		{
 			m_commands.push_back(reinterpret_cast<cmd_data<cmd_functions>*>(new T(args...)));
+		}
+
+		cmd_data<cmd_functions>* get_cmd_at(u64 index)
+		{
+			if (index >= num_commands())
+			{
+				return nullptr;
+			}
+
+			return m_commands.at(index);
 		}
 
 		template <typename T>
@@ -70,6 +80,20 @@ namespace dwn::commands
 			loop_commands_impl();
 		}
 
+		void render_commands()
+		{
+			for (auto& cmd : m_commands)
+			{
+				if (!cmd->m_does_once_act_as_init)
+				{
+					if (!cmd->is_render_of<cmd_functions>())
+					{
+						cmd->get_render<cmd_functions>()->call(cmd, false);
+					}
+				}
+			}
+		}
+
 		void check_if_init()
 		{
 			for (auto& sub : m_subs)
@@ -82,6 +106,7 @@ namespace dwn::commands
 		void add_sub(sub_manager sub)
 		{
 			m_subs.push_back(new sub_manager(sub));
+			add_cmd<group_command>(sub.get_name());
 		}
 
 		void add_sub(const std::string_view& name, sub_manager sub)
@@ -106,6 +131,11 @@ namespace dwn::commands
 		std::string& get_name()
 		{
 			return m_name;
+		}
+
+		u64 num_commands()
+		{
+			return m_commands.size();
 		}
 
 	private:

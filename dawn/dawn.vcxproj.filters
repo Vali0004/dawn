@@ -154,7 +154,7 @@
     <ClInclude Include="src\renderer\state_saver.h" />
     <ClInclude Include="src\renderer\vectors.h" />
     <ClInclude Include="src\common\virtual_pure.h" />
-    <ClInclude Include="src\menu\test_gui.h" />
+    <ClInclude Include="src\menu\command_gui_wrapper.h" />
     <ClInclude Include="src\renderer\input.h" />
     <ClInclude Include="src\thread_manager\thread.h" />
     <ClInclude Include="src\thread_manager\thread_manager.h" />

@@ -1,6 +1,7 @@
 #pragma once
 #include "pch/pch.h"
 #include "common/virtual_pure.h"
+#define TYPE(c) enum { Type = #c##_j }
 
 namespace dwn::commands
 {
@@ -66,11 +67,12 @@ namespace dwn::commands
 	class cmd_functions
 	{
 	public:
+		TYPE(cmd_functions);
 		void once()
 		{}
 		void tick()
 		{}
-		void render()
+		void render(bool selected)
 		{}
 	};
 
@@ -85,6 +87,7 @@ namespace dwn::commands
 			m_once = new std::remove_pointer_t<decltype(m_once)>();
 			m_tick = new std::remove_pointer_t<decltype(m_tick)>();
 			m_render = new std::remove_pointer_t<decltype(m_render)>();
+			m_class_name = T1::Type;
 			if constexpr (std::is_same_v<T1, cmd_functions>)
 				m_once->set<cmd_functions>(&cmd_functions::once);
 			if constexpr (std::is_same_v<T2, cmd_functions>)
@@ -101,20 +104,20 @@ namespace dwn::commands
 		// This is to satisfy our templating bullshit
 		void once() {}
 		void tick() {}
-		void render() {}
+		void render(bool selected) {}
 		template <typename T = T1, typename ...A>
 		auto get_once() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_once); }
 		template <typename T = T1, typename ...A>
 		auto get_tick() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_tick); }
 		template <typename T = T1, typename ...A>
-		auto get_render() { return reinterpret_cast<virtual_pure<void, T, A...>*>(m_render); }
+		auto get_render() { return reinterpret_cast<virtual_pure<void, T, bool, A...>*>(m_render); }
 
 		template <typename C>
-		bool is_once_of() const { return (*m_once).template is_class<C>(); }
+		bool is_once_of() const { return (*reinterpret_cast<virtual_pure<void, T1>*>(m_once)).template is_class<C>(); }
 		template <typename C>
-		bool is_tick_of() const { return (*m_tick).template is_class<C>(); }
+		bool is_tick_of() const { return (*reinterpret_cast<virtual_pure<void, T1>*>(m_tick)).template is_class<C>(); }
 		template <typename C>
-		bool is_render_of() const { return (*m_render).template is_class<C>(); }
+		bool is_render_of() const { return (*reinterpret_cast<virtual_pure<void, T1, bool>*>(m_render)).template is_class<C>(); }
 
 		cmd_container* get_container(const std::string_view& name)
 		{
@@ -145,11 +148,17 @@ namespace dwn::commands
 			return container;
 		}
 
+		std::string& get_name()
+		{
+			return m_name;
+		}
+
 		std::string m_name{};
+		u32 m_class_name{};
 		bool m_does_once_act_as_init{};
 		virtual_pure<void, T1>* m_once;
 		virtual_pure<void, T2>* m_tick;
-		virtual_pure<void, T3>* m_render;
+		virtual_pure<void, T3, bool>* m_render;
 		std::vector<cmd_container*> m_containers{};
 	};
 }

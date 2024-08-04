@@ -30,11 +30,27 @@
 
 namespace dwn::renderer
 {
+	inline float g_drawbase{};
+	inline directx::font iconfont_22{};
+	inline directx::font iconfont_24{};
+	inline directx::font arial_22{};
+	inline directx::font arial_23{};
+	inline directx::font arialbd_22{};
+	inline directx::font arialbd_23{};
+	inline directx::font ariali_22{};
+	inline directx::font ariali_23{};
+	inline directx::font arialbi_22{};
+	inline directx::font arialbi_23{};
 	using namespace directx;
 	inline std::unique_ptr<class renderer> g_renderer{};
 	constexpr long double M_PI{ 3.141592653589793238462643383279502884L };
 	constexpr long double M_PI_2{ 3.141592653589793238462643383279502884L / 2 };
-
+	enum class eJustify : u8
+	{
+		Left,
+		Center,
+		Right
+	};
 	class renderer final
 	{
 	public:
@@ -144,9 +160,24 @@ namespace dwn::renderer
 			m_image_batch.end();
 		}
 
-		void draw_text(font& f, const char* text, Vector2 position, const Color& color)
+		void draw_text(font& f, const char* text, Vector2 position, const Color& color, eJustify justify = eJustify::Left)
 		{
-			Vector2 pos{ position * m_display_size };
+			Vector2 justified_pos{ position };
+			switch (justify)
+			{
+				case eJustify::Center:
+				{
+				} break;
+				case eJustify::Right:
+				{
+					const Vector2 string_size{ get_string_size(f, text) / m_display_size };
+					justified_pos = { position.x - string_size.x - 0.0005f, position.y };
+				} break;
+				default:
+				{
+				} break;
+			}
+			Vector2 pos{ justified_pos * m_display_size };
 			for (size_t i{}; text[i] >= f.m_first_codepoint && text[i] < (f.m_first_codepoint + f.m_num_characters); ++i)
 			{
 				auto& c{ f.m_characters[text[i] - f.m_first_codepoint] };

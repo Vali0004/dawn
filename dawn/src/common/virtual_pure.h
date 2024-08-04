@@ -7,12 +7,10 @@ namespace dwn
 	class virtual_pure
 	{
 	public:
-		using ReturnT = R;
-		using InstanceT = T;
 		template <typename C>
 		constexpr bool is_class() const
 		{
-			return std::is_base_of_v<T, std::remove_pointer_t<C>>;
+			return C::Type == m_type;
 		}
 		bool is_valid()
 		{
@@ -22,6 +20,7 @@ namespace dwn
 		auto set(mfptr<R, I, A...> fn)
 		{
 			auto cached_function{ m_function };
+			m_type = I::Type;
 			m_function = *reinterpret_cast<decltype(m_function)*>(&fn);
 			return cached_function;
 		}
@@ -42,6 +41,7 @@ namespace dwn
 			}
 		}
 	public:
+		u32 m_type{};
 		mfptr<R, T, A...> m_function{};
 	};
 }

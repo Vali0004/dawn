@@ -122,7 +122,7 @@ namespace dwn::pointers
 	inline void rgsc_scan()
 	{
 		memory::pointer_manager ptr_mgr{};
-		//ptr_mgr.add("rgsc::RgscRetailLog::RgscRetailMsg", g_RgscRetailLogRgscRetailMsg, "48 8B C4 48 89 58 ? 55 56 41 56", {}, { "socialclub.dll" });
+		ptr_mgr.add("rgsc::RgscRetailLog::RgscRetailMsg", g_RgscRetailLogRgscRetailMsg, "48 8B C4 48 89 58 ? 55 56 41 56", {}, { "socialclub.dll" });
 		ptr_mgr.add("rgsc::Rgsc::Init", g_RgscInit, "48 89 5C 24 ? 55 57 41 54 41 56", {}, { "socialclub.dll" });
 		ptr_mgr.add("rage::rlHttpTask::BuildUrl", g_rlHttpTaskBuildUrl, "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 48 81 EC ? ? ? ? 48 8B 01 48 8B FA");
 		ptr_mgr.add("rage::rlHttpTask::BuildUrlSc", g_rlHttpTaskBuildUrlSc, "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 48 81 EC", {}, { "socialclub.dll" });

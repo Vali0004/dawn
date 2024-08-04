@@ -94,6 +94,8 @@ void routine(dwn::thread* thr)
 	LOG_TO_STREAM("Console created.");
 	LOG_TO_STREAM("Base address: " << HEX(dwn::memory::hmodule().begin().as<u64>()));
 
+	dwn::util::spawn_detached_thread(&game_death);
+
 	if (g_was_injected_early)
 	{
 		LOG_TO_STREAM("Early injection present, awaiting RGSC...");
@@ -101,7 +103,6 @@ void routine(dwn::thread* thr)
 
 	dwn::hooking::create();
 
-	dwn::util::spawn_detached_thread(&game_death);
 
 	if (!IsDebuggerPresent())
 	{
@@ -140,7 +141,7 @@ void routine(dwn::thread* thr)
 DWORD WINAPI entry(void* hmod)
 {
 	g_entry = reinterpret_cast<HMODULE>(hmod);
-	dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
+	//dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
 	dwn::g_thread_manager.create_thread(&routine);
 
 	while (g_running)

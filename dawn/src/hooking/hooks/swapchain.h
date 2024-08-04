@@ -7,7 +7,7 @@ namespace dwn::renderer
 {
 	inline LRESULT renderer::wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		gui::flip_bit(uMsg == WM_KEYUP && wParam == VK_INSERT);
+		commands::gui::flip_bit(uMsg == WM_KEYUP && wParam == VK_INSERT);
 
 		input::g_input.m_keyboard.wndproc(hWnd, uMsg, wParam, lParam);
 
@@ -22,9 +22,9 @@ namespace dwn::hooking
 		if (g_running && renderer::get())
 		{
 			renderer::get()->begin_frame();
-			if (renderer::gui::is_open())
+			if (commands::gui::is_open())
 			{
-				renderer::menu::render();
+				commands::draw_menu();
 			}
 			renderer::get()->end_frame();
 		}

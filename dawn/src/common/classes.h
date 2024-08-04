@@ -8411,12 +8411,12 @@ public:
 		MATCH_THREAD_ID,
 		MATCH_ALL
 	};
-	CGameScriptHandler*	m_Handler;
-	CGameScriptHandlerNetComponent*	m_NetComponent;
+	CGameScriptHandler* m_Handler;
+	CGameScriptHandlerNetComponent* m_NetComponent;
 	s32 m_HashOfScriptName;
-	int	ForceCleanupPC, ForceCleanupFP, ForceCleanupSP;
-	u32	m_ForceCleanupFlags;
-	u32	m_CauseOfMostRecentForceCleanup;
+	int ForceCleanupPC, ForceCleanupFP, ForceCleanupSP;
+	u32 m_ForceCleanupFlags;
+	u32 m_CauseOfMostRecentForceCleanup;
 	int InstanceId;
 	int EntityIndexForScriptBrain;
 	bool IsThisAMissionScript; // TRUE for a script which contains a mission

@@ -4,7 +4,7 @@
 #include "commands/cmd_util.h"
 #include "util.h"
 #include "features/features.h"
-#include "test_gui.h"
+#include "command_gui_wrapper.h"
 
 inline void print_sc_data()
 {
@@ -65,130 +65,115 @@ namespace dwn::renderer
 	{
 		inline void init()
 		{
-			submenu sub{ make_sub("Home", [](submenu& sub) {
-				sub.add(submenu_option("Settings", [](submenu& sub) {
-					sub.add(submenu_option("Command tests", [](submenu& sub) {
-						sub.add(base_option("Change player model", [] {
-							u32 hash{ "player_zero"_j };
-							rage::run_as_thread_callback("main_persistent"_j, [hash] {
-								for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
-								{
-									STREAMING::REQUEST_MODEL(hash);
-								}
-								if (!STREAMING::HAS_MODEL_LOADED(hash))
-								{
-									LOG_TO_STREAM("Model does not exist in memory yet.");
-								}
-								Ped ped{ PLAYER::PLAYER_PED_ID() };
-								Player player{ PLAYER::PLAYER_ID() };
-								PLAYER::SET_PLAYER_MODEL(player, hash);
-								PED::SET_PED_DEFAULT_COMPONENT_VARIATION(ped);
-
-								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
-							});
-						}));
-						sub.add(base_option("Spawn a t20", [] {
-							u32 hash{ "rmodlp770"_j };
-							rage::run_as_thread_callback("main_persistent"_j, [hash] {
-								if (STREAMING::IS_MODEL_VALID(hash))
-								{
-									bool unload_model{ true };
-									for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
-									{
-										STREAMING::REQUEST_MODEL(hash);
-									}
-									if (!STREAMING::HAS_MODEL_LOADED(hash))
-									{
-										unload_model = false;
-										LOG_TO_STREAM("Model does not exist in memory yet.");
-									}
-									Ped ped{ PLAYER::PLAYER_PED_ID() };
-									rage::scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
-									Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
-
-									if (NETWORK::NETWORK_IS_SESSION_STARTED())
-									{
-										DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-									}
-
-									PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
-									if (unload_model)
-									{
-										STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
-									}
-								}
-								else
-								{
-									LOG_TO_STREAM("Not a valid model");
-								}
-							});
-						}));
-					}));
-					sub.add(submenu_option("Debug", [](submenu& sub) {
-						sub.add(base_option("Print SocialClub data", [] {
-							print_sc_data();
-						}));
-						sub.add(base_option("Print CRC data", [] {
-							CNetworkAssetVerifier* asset_verifier = (*pointers::g_CNetworkAssetVerifiersmInstance);
-							u32 file_checksum = asset_verifier->m_fileChecksum.Get();
-							u32 num_files = asset_verifier->m_numFiles.Get();
-							int crc = asset_verifier->m_CRC.Get();
-							int static_crc = asset_verifier->m_StaticCRC.Get();
-							LOG_TO_STREAM("File checksum: " << HEX(file_checksum));
-							LOG_TO_STREAM("Num files: " << DEC(num_files));
-							LOG_TO_STREAM("CRC: " << HEX(crc));
-							LOG_TO_STREAM("Static CRC: " << DEC(static_crc));
-						}));
-						sub.add(base_option("Test load DLC", [] {
-							CExtraContentManager* content_mgr = *pointers::g_CExtraContentManagersmInstance;
-							if (pointers::g_CExtraContentManagerAddContentFolder(content_mgr, "C:/Users/Vali/Documents/Cherax/DLCs/rmodlp770/"))
-							{
-								LOG_TO_STREAM("Passed.");
-							}
-							pointers::g_CExtraContentManagerLoadContent(content_mgr, false, false);
-						}));
-					}));
-					sub.add(submenu_option("Console", [](submenu& sub) {
-						sub.add(base_option("Reconnect to console pipe", [] {
-							reconnect_to_remote_console();
-						}));
-						sub.add(base_option("Connect to console pipe", [] {
-							g_console->close_handles(true);
-							make_remote_console();
-						}));
-						sub.add(base_option("Use attached console", [] {
-							destroy_remote_console();
-							g_console->close_handles(true);
-							g_console->init_wapi(false);
-							g_console->init_cout();
-							g_console->set_console_title(g_console->m_title);
-						}));
-						sub.add(base_option("Free console", [] {
-							destroy_remote_console();
-							g_console->close_handles(true);
-						}));
-					}));
-					sub.add(base_option("Exit game", [] {
-						exit(0);
-						abort();
-					}));
-					sub.add(base_option("Unload", [] {
-						g_running = false;
-					}));
-				}));
-				sub.add(base_option("Do a funny?", [] {
-					LOG_TO_STREAM("Do a funny.");
-					rage::strLocalIndex idx = pointers::g_StreamedScripts->Register("testscript");
-					if (pointers::g_StreamedScripts->LoadFile(idx, R"(X:\gta5_old\script\dev_ng\BGNG\BGScript\RELEASE\testscript.ysc)"))
+			commands::sub_manager settings_command_tests_sub{ "settings_command_tests" };
+			settings_command_tests_sub.add_cmd("change_player_model", [](commands::single_command* command) {
+				u32 hash{ "player_zero"_j };
+				rage::run_as_thread_callback("main_persistent"_j, [hash] {
+					for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
 					{
-						LOG_TO_STREAM("The funny has happened.");
+						STREAMING::REQUEST_MODEL(hash);
 					}
-				}));
-				sub.add(base_option("Hello, world", [] {
-					LOG_TO_STREAM("Hello!");
-				}));
-			}) };
-			push(sub);
+					if (!STREAMING::HAS_MODEL_LOADED(hash))
+					{
+						LOG_TO_STREAM("Model does not exist in memory yet.");
+					}
+					Ped ped{ PLAYER::PLAYER_PED_ID() };
+					Player player{ PLAYER::PLAYER_ID() };
+					PLAYER::SET_PLAYER_MODEL(player, hash);
+					PED::SET_PED_DEFAULT_COMPONENT_VARIATION(ped);
+
+					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+				});
+			});
+			settings_command_tests_sub.add_cmd("spawn_a_t20", [](commands::single_command* command)  {
+				u32 hash{ "t20"_j };
+				rage::run_as_thread_callback("main_persistent"_j, [hash] {
+					if (STREAMING::IS_MODEL_VALID(hash))
+					{
+						bool unload_model{ true };
+						for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
+						{
+							STREAMING::REQUEST_MODEL(hash);
+						}
+						if (!STREAMING::HAS_MODEL_LOADED(hash))
+						{
+							unload_model = false;
+							LOG_TO_STREAM("Model does not exist in memory yet.");
+						}
+						Ped ped{ PLAYER::PLAYER_PED_ID() };
+						rage::scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
+						Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
+
+						if (NETWORK::NETWORK_IS_SESSION_STARTED())
+						{
+							DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+						}
+
+						PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+						if (unload_model)
+						{
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+						}
+					}
+					else
+					{
+						LOG_TO_STREAM("Not a valid model");
+					}
+				});
+			});
+			commands::sub_manager settings_debug_sub{ "settings_debug" };
+			settings_debug_sub.add_cmd("unload", [](commands::single_command* command) {
+				g_running = false;
+			});
+			commands::sub_manager settings_console_sub{ "settings_console" };
+			settings_console_sub.add_cmd("reconnect_to_console_pipe", [](commands::single_command* command) {
+				reconnect_to_remote_console();
+			});
+			settings_console_sub.add_cmd("connect_to_console_pipe", [](commands::single_command* command) {
+				g_console->close_handles(true);
+				make_remote_console();
+			});
+			settings_console_sub.add_cmd("use_attached_console", [](commands::single_command* command) {
+				destroy_remote_console();
+				g_console->close_handles(true);
+				g_console->init_wapi(false);
+				g_console->init_cout();
+				g_console->set_console_title(g_console->m_title);
+			});
+			settings_console_sub.add_cmd("free_console", [](commands::single_command* command) {
+				destroy_remote_console();
+				g_console->close_handles(true);
+			});
+			commands::sub_manager settings_sub{ "settings" };
+			settings_sub.add_sub(settings_command_tests_sub);
+			settings_sub.add_sub(settings_debug_sub);
+			settings_sub.add_sub(settings_console_sub);
+			settings_sub.add_cmd("exit_game", [](commands::single_command* command) {
+				exit(0);
+				abort();
+			});
+			settings_sub.add_cmd("unload", [](commands::single_command* command) {
+				g_running = false;
+			});
+			commands::sub_manager home_sub{ "home" };
+			home_sub.add_sub(settings_sub);
+			home_sub.add_cmd("do_a_funny", [](commands::single_command* command) {
+				LOG_TO_STREAM("Do a funny.");
+				rage::strLocalIndex idx = pointers::g_StreamedScripts->Register("testscript");
+				if (pointers::g_StreamedScripts->LoadFile(idx, R"(X:\gta5_old\script\dev_ng\BGNG\BGScript\RELEASE\testscript.ysc)"))
+				{
+					LOG_TO_STREAM("The funny has happened.");
+				}
+			});
+			home_sub.add_cmd("hello_world", [](commands::single_command* command) {
+				LOG_TO_STREAM("Hello!");
+			});
+			home_sub.add_cmd("test", [](commands::single_command* command) {
+				LOG_TO_STREAM("Hello!");
+			}, nullptr, true);
+			home_sub.check_if_init();
+			commands::g_manager.push_back(home_sub);
+			push(home_sub);
 			stdfs::path font_path{ std::getenv("appdata") };
 			font_path /= BASE_NAME;
 			font_path /= "Fonts";
@@ -203,7 +188,7 @@ namespace dwn::renderer
 			ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 23.f, get()->m_device);
 			arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 22.f, get()->m_device);
 			arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 23.f, get()->m_device);
-			gui::flip_bit(true);
+			commands::gui::flip_bit(true);
 		}
 		inline void uninit()
 		{
@@ -317,13 +302,13 @@ namespace dwn::renderer
 			}*/
 			inline void render()
 			{
-				draw_menu();
+				commands::draw_menu();
 			}
 		}
 
 		inline void tick()
 		{
-			PAD::DISABLE_CONTROL_ACTION(0, 27, gui::is_open());
+			PAD::DISABLE_CONTROL_ACTION(0, 27, commands::gui::is_open());
 			features::on_tick();
 		}
 
