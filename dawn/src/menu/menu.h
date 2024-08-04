@@ -179,16 +179,17 @@ namespace dwn::renderer
 			font_path /= BASE_NAME;
 			font_path /= "Fonts";
 			std::string str{ (font_path / "icon_font.ttf").string() };
-			iconfont_22 = directx::load_font(str.data(), 22.f, get()->m_device);
-			iconfont_24 = directx::load_font(str.data(), 24.f, get()->m_device);
-			arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 22.f, get()->m_device);
+			float width = get()->m_display_size.x;
+			iconfont_22 = directx::load_font(str.data(), (22.f / 3160.f) * width, get()->m_device);
+			iconfont_24 = directx::load_font(str.data(), (24.f / 3160.f) * width, get()->m_device);
+			arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", (22.f / 3160.f) * width, get()->m_device);
 			arial_23 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 23.f, get()->m_device);
-			arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 22.f, get()->m_device);
-			arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 23.f, get()->m_device);
-			ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 22.f, get()->m_device);
-			ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 23.f, get()->m_device);
-			arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 22.f, get()->m_device);
-			arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 23.f, get()->m_device);
+			arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (22.f / 3160.f) * width, get()->m_device);
+			arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (23.f / 3160.f) * width, get()->m_device);
+			ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (22.f / 3160.f) * width, get()->m_device);
+			ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (23.f / 3160.f) * width, get()->m_device);
+			arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (22.f / 3160.f) * width, get()->m_device);
+			arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (23.f / 3160.f) * width, get()->m_device);
 			commands::gui::flip_bit(true);
 		}
 		inline void uninit()

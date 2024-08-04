@@ -18,6 +18,7 @@ namespace dwn::config
 			add_hotkey("unload", VK_F12);
 			add_hotkey("game_exit", VK_F4);
 		}
+
 		nlohmann::json to_json() override
 		{
 			nlohmann::json json{};
@@ -52,6 +53,7 @@ namespace dwn::config
 			}
 			return json;
 		}
+
 		void from_json(nlohmann::json& json) override
 		{
 			for (auto& [id, hotkey_json] : json.items())

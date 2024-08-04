@@ -1,6 +1,6 @@
 #pragma once
 #include "common/data/types.h"
-#include "common/data/macros.h"
+#include "common/macros.h"
 
 namespace rage {
 

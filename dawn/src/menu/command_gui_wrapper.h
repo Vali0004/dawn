@@ -104,7 +104,7 @@ namespace dwn::commands
 					}
 				}
 			}
-			if (m_current >= num_commands())
+			if (m_current >= get_num_usable_commands())
 			{
 				m_current = 0;
 			}

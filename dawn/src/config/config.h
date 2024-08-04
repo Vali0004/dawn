@@ -38,6 +38,7 @@ namespace dwn::config
             file << json.dump(4); // Pretty print with 4 spaces
             return true;
         }
+
         bool load_from_file()
         {
             std::ifstream file(m_config_path);
