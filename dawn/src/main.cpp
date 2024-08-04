@@ -118,21 +118,23 @@ void routine(dwn::thread* thr)
 
 	dwn::renderer::menu::init();
 
-	thr->keepalive(&g_running, [] {
+	while (g_running)
+	{
 		if (GetAsyncKeyState(VK_F12))
 		{
 			g_running = false;
-
-			dwn::renderer::menu::uninit();
-
-			dwn::hooking::remove();
-
-			LOG_TO_STREAM("Destroying console...");
-			dwn::konsole::destroy(dwn::g_console);
-
-			dwn::exception::detach_handler();
 		}
-	}, 100ms);
+		std::this_thread::sleep_for(100ms);
+	}
+
+	dwn::renderer::menu::uninit();
+
+	dwn::hooking::remove();
+
+	LOG_TO_STREAM("Destroying console...");
+	dwn::konsole::destroy(dwn::g_console);
+
+	dwn::exception::detach_handler();
 }
 
 DWORD WINAPI entry(void* hmod)

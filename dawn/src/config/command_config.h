@@ -12,11 +12,13 @@ namespace dwn::config
 			m_path(std::getenv("appdata")),
 			generic_config(m_path.append("Dawn"), "command_config.json")
 		{}
+
 		nlohmann::json to_json() override
 		{
 			nlohmann::json json{};
 			return json;
 		}
+
 		void from_json(nlohmann::json& json) override
 		{
 

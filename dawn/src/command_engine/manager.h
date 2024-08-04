@@ -206,6 +206,22 @@ namespace dwn::commands
 			return m_name;
 		}
 
+		u64 get_num_usable_commands()
+		{
+			size_t i{};
+			for (auto& cmd : m_commands)
+			{
+				if (!cmd->m_does_once_act_as_init && cmd->m_enabled)
+				{
+					if (!cmd->is_once_of<cmd_functions>())
+					{
+						i++;
+					}
+				}
+			}
+			return i;
+		}
+
 		u64 num_commands()
 		{
 			return m_commands.size();
