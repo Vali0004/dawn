@@ -1,6 +1,8 @@
 #pragma once
 #include "pch/pch.h"
 #include "common/virtual_pure.h"
+#include "nlohmann/json.h"
+#include "common/word_tokenizer.h"
 #define TYPE(c) enum { Type = #c##_j }
 
 namespace dwn::commands
@@ -82,6 +84,8 @@ namespace dwn::commands
 	public:
 		cmd_data(const std::string& name, bool doesOnceActAsInit = false) :
 			m_name(name),
+			m_id(name),
+			m_enabled(true),
 			m_does_once_act_as_init(doesOnceActAsInit)
 		{
 			m_once = new std::remove_pointer_t<decltype(m_once)>();
@@ -153,12 +157,44 @@ namespace dwn::commands
 			return m_name;
 		}
 
-		std::string m_name{};
-		u32 m_class_name{};
+		bool is_enabled()
+		{
+			return m_enabled;
+		}
+
+		nlohmann::json to_json()
+		{
+			nlohmann::json json{
+				{ "label", m_name },
+				{ "id", m_id }, // If a user changes this, we will just override it. : )
+				{ "enabled", m_enabled },
+				{ "order_id", number_to_word(m_order_id, true) },
+				{ "values", nullptr },
+			};
+
+			// Containers is TODO
+			json["values"] = nullptr;
+
+			return json;
+		}
+
+		void from_json(nlohmann::json& json)
+		{
+			m_name = json.value("label", m_name);
+			json["id"] = m_id;
+			m_enabled = json.value("enabled", m_enabled);
+			m_order_id = json.value("enabled", m_order_id);
+			m_containers;
+		}
+
+		bool m_enabled{};
+		std::string m_name{}, m_id{};
+		u64 m_order_id{};
 		bool m_does_once_act_as_init{};
-		virtual_pure<void, T1>* m_once;
-		virtual_pure<void, T2>* m_tick;
-		virtual_pure<void, T3, bool>* m_render;
+		u32 m_class_name{};
+		virtual_pure<void, T1>* m_once{};
+		virtual_pure<void, T2>* m_tick{};
+		virtual_pure<void, T3, bool>* m_render{};
 		std::vector<cmd_container*> m_containers{};
 	};
 }

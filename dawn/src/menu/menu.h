@@ -160,13 +160,14 @@ namespace dwn::renderer
 			home_sub.add_cmd("do_a_funny", [](commands::single_command* command) {
 				LOG_TO_STREAM("Do a funny.");
 				rage::strLocalIndex idx = pointers::g_StreamedScripts->Register("testscript");
-				if (pointers::g_StreamedScripts->LoadFile(idx, R"(X:\gta5_old\script\dev_ng\BGNG\BGScript\RELEASE\testscript.ysc)"))
-				{
-					LOG_TO_STREAM("The funny has happened.");
-				}
+				LOG_TO_STREAM("Index: " << idx.Get());
+				//if (pointers::g_StreamedScripts->LoadFile(idx, R"(X:\gta5_old\script\dev_ng\BGNG\BGScript\RELEASE\testscript.ysc)"))
+				//{
+				//	LOG_TO_STREAM("The funny has happened.");
+				//}
 			});
 			home_sub.add_cmd("hello_world", [](commands::single_command* command) {
-				LOG_TO_STREAM("Hello!");
+				LOG_TO_STREAM("Hello, world!");
 			});
 			home_sub.add_cmd("test", [](commands::single_command* command) {
 				LOG_TO_STREAM("Hello!");

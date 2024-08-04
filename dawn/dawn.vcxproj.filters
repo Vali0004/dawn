@@ -20,7 +20,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\common\data\base64.cpp" />
     <ClCompile Include="src\common\data\rson.cpp" />
-    <ClCompile Include="src\simdjson\simdjson.cpp" />
     <ClCompile Include="src\renderer\batch\batch.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +113,7 @@
     <ClInclude Include="src\hooking\hooks\http_process_response.h" />
     <ClInclude Include="src\hooking\hooks\aes.h" />
     <ClInclude Include="src\memory\types.h" />
-    <ClInclude Include="src\simdjson\simdjson.h" />
+    <ClInclude Include="src\nlohmann\json.h" />
     <ClInclude Include="src\hooking\etc\base.h" />
     <ClInclude Include="src\hooking\hooks\swapchain.h" />
     <ClInclude Include="src\common\hatelist.h" />
@@ -160,6 +159,10 @@
     <ClInclude Include="src\thread_manager\thread_manager.h" />
     <ClInclude Include="src\scripthookv\scripthookv.h" />
     <ClInclude Include="src\scripthookv\module_loader.h" />
+    <ClInclude Include="src\common\word_tokenizer.h" />
+    <ClInclude Include="src\config\config.h" />
+    <ClInclude Include="src\config\hotkey_config.h" />
+    <ClInclude Include="src\config\command_config.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

@@ -23,12 +23,6 @@ namespace dwn::commands
 			}
 		}
 	}
-	inline void draw_text_right(directx::font& f, const char* text, const Vector2 position, const Color color)
-	{
-		const Vector2 string_size{ get_string_size(f, text) / get()->m_display_size };
-		const Vector2 pos{ position.x - string_size.x - 0.0005f, position.y };
-		get()->draw_text(f, text, pos, color);
-	}
 	class submenu;
 	inline submenu* g_submenu;
 	extern void push(submenu sub);
@@ -51,7 +45,7 @@ namespace dwn::commands
 					if (num_commands())
 					{
 						auto cmd{ get_cmd_at(m_current) };
-						if (!cmd->is_once_of<cmd_functions>())
+						if (!cmd->is_once_of<cmd_functions>() && cmd->is_enabled())
 						{
 							if (cmd->is_once_of<single_command>())
 							{
@@ -64,8 +58,12 @@ namespace dwn::commands
 							{
 								cmd->get_once()->call(cmd);
 								// This actually isn't type mutting, or anything stupid. We do this properly : )
-								g_submenu = reinterpret_cast<submenu*>(get_sub(cmd->get_name()));
-								push(*g_submenu);
+								submenu* sub = reinterpret_cast<submenu*>(get_sub(cmd->get_name()));
+								if (sub && sub->is_enabled())
+								{
+									g_submenu = sub;
+									push(*g_submenu);
+								}
 							}
 						}
 					}
@@ -93,7 +91,17 @@ namespace dwn::commands
 				auto cmd{ get_cmd_at(i) };
 				if (!cmd->m_does_once_act_as_init)
 				{
-					cmd->get_render()->call(cmd, m_current == i);
+					if (cmd->is_once_of<group_command>())
+					{
+						if (get_sub(cmd->get_name())->is_enabled())
+						{
+							cmd->get_render()->call(cmd, m_current == i);
+						}
+					}
+					else if (cmd->is_enabled())
+					{
+						cmd->get_render()->call(cmd, m_current == i);
+					}
 				}
 			}
 			if (m_current >= num_commands())

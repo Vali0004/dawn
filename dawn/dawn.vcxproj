@@ -137,6 +137,10 @@
     <ClInclude Include="src\common\vectors.h" />
     <ClInclude Include="src\commands\crossmap.h" />
     <ClInclude Include="src\common\virtual_pure.h" />
+    <ClInclude Include="src\common\word_tokenizer.h" />
+    <ClInclude Include="src\config\command_config.h" />
+    <ClInclude Include="src\config\config.h" />
+    <ClInclude Include="src\config\hotkey_config.h" />
     <ClInclude Include="src\exception_handler\amd64_disassembler.h" />
     <ClInclude Include="src\exception_handler\handler.h" />
     <ClInclude Include="src\features\features.h" />
@@ -223,7 +227,7 @@
     <ClInclude Include="src\rgsc\public_interface\titleid_interface.h" />
     <ClInclude Include="src\scripthookv\module_loader.h" />
     <ClInclude Include="src\scripthookv\scripthookv.h" />
-    <ClInclude Include="src\simdjson\simdjson.h" />
+    <ClInclude Include="src\nlohmann\json.h" />
     <ClInclude Include="src\thread_manager\thread.h" />
     <ClInclude Include="src\thread_manager\thread_manager.h" />
     <ClInclude Include="src\util.h" />
@@ -251,9 +255,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\renderer\batch\batch.cpp" />
-    <ClCompile Include="src\simdjson\simdjson.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\renderer\shaders\pixel_shader.fx">

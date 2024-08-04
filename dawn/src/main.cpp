@@ -7,6 +7,7 @@
 #include "build_number.h"
 #include "command_engine/manager.h"
 #include "thread_manager/thread_manager.h"
+#include "config/hotkey_config.h"
 using namespace rage;
 
 void game_speedup()
@@ -103,7 +104,6 @@ void routine(dwn::thread* thr)
 
 	dwn::hooking::create();
 
-
 	if (!IsDebuggerPresent())
 	{
 		dwn::exception::attach_handler();
@@ -118,8 +118,7 @@ void routine(dwn::thread* thr)
 
 	dwn::renderer::menu::init();
 
-	while (g_running)
-	{
+	thr->keepalive(&g_running, [] {
 		if (GetAsyncKeyState(VK_F12))
 		{
 			g_running = false;
@@ -133,15 +132,12 @@ void routine(dwn::thread* thr)
 
 			dwn::exception::detach_handler();
 		}
-
-		std::this_thread::sleep_for(100ms);
-	}
+	}, 100ms);
 }
 
 DWORD WINAPI entry(void* hmod)
 {
 	g_entry = reinterpret_cast<HMODULE>(hmod);
-	//dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
 	dwn::g_thread_manager.create_thread(&routine);
 
 	while (g_running)
