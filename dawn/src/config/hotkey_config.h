@@ -15,8 +15,12 @@ namespace dwn::config
 		hotkey_config() :
 			generic_config(std::fs::path(std::getenv("appdata")) / "Dawn", "hotkey_config.json")
 		{
-			add_hotkey("unload", VK_F12);
-			add_hotkey("game_exit", VK_F4);
+			// Create defaults.
+			if (m_mark_as_create)
+			{
+				add_hotkey("unload", VK_F12);
+				add_hotkey("game_exit", VK_F4);
+			}
 			handle_init();
 		}
 
@@ -196,7 +200,7 @@ namespace dwn::config
 
 		bool valid(const std::string& id)
 		{
-			if (!m_hotkeys.empty())
+			if (m_hotkeys.empty())
 			{
 				return false;
 			}

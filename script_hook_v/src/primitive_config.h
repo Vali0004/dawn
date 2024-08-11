@@ -133,7 +133,7 @@ public:
 
 	bool valid(const std::string& id)
 	{
-		if (!m_hotkeys.empty())
+		if (m_hotkeys.empty())
 		{
 			return false;
 		}
