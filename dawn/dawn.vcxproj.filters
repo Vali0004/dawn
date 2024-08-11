@@ -121,7 +121,6 @@
     <ClInclude Include="src\commands\types.h" />
     <ClInclude Include="src\commands\cmd_util.h" />
     <ClInclude Include="src\util.h" />
-    <ClInclude Include="src\features\features.h" />
     <ClInclude Include="src\command_engine\abstract.h" />
     <ClInclude Include="src\command_engine\types.h" />
     <ClInclude Include="src\command_engine\manager.h" />

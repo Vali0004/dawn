@@ -171,7 +171,7 @@ namespace dwn::renderer
 				case eJustify::Right:
 				{
 					const Vector2 string_size{ get_string_size(f, text) / m_display_size };
-					justified_pos = { position.x - string_size.x - 0.0005f, position.y };
+					justified_pos = { (position.x - string_size.x) - 0.0005f, position.y };
 				} break;
 				default:
 				{

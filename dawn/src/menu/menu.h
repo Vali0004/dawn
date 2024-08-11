@@ -3,7 +3,6 @@
 #include "commands/list.h"
 #include "commands/cmd_util.h"
 #include "util.h"
-#include "features/features.h"
 #include "command_gui_wrapper.h"
 #include "config/command_config.h"
 
@@ -17,12 +16,7 @@ inline void print_sc_data()
 	LOG_TO_STREAM("Additional Join Attribute: " << pc.m_AdditionalJoinAttr);
 	LOG_TO_STREAM("MetaData Path: " << pc.m_MetaDataPath);
 
-	/*if (pc.m_Telemetry->HasAnyMetrics())
-	{
-		LOG_TO_STREAM("RGSC has metrics" << dwn::endl << "Flushing...");
-		pc.m_Telemetry->Flush(true);
-	}*/
-	rgsc::Profile profile;
+	rgsc::Profile profile{};
 	pc.m_ProfileManager->GetSignInInfo(&profile);
 
 	LOG_TO_STREAM("--------------------------------------------");
@@ -182,122 +176,20 @@ namespace dwn::renderer
 			commands::create_fonts();
 			commands::gui::flip_bit(true);
 		}
+
 		inline void uninit()
 		{
 			commands::destroy_fonts();
 		}
 
-		int g_current_player{};
-		namespace main
-		{
-			/*inline void render_settings()
-			{
-				tab_bar("settings_bar", [] {
-					tab_item("Command tests", [] {
-						button("Spawn a adder", [] {
-							u32 hash{ "adder"_j };
-							rage::run_as_thread("main_persistent"_j, [hash] {
-								for (int i{}; i != 400 && !STREAMING::HAS_MODEL_LOADED(hash); ++i)
-								{
-									STREAMING::REQUEST_MODEL(hash);
-								}
-								if (!STREAMING::HAS_MODEL_LOADED(hash))
-								{
-									LOG_TO_STREAM("Model does not exist in memory yet.");
-								}
-								Ped ped{ PLAYER::PLAYER_PED_ID() };
-								rage::scrVector pos{ ENTITY::GET_ENTITY_COORDS(ped, true) };
-								Vehicle vehicle{ VEHICLE::CREATE_VEHICLE(hash, pos, 0.f, true, true, false) };
-
-								if (NETWORK::NETWORK_IS_SESSION_STARTED())
-								{
-									DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-								}
-
-								PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
-
-								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
-							});
-						});
-					});
-					tab_item("Debug", [] {
-						button("Attempt to force load the game", [] {
-							std::vector<std::string> strings;
-							strings.push_back("Are you sure you want to do this?\n");
-							callback_yesno_popup("Force load", strings, [] {
-								LoadingScreenContext& value = *pointers::g_LoadingScreenContext;
-								pointers::g_CLoadingScreensSetLoadingContext(LOADINGSCREEN_CONTEXT_LOADLEVEL);
-								pointers::g_CLoadingScreensSetMovieContext(LOADINGSCREEN_SCALEFORM_CTX_BLANK);
-								pointers::g_CLoadingScreensShutdown(0);
-							});
-						});
-						button("Print SocialClub data", [] {
-							print_sc_data();
-						});
-						button("Print CRC data", [] {
-							CNetworkAssetVerifier* asset_verifier = (*pointers::g_CNetworkAssetVerifiersmInstance);
-							u32 file_checksum = asset_verifier->m_fileChecksum.Get();
-							u32 num_files = asset_verifier->m_numFiles.Get();
-							int crc = asset_verifier->m_CRC.Get();
-							int static_crc = asset_verifier->m_StaticCRC.Get();
-							LOG_TO_STREAM("File checksum: " << HEX(file_checksum));
-							LOG_TO_STREAM("Num files: " << DEC(num_files));
-							LOG_TO_STREAM("CRC: " << HEX(crc));
-							LOG_TO_STREAM("Static CRC: " << DEC(static_crc));
-						});
-						button("Test load DLC", [] {
-							CExtraContentManager* content_mgr = *pointers::g_CExtraContentManagersmInstance;
-							if (pointers::g_CExtraContentManagerAddContentFolder(content_mgr, "C:/Users/Vali/Documents/Cherax/DLCs/rmodlp770/"))
-							{
-								LOG_TO_STREAM("Passed.");
-							}
-							pointers::g_CExtraContentManagerLoadContent(content_mgr, false, false);
-						});
-					});
-					tab_item("Console", [] {
-						button("Reconnect to console pipe", [] {
-							dwn::reconnect_to_remote_console();
-						});
-						button("Connect to console pipe", [] {
-							g_console->close_handles(true);
-							make_remote_console();
-						});
-						button("Use attached console", [] {
-							destroy_remote_console();
-							g_console->close_handles(true);
-							g_console->init_wapi(false);
-							g_console->init_cout();
-							g_console->set_console_title(g_console->m_title);
-						});
-						button("Free console", [] {
-							destroy_remote_console();
-							g_console->close_handles(true);
-						});
-					});
-					tab_button("Exit game", [] {
-						exit(0);
-						abort();
-					});
-					tab_button("Unload", [] {
-						g_running = false;
-					});
-				});
-			}*/
-			inline void render()
-			{
-				commands::draw_menu();
-			}
-		}
-
 		inline void tick()
 		{
 			PAD::DISABLE_CONTROL_ACTION(0, 27, commands::gui::is_open());
-			features::on_tick();
 		}
 
 		inline void render()
 		{
-			main::render();
+			commands::draw_menu();
 		}
 	}
 }

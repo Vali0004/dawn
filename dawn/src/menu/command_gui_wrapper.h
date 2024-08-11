@@ -178,10 +178,10 @@ namespace dwn::commands
 	{
 		if (GetForegroundWindow() == pointers::g_hwnd)
 		{
-			static simple_timer t{}; // Update the input states
+			static simple_timer t{};
 
-			bool pressed = input::g_input.m_keyboard.key_pressed(key);
-			bool down = input::g_input.m_keyboard.key_down(key);
+			bool pressed{ input::g_input.m_keyboard.key_pressed(key) ? true : false };
+			bool down{ input::g_input.m_keyboard.key_down(key) ? true : false };
 
 			if (pressed)
 			{
@@ -241,17 +241,16 @@ namespace dwn::commands
 		font_path /= BASE_NAME;
 		font_path /= "Fonts";
 		std::string str{ (font_path / "icon_font.ttf").string() };
-		float width = get()->m_display_size.x;
-		iconfont_22 = directx::load_font(str.data(), (22.f / 3160.f) * width, get()->m_device);
-		iconfont_24 = directx::load_font(str.data(), (24.f / 3160.f) * width, get()->m_device);
-		arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", (22.f / 3160.f) * width, get()->m_device);
+		iconfont_22 = directx::load_font(str.data(), 22.f, get()->m_device);
+		iconfont_24 = directx::load_font(str.data(), 24.f, get()->m_device);
+		arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 22.f, get()->m_device);
 		arial_23 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 23.f, get()->m_device);
-		arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (22.f / 3160.f) * width, get()->m_device);
-		arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (23.f / 3160.f) * width, get()->m_device);
-		ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (22.f / 3160.f) * width, get()->m_device);
-		ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (23.f / 3160.f) * width, get()->m_device);
-		arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (22.f / 3160.f) * width, get()->m_device);
-		arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (23.f / 3160.f) * width, get()->m_device);
+		arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 22.f, get()->m_device);
+		arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", 23.f, get()->m_device);
+		ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 22.f, get()->m_device);
+		ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", 23.f, get()->m_device);
+		arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 22.f, get()->m_device);
+		arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", 23.f, get()->m_device);
 	}
 
 	inline void destroy_fonts()

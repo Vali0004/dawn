@@ -142,7 +142,6 @@
     <ClInclude Include="src\config\hotkey_config.h" />
     <ClInclude Include="src\exception_handler\amd64_disassembler.h" />
     <ClInclude Include="src\exception_handler\handler.h" />
-    <ClInclude Include="src\features\features.h" />
     <ClInclude Include="src\hooking\etc\base.h" />
     <ClInclude Include="src\hooking\etc\detour.h" />
     <ClInclude Include="src\hooking\etc\vmt.h" />

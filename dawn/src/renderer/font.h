@@ -12,6 +12,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb/stb_truetype.h"
 #endif
+#include "memory/pointers.h"
 #define iFloor(x) static_cast<float>(static_cast<int>(x))
 
 namespace dwn::directx
@@ -122,6 +123,11 @@ namespace dwn::directx
 
 	inline font load_font(const char* fontPath, float fontSize, device& device)
 	{
+		RECT rect{};
+		GetClientRect(pointers::g_hwnd, &rect);
+		float display_width{ static_cast<float>(rect.right - rect.left) };
+		fontSize /= 3160.f;
+		fontSize *= display_width;
 		font f{};
 		f.m_font_size = fontSize;
 		FILE* font_file{};

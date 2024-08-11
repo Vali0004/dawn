@@ -20,6 +20,12 @@ namespace dwn::config
 		void from_json(nlohmann::json& json) override
 		{
 			commands::g_manager.from_json(json);
+			if (json.contains("subs") && json["subs"].is_object())
+			{
+
+			}
+			update_json(json);
+			save_to_file();
 		}
 	};
 	inline command_config g_command_config{};

@@ -41,11 +41,17 @@ namespace dwn::config
 		{
 			if (m_mark_as_create)
 			{
+				update_json(to_json());
 				m_mark_as_create = save_to_file();
 				return m_mark_as_create;
 			}
 
 			return load_from_file();
+		}
+
+		void update_json(nlohmann::json json)
+		{
+			m_json = json;
 		}
 
 		bool save_to_file()
@@ -56,9 +62,7 @@ namespace dwn::config
 				return false;
 			}
 
-			nlohmann::json json{ to_json() };
-			file << json.dump(4); // Pretty print with 4 spaces
-			m_json = json;
+			file << m_json.dump(1, '	');
 			return true;
 		}
 
@@ -73,7 +77,7 @@ namespace dwn::config
 			nlohmann::json json{};
 			file >> json;
 			from_json(json);
-			m_json = json;
+			update_json(json);
 			return true;
 		}
 	private:
