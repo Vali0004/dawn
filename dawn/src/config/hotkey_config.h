@@ -135,12 +135,13 @@ namespace dwn::config
 							} break;
 							default:
 							{
-								if (key.find("F"))
+								if (size_t pos{ key.find("F") }; pos != std::string::npos && pos == 0)
 								{
-									s32 fkey{ stoi(key.substr(1)) };
+									std::string keySubstr{ key.substr(1) };
+									s32 fkey{ stoi(keySubstr) };
 									keys.push_back((VK_F1 + fkey) - 1);
 								}
-								else
+								else if (key.size() <= 1 && !key.empty())
 								{
 									keys.push_back(key[0]);
 								}

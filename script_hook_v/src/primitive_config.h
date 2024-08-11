@@ -79,13 +79,13 @@ public:
 						} break;
 						default:
 						{
-							std::string key{ key_json.get<std::string>() };
-							if (key.find("F"))
+							if (size_t pos{ key.find("F") }; pos != std::string::npos && pos == 0)
 							{
-								int fkey{ stoi(key.substr(1)) };
+								std::string keySubstr{ key.substr(1) };
+								int fkey{ stoi(keySubstr) };
 								keys.push_back((VK_F1 + fkey) - 1);
 							}
-							else
+							else if (key.size() <= 1 && !key.empty())
 							{
 								keys.push_back(key[0]);
 							}
