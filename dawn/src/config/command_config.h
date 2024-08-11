@@ -4,14 +4,13 @@
 
 namespace dwn::config
 {
-	// I'll do a actual hotkey manager at some point
-	class command_config : public generic_config
-	{
+	// I'll do a actual hotkey manager at some point | Update: i did it(Black_Killer456378) lmao
+	class command_config : public generic_config {
 	public:
-		command_config() :
-			m_path(std::getenv("appdata")),
-			generic_config(m_path.append("Dawn"), "command_config.json")
-		{}
+		command_config() : m_path(std::getenv("appdata")), generic_config(m_path.append("Dawn"), "command_config.json")
+		{
+
+		}
 
 		nlohmann::json to_json() override
 		{
@@ -23,7 +22,6 @@ namespace dwn::config
 		{
 
 		}
-
 	private:
 		stdfs::path m_path{};
 	};

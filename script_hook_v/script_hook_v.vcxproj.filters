@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>src\pch</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\hotkey_config.h">
+      <Filter>src\config</Filter>
+    </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>src\config</Filter>
+    </ClInclude>
+    <ClInclude Include="src\framework.h">
+      <Filter>src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.h">
+      <Filter>src\pch</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{cfef1080-8888-4351-bd4f-bc5b38ad867f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\config">
+      <UniqueIdentifier>{77affb5d-0bdc-4eb7-96c1-96039980c258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\pch">
+      <UniqueIdentifier>{ac93171b-84d7-433b-8f80-639f86bfcfe3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

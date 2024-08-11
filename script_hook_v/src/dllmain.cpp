@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "hotkey_config.h"
+
 #define EXPORT __declspec(dllexport)
 
 typedef void(*TKeyboardFn)(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow);
@@ -163,7 +165,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD  reason, LPVOID)
 				while (g_running)
 				{
 					// Change this to pull from key_config.json in dawn
-					if (GetAsyncKeyState(VK_F12))
+					if (dwn::config::g_hotkey_config.is_key_pressed("unload"))
 						g_running = false;
 				}
 				FreeLibraryAndExitThread(HMODULE(hmodule), 0);

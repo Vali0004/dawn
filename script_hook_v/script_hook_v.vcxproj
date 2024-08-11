@@ -107,7 +107,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\config.h" />
     <ClInclude Include="src\framework.h" />
+    <ClInclude Include="src\hotkey_config.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
