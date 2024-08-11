@@ -36,12 +36,11 @@ public:
 		return true;
 	}
 
-
-	void from_json(nlohmann::json& json)
+	void from_json(nlohmann::json& json) override
 	{
 		for (auto& [id, hotkey_json] : json.items())
 		{
-			std::vector<uint8_t> keys{};
+			std::vector<u8> keys{};
 			if (hotkey_json.contains("keys") && hotkey_json["keys"].is_array())
 			{
 				for (auto& key_json : hotkey_json["keys"])
@@ -49,43 +48,43 @@ public:
 					std::string key{ key_json.get<std::string>() };
 					switch (atStringHash(key))
 					{
-						case atStringHash("END"):
+						case "END"_j:
 						{
 							keys.push_back(VK_END);
 						} break;
-						case atStringHash("ENTER"):
+						case "ENTER"_j:
 						{
 							keys.push_back(VK_RETURN);
 						} break;
-						case atStringHash("BACK"):
+						case "BACK"_j:
 						{
 							keys.push_back(VK_BACK);
 						} break;
-						case atStringHash("UP"):
+						case "UP"_j:
 						{
 							keys.push_back(VK_UP);
 						} break;
-						case atStringHash("DOWN"):
+						case "DOWN"_j:
 						{
 							keys.push_back(VK_DOWN);
 						} break;
-						case atStringHash("LEFT"):
+						case "LEFT"_j:
 						{
 							keys.push_back(VK_LEFT);
 						} break;
-						case atStringHash("RIGHT"):
+						case "RIGHT"_j:
 						{
 							keys.push_back(VK_RIGHT);
 						} break;
 						default:
 						{
-							std::string key{ key_json.get<std::string>() };
-							if (key.find("F"))
+							if (size_t pos{ key.find("F") }; pos != std::string::npos && pos == 0)
 							{
-								int fkey{ stoi(key.substr(1)) };
+								std::string keySubstr{ key.substr(1) };
+								s32 fkey{ stoi(keySubstr) };
 								keys.push_back((VK_F1 + fkey) - 1);
 							}
-							else
+							else if (key.size() <= 1 && !key.empty())
 							{
 								keys.push_back(key[0]);
 							}
