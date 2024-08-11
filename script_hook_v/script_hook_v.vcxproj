@@ -47,7 +47,7 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\$(Configuration)\script_hook_v</OutDir>
     <IntDir>..\Bin\$(Configuration)\script_hook_v\int</IntDir>
-    <TargetName>script_hook_v</TargetName>
+    <TargetName>ScriptHookV</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -55,7 +55,7 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\$(Configuration)\script_hook_v</OutDir>
     <IntDir>..\Bin\$(Configuration)\script_hook_v\int</IntDir>
-    <TargetName>script_hook_v</TargetName>
+    <TargetName>ScriptHookV</TargetName>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>false</GenerateManifest>
     <LibraryPath>src\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>

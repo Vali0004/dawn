@@ -10,9 +10,7 @@ namespace dwn::config
 	public:
 		command_config() :
 			generic_config(std::fs::path(std::getenv("appdata")) / "Dawn", "command_config.json")
-		{
-			handle_init();
-		}
+		{}
 
 		nlohmann::json to_json() override
 		{
@@ -24,5 +22,5 @@ namespace dwn::config
 			commands::g_manager.from_json(json);
 		}
 	};
-	inline std::unique_ptr<command_config> g_command_config{};
+	inline command_config g_command_config{};
 }

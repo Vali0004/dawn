@@ -18,6 +18,13 @@ namespace dwn::config
 			}
 
 			m_config_path /= filename;
+
+			std::ifstream file(m_config_path);
+			if (!file.is_open())
+			{
+				m_mark_as_create = true;
+			}
+			file.close();
 		}
 
 		virtual void from_json(nlohmann::json& json)
