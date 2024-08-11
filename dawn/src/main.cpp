@@ -153,6 +153,8 @@ void routine(dwn::thread* thr)
 		std::this_thread::sleep_for(100ms);
 	}
 
+	dwn::shv::g_module_loader.unload_all();
+
 	dwn::renderer::menu::uninit();
 
 	dwn::hooking::remove();

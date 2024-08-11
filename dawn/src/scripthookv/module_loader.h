@@ -53,14 +53,6 @@ namespace dwn::shv
 	class module_loader
 	{
 	public:
-		module_loader()
-		{}
-
-		~module_loader()
-		{
-			unload_all();
-		}
-
 		void load(const std::string& name)
 		{
 			if (!m_scripthook_module.get())
