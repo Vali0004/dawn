@@ -36,9 +36,38 @@ namespace dwn::shv
 	inline std::vector<u64> g_args{};
 	inline std::unordered_map<KeyboardFunctionT, KeyboardFunctionT> g_keyboard_functions{};
 	inline std::unordered_map<PresentCallbackT, PresentCallbackT> g_present_callbacks{};
+	class shv_thread
+	{
+	public:
+		shv_thread(std::function<void()> callback)
+		{
+			create(callback);
+		}
+		~shv_thread()
+		{
+			destroy();
+		}
+		void create(std::function<void()> callback)
+		{
+			m_handle = CreateThread(nullptr, NULL, [](void* cb) -> ul32 WINAPI {
+				std::function<void()>* callback_ptr{ reinterpret_cast<decltype(callback_ptr)>(cb) };
+				if (callback_ptr && *callback_ptr)
+				{
+					(*callback_ptr)();
+				}
+				return 0;
+			}, &callback, NULL, nullptr);
+		}
+		void destroy()
+		{
+			TerminateThread(m_handle, 0);
+		}
+	private:
+		HANDLE m_handle{};
+	};
 	struct thread_identifier
 	{
-		thread* m_thread{};
+		shv_thread* m_thread{};
 		void* m_handle{};
 		void* m_function{};
 	};
@@ -46,7 +75,7 @@ namespace dwn::shv
 
 	inline void scriptRegister(HMODULE module, void(*LP_SCRIPT_MAIN)())
 	{
-		thread_identifier thread_id{ g_thread_manager.create_thread(LP_SCRIPT_MAIN) };
+		thread_identifier thread_id{ new shv_thread(LP_SCRIPT_MAIN) };
 		thread_id.m_handle = module;
 		thread_id.m_function = LP_SCRIPT_MAIN;
 		g_threads.insert(std::make_pair(reinterpret_cast<void*>(module), thread_id));
@@ -54,7 +83,7 @@ namespace dwn::shv
 
 	inline void scriptRegisterAdditionalThread(HMODULE module, void(*LP_SCRIPT_MAIN)())
 	{
-		thread_identifier thread_id{ g_thread_manager.create_thread(LP_SCRIPT_MAIN) };
+		thread_identifier thread_id{ new shv_thread(LP_SCRIPT_MAIN) };
 		thread_id.m_handle = module;
 		thread_id.m_function = LP_SCRIPT_MAIN;
 		g_threads.insert(std::make_pair(reinterpret_cast<void*>(module), thread_id));
@@ -63,7 +92,6 @@ namespace dwn::shv
 	inline void scriptUnregister(HMODULE module)
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(module)] };
-		id.m_thread->kill();
 		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(module));
 	}
@@ -71,7 +99,6 @@ namespace dwn::shv
 	inline void scriptUnregisterDepricated(void(*LP_SCRIPT_MAIN)())
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(LP_SCRIPT_MAIN)] };
-		id.m_thread->kill();
 		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(LP_SCRIPT_MAIN));
 	}
@@ -126,7 +153,10 @@ namespace dwn::shv
 
 	inline void scriptWait(ul32 waitTime)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+		if (waitTime)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+		}
 	}
 
 	inline void keyboardHandlerRegister(KeyboardFunctionT function)

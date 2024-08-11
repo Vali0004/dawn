@@ -19,8 +19,9 @@ namespace dwn::config
 			if (m_mark_as_create)
 			{
 				add_hotkey("unload", VK_F12);
-				add_hotkey("game_exit", VK_F4);
+				add_hotkey("game_exit", VK_F6);
 			}
+			// Write defaults to config if needed
 			handle_init();
 		}
 

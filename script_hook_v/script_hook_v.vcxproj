@@ -100,7 +100,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>..\bin\$(Configuration)\script_hook_v\script_hook_v.lib</ImportLibrary>
+      <ImportLibrary>..\bin\$(Configuration)\script_hook_v\$(TargetName).lib</ImportLibrary>
       <GenerateMapFile>true</GenerateMapFile>
       <EntryPointSymbol>
       </EntryPointSymbol>

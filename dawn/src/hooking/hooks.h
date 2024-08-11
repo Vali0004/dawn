@@ -18,6 +18,7 @@ namespace dwn::hooking
 		{
 			return rage::scrThread::State();
 		}
+
 		invoke_thread_callbacks(pt->HashCode);
 
 		if (pt->HashCode == "freemode"_j || pt->HashCode == "main_persistent"_j)
@@ -80,6 +81,7 @@ namespace dwn::hooking
 		}
 		if (reinterpret_cast<u64>(hModule) == "dwn"_j)
 		{
+			LOG_TO_STREAM("Export for dwn's ScriptHooKV called.");
 			switch (atStringHash(lpProcName))
 			{
 				SHV_FN_IMPL(scriptRegister);

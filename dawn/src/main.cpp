@@ -76,7 +76,7 @@ void game_death()
 		}
 		else
 		{
-			if (GetAsyncKeyState(VK_F4))
+			if (GetAsyncKeyState(VK_F6))
 			{
 				exit(0);
 				abort();

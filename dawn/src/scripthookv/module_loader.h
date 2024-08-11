@@ -25,6 +25,7 @@ namespace dwn::shv
 			m_name = name;
 			m_path = m_path.append(m_name);
 			std::string path{ m_path.string() };
+			LOG_TO_STREAM("Path: " << path);
 			m_handle = LoadLibraryA(path.data());
 		}
 
@@ -51,6 +52,14 @@ namespace dwn::shv
 	class module_loader
 	{
 	public:
+		module_loader()
+		{}
+
+		~module_loader()
+		{
+			unload_all();
+		}
+
 		void load(const std::string& name)
 		{
 			if (!m_scripthook_module.get())
@@ -59,7 +68,8 @@ namespace dwn::shv
 				m_scripthook_module->load("ScriptHookV.dll");
 			}
 
-			shv_module* module{ new shv_module(name) };
+			shv_module* module{ new shv_module() };
+			module->load(name);
 			m_modules.push_back(module);
 		}
 

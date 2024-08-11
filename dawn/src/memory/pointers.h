@@ -89,9 +89,9 @@ namespace dwn::pointers
 	inline void remove_keyboard_hook()
 	{
 		using removeKeybaordHookT = fptr<void()>;
-		/*removeKeybaordHookT remove_fn{};
+		removeKeybaordHookT remove_fn{};
 		memory::pointer_manager ptr_mgr{};
-		ptr_mgr.add("RemoveKeyboardHook", remove_fn, "48 8B 0D ? ? ? ? 48 FF 25 ? ? ? ? E9");
+		ptr_mgr.add("RemoveKeyboardHook", remove_fn, "48 8B 0D ? ? ? ? 48 FF 25 ? ? ? ? C3");
 		trigger_scan(ptr_mgr);
 
 		if (remove_fn)
@@ -102,7 +102,7 @@ namespace dwn::pointers
 		else
 		{
 			LOG_TO_STREAM("There is no keyboard hook!");
-		}*/
+		}
 	}
 
 	inline void wait_for_rgsc()

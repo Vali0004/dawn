@@ -13,6 +13,7 @@ enum eGameVersion : int
 
 EXPORT void scriptRegister(HMODULE module, void(*LP_SCRIPT_MAIN)())
 {
+	printf("Register called\n");
 	auto fn{ (decltype(&scriptRegister))GetProcAddress(g_module, __FUNCTION__) };
 	if (fn)
 	{
@@ -160,6 +161,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD  reason, LPVOID)
 		case DLL_PROCESS_ATTACH:
 		{
 			CreateThread(nullptr, NULL, [](void* hmodule) -> DWORD WINAPI {
+				printf("Loaded SHV dll\n");
 				g_config.load_from_file();
 				while (g_running)
 				{
@@ -178,6 +180,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD  reason, LPVOID)
 						}
 					}
 				}
+				printf("Unloaded SHV dll\n");
 				FreeLibraryAndExitThread(HMODULE(hmodule), 0);
 				return 0;
 			}, hmod, NULL, nullptr);

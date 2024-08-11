@@ -5,6 +5,7 @@
 #include "util.h"
 #include "command_gui_wrapper.h"
 #include "config/command_config.h"
+#include "scripthookv/module_loader.h"
 
 inline void print_sc_data()
 {
@@ -118,8 +119,14 @@ namespace dwn::renderer
 				});
 			});
 			commands::sub_manager settings_debug_sub{ "settings_debug" };
-			settings_debug_sub.add_cmd("unload", [](commands::single_command* command) {
-				g_running = false;
+			settings_debug_sub.add_cmd("test_load_asi", [](commands::single_command* command) {
+				shv::g_module_loader.load("NativeTrainer.asi");
+			});
+			settings_debug_sub.add_cmd("test_unload_asi", [](commands::single_command* command) {
+				shv::g_module_loader.unload("NativeTrainer.asi");
+			});
+			settings_debug_sub.add_cmd("test_unload_all", [](commands::single_command* command) {
+				shv::g_module_loader.unload_all();
 			});
 			commands::sub_manager settings_console_sub{ "settings_console" };
 			settings_console_sub.add_cmd("reconnect_to_console_pipe", [](commands::single_command* command) {
