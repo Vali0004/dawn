@@ -72,7 +72,6 @@ namespace dwn::hooking::etc
 	{
 		g_hooks.insert({ hook.name(), hook });
 
-
 		MH_STATUS status = MH_CreateHook(hook.target(), hook.fn(), hook.og());
 		//handle_mh_status(status, hook);
 
