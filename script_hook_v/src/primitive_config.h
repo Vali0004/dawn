@@ -36,6 +36,7 @@ public:
 		return true;
 	}
 
+
 	void from_json(nlohmann::json& json)
 	{
 		for (auto& [id, hotkey_json] : json.items())
@@ -46,14 +47,49 @@ public:
 				for (auto& key_json : hotkey_json["keys"])
 				{
 					std::string key{ key_json.get<std::string>() };
-					if (key.find("F"))
+					switch (atStringHash(key))
 					{
-						int fkey{ stoi(key.substr(1)) };
-						keys.push_back((VK_F1 + fkey) - 1);
-					}
-					else
-					{
-						keys.push_back(key[0]);
+						case atStringHash("END"):
+						{
+							keys.push_back(VK_END);
+						} break;
+						case atStringHash("ENTER"):
+						{
+							keys.push_back(VK_RETURN);
+						} break;
+						case atStringHash("BACK"):
+						{
+							keys.push_back(VK_BACK);
+						} break;
+						case atStringHash("UP"):
+						{
+							keys.push_back(VK_UP);
+						} break;
+						case atStringHash("DOWN"):
+						{
+							keys.push_back(VK_DOWN);
+						} break;
+						case atStringHash("LEFT"):
+						{
+							keys.push_back(VK_LEFT);
+						} break;
+						case atStringHash("RIGHT"):
+						{
+							keys.push_back(VK_RIGHT);
+						} break;
+						default:
+						{
+							std::string key{ key_json.get<std::string>() };
+							if (key.find("F"))
+							{
+								int fkey{ stoi(key.substr(1)) };
+								keys.push_back((VK_F1 + fkey) - 1);
+							}
+							else
+							{
+								keys.push_back(key[0]);
+							}
+						} break;
 					}
 				}
 			}

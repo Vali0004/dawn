@@ -117,6 +117,7 @@ void routine(dwn::thread* thr)
 
 	if (!hotkey_load)
 	{
+		dwn::config::g_hotkey_config.save_to_file();
 		LOG_TO_STREAM("Hotkey load failed, using defaults");
 	}
 

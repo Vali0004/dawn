@@ -13,7 +13,7 @@ namespace dwn::config
 	{
 	public:
 		hotkey_config() :
-			generic_config(std::fs::path(std::getenv("appdata")) / "Dawn", "command_config.json")
+			generic_config(std::fs::path(std::getenv("appdata")) / "Dawn", "hotkey_config.json")
 		{
 			add_hotkey("unload", VK_F12);
 			add_hotkey("game_exit", VK_F4);
@@ -33,14 +33,48 @@ namespace dwn::config
 					for (auto& hk : hotkey.second.m_keys)
 					{
 						std::string key{};
-						if (hk < VK_F1)
+						switch (hk)
 						{
-							key.push_back(hk);
-							key.push_back('\0');
-						}
-						else
-						{
-							key = "F" + std::to_string((hk - VK_F1) + 1);
+							case VK_END:
+							{
+								key = "END";
+							} break;
+							case VK_RETURN:
+							{
+								key = "ENTER";
+							} break;
+							case VK_BACK:
+							{
+								key = "BACK";
+							} break;
+							case VK_UP:
+							{
+								key = "UP";
+							} break;
+							case VK_DOWN:
+							{
+								key = "DOWN";
+							} break;
+							case VK_LEFT:
+							{
+								key = "LEFT";
+							} break;
+							case VK_RIGHT:
+							{
+								key = "RIGHT";
+							} break;
+							default:
+							{
+								if (hk < VK_F1)
+								{
+									key.push_back(hk);
+									key.push_back('\0');
+								}
+								else
+								{
+									key = "F" + std::to_string((hk - VK_F1) + 1);
+								}
+							} break;
 						}
 						key_json["keys"].push_back(key);
 					}
@@ -64,14 +98,48 @@ namespace dwn::config
 					for (auto& key_json : hotkey_json["keys"])
 					{
 						std::string key{ key_json.get<std::string>() };
-						if (key.find("F"))
+						switch (atStringHash(key))
 						{
-							s32 fkey{ stoi(key.substr(1)) };
-							keys.push_back((VK_F1 + fkey) - 1);
-						}
-						else
-						{
-							keys.push_back(key[0]);
+							case "END"_j:
+							{
+								keys.push_back(VK_END);
+							} break;
+							case "ENTER"_j:
+							{
+								keys.push_back(VK_RETURN);
+							} break;
+							case "BACK"_j:
+							{
+								keys.push_back(VK_BACK);
+							} break;
+							case "UP"_j:
+							{
+								keys.push_back(VK_UP);
+							} break;
+							case "DOWN"_j:
+							{
+								keys.push_back(VK_DOWN);
+							} break;
+							case "LEFT"_j:
+							{
+								keys.push_back(VK_LEFT);
+							} break;
+							case "RIGHT"_j:
+							{
+								keys.push_back(VK_RIGHT);
+							} break;
+							default:
+							{
+								if (key.find("F"))
+								{
+									s32 fkey{ stoi(key.substr(1)) };
+									keys.push_back((VK_F1 + fkey) - 1);
+								}
+								else
+								{
+									keys.push_back(key[0]);
+								}
+							} break;
 						}
 					}
 				}
