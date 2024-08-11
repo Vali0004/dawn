@@ -7,13 +7,14 @@ namespace dwn::shv
 	class shv_module
 	{
 	public:
-		shv_module(const std::string& path_append = "ScriptHookV") :
+		shv_module(const std::string& name, const std::string& path_append = "ScriptHookV") :
 			m_path(std::fs::path(std::getenv("appdata")) / "Dawn")
 		{
 			if (!path_append.empty())
 			{
 				m_path /= path_append;
 			}
+			load(name);
 		}
 		~shv_module()
 		{
@@ -64,13 +65,10 @@ namespace dwn::shv
 		{
 			if (!m_scripthook_module.get())
 			{
-				m_scripthook_module = std::make_unique<shv_module>(std::string());
-				m_scripthook_module->load("ScriptHookV.dll");
+				m_scripthook_module = std::make_unique<shv_module>("ScriptHookV.dll", std::string());
 			}
 
-			shv_module* module{ new shv_module() };
-			module->load(name);
-			m_modules.push_back(module);
+			m_modules.push_back(new shv_module(name));
 		}
 
 		void unload(const std::string& name)

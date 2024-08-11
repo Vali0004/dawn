@@ -134,8 +134,6 @@ void routine(dwn::thread* thr)
 
 	dwn::renderer::menu::init();
 
-	LOG_TO_STREAM("Init finished");
-
 	while (g_running)
 	{
 		if (dwn::config::g_hotkey_config.valid("unload"))

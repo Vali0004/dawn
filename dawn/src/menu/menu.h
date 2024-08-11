@@ -172,9 +172,6 @@ namespace dwn::renderer
 			home_sub.add_cmd("hello_world", [](commands::single_command* command) {
 				LOG_TO_STREAM("Hello, world!");
 			});
-			home_sub.add_cmd("test", [](commands::single_command* command) {
-				LOG_TO_STREAM("Hello!");
-			}, nullptr, true);
 			home_sub.check_if_init();
 			commands::g_manager.push_back(home_sub);
 			dwn::config::g_command_config.handle_init();

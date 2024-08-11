@@ -39,7 +39,7 @@ namespace dwn::shv
 	class shv_thread
 	{
 	public:
-		shv_thread(std::function<void()> callback)
+		shv_thread(fptr<void()> callback)
 		{
 			create(callback);
 		}
@@ -47,16 +47,15 @@ namespace dwn::shv
 		{
 			destroy();
 		}
-		void create(std::function<void()> callback)
+		void create(fptr<void()> callback)
 		{
-			m_handle = CreateThread(nullptr, NULL, [](void* cb) -> ul32 WINAPI {
-				std::function<void()>* callback_ptr{ reinterpret_cast<decltype(callback_ptr)>(cb) };
-				if (callback_ptr && *callback_ptr)
+			m_handle = CreateThread(nilptr, nil, [](void* cb) -> ul32 WINAPI {
+				if (cb && g_running)
 				{
-					(*callback_ptr)();
+					reinterpret_cast<fptr<void()>>(cb)();
 				}
 				return 0;
-			}, &callback, NULL, nullptr);
+			}, callback, nil, nilptr);
 		}
 		void destroy()
 		{
@@ -92,6 +91,7 @@ namespace dwn::shv
 	inline void scriptUnregister(HMODULE module)
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(module)] };
+		delete id.m_thread;
 		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(module));
 	}
@@ -99,6 +99,7 @@ namespace dwn::shv
 	inline void scriptUnregisterDepricated(void(*LP_SCRIPT_MAIN)())
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(LP_SCRIPT_MAIN)] };
+		delete id.m_thread;
 		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(LP_SCRIPT_MAIN));
 	}
