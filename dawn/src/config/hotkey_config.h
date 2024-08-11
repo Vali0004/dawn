@@ -17,6 +17,7 @@ namespace dwn::config
 		{
 			add_hotkey("unload", VK_F12);
 			add_hotkey("game_exit", VK_F4);
+			handle_init();
 		}
 
 		nlohmann::json to_json() override
