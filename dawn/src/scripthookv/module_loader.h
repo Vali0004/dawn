@@ -56,7 +56,7 @@ namespace dwn::shv
 			if (!m_scripthook_module.get())
 			{
 				m_scripthook_module = std::make_unique<shv_module>(std::string());
-				m_scripthook_module->load("script_hook_v.dll");
+				m_scripthook_module->load("ScriptHookV.dll");
 			}
 
 			shv_module* module{ new shv_module(name) };
