@@ -31,6 +31,7 @@
 namespace dwn::renderer
 {
 	inline float g_drawbase{};
+	inline float g_pos_x { 0.01f };
 	inline directx::font iconfont_22{};
 	inline directx::font iconfont_24{};
 	inline directx::font arial_22{};

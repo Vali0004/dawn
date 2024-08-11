@@ -141,25 +141,25 @@ namespace dwn::commands
 
 	inline void draw_header()
 	{
-		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.0694f }, { 0, 186, 255, 255 });
+		get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.0694f }, { 0, 186, 255, 255 });
 		g_drawbase += 0.0694f;
 	}
 
 	inline void draw_subtitle(submenu sub)
 	{
-		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
-		get()->draw_text(arialbd_23, sub.get_name().data(), { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+		get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
+		get()->draw_text(arialbd_23, sub.get_name().data(), { g_pos_x + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
 		std::string pos{ std::format("{}/{}", sub.m_current + 1, sub.get_num_usable_commands()) };
-		get()->draw_text(arialbd_23, pos.data(), { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
+		get()->draw_text(arialbd_23, pos.data(), { g_pos_x + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
 
 	inline void draw_footer()
 	{
-		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
+		get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
 		std::string candidate{ BASE_CANDIDATE " ["  BASE_BRANCH "]" };
-		get()->draw_text(arial_22, candidate.data(), { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
-		get()->draw_text(arial_22, "v0.01", { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
+		get()->draw_text(arial_22, candidate.data(), { g_pos_x + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
+		get()->draw_text(arial_22, "v0.01", { g_pos_x + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
 
