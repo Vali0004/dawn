@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "primitive_config.h"
 #define EXPORT __declspec(dllexport)
 
 typedef void(*TKeyboardFn)(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow);
@@ -159,12 +160,23 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD  reason, LPVOID)
 		case DLL_PROCESS_ATTACH:
 		{
 			CreateThread(nullptr, NULL, [](void* hmodule) -> DWORD WINAPI {
-				// Might not be a bad idea to check a bin file in temp if a byte is 1 or not.
+				g_config.load_from_file();
 				while (g_running)
 				{
-					// Change this to pull from key_config.json in dawn
-					if (GetAsyncKeyState(VK_F12))
-						g_running = false;
+					if (g_config.valid("unload"))
+					{
+						if (g_config.is_key_pressed("unload"))
+						{
+							g_running = false;
+						}
+					}
+					else
+					{
+						if (GetAsyncKeyState(VK_F12))
+						{
+							g_running = false;
+						}
+					}
 				}
 				FreeLibraryAndExitThread(HMODULE(hmodule), 0);
 				return 0;

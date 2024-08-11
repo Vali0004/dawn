@@ -13,12 +13,13 @@ namespace dwn::util
 
 namespace dwn::util::math
 {
-	constexpr long double PI{ 3.141592653589793238462643383279502884L };
+	constexpr long double M_PI{ 3.141592653589793238462643383279502884L };
+	constexpr long double M_PI_2{ 3.141592653589793238462643383279502884L / 2 };
 
 	inline float degrees_to_radians(float degrees)
 	{
 		//Formula: x * PI/180 = y rad
-		return static_cast<float>((static_cast<long double>(degrees) * PI) / 180.L);
+		return static_cast<float>((static_cast<long double>(degrees) * M_PI) / 180.L);
 	}
 
 	inline float distance_3D(Vector3 a, Vector3 b)

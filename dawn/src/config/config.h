@@ -11,11 +11,20 @@ namespace dwn::config
         generic_config(stdfs::path path, const std::string& filename) :
             m_config_path(path)
         {
+            bool existed{ true };
             if (!stdfs::exists(path))
             {
+                existed = false;
                 stdfs::create_directories(path);
             }
-            m_config_path = path.append(filename);
+
+            path /= filename;
+            m_config_path = path;
+
+            if (!existed)
+            {
+                save_to_file();
+            }
         }
         virtual void from_json(nlohmann::json& json)
         {

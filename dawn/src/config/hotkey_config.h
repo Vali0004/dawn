@@ -14,7 +14,7 @@ namespace dwn::config
 	public:
 		hotkey_config() :
 			m_path(std::getenv("appdata")),
-			generic_config(m_path.append("Dawn"), "command_config.json")
+			generic_config(m_path / "Dawn", "command_config.json")
 		{
 			add_hotkey("unload", VK_F12);
 			add_hotkey("game_exit", VK_F4);

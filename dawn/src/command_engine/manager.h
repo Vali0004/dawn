@@ -283,6 +283,16 @@ namespace dwn::commands
 
 			return json;
 		}
+
+		void from_json(nlohmann::json& json)
+		{
+			if (m_subs.empty())
+			{
+				return;
+			}
+
+			m_subs[0]->from_json(json);
+		}
 	private:
 		std::vector<sub_manager*> m_subs{};
 	};

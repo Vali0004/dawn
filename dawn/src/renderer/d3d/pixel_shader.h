@@ -22,14 +22,15 @@ namespace dwn::directx
 		{
 			return D3DCompile((LPCVOID)shader, size, nullptr, nullptr, nullptr, "PS_ShaderMain", "ps_5_0", NULL, NULL, m_blob.get_address(), nullptr) == S_OK;
 		}
-		bool compile_file(const char* path)
+
+		bool compile_file(const stdfs::path& path)
 		{
 			std::ifstream file{ path };
 			std::string contents{ (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>() };
 			return D3DCompile((LPCVOID)contents.data(), contents.size(), nullptr, nullptr, nullptr, "PS_ShaderMain", "ps_5_0", NULL, NULL, m_blob.get_address(), nullptr) == S_OK;
 		}
 
-		bool precompiled(const char* path)
+		bool precompiled(const stdfs::path& path)
 		{
 			std::ifstream file{ path, std::ios_base::binary | std::ios_base::ate };
 

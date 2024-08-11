@@ -18,8 +18,8 @@ namespace dwn::shv
 			for (auto& f : g_keyboard_functions)
 			{
 				bool with_alt{ uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP };
-				bool extended{ (lParam >> 24) & 1 };
-				bool was_down_before{ (lParam >> 30) & 1 };
+				bool extended{ (lParam >> 24) & 1 ? true : false };
+				bool was_down_before{ (lParam >> 30) & 1 ? true : false };
 				bool is_up{ uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP };
 				f.second(static_cast<ul32>(wParam), lParam & 0xFFFF, (lParam >> 16) & 0xFF, extended, with_alt, was_down_before, is_up);
 			}

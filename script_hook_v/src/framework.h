@@ -5,3 +5,8 @@
 #include <windows.h>
 #include <stdint.h>
 #include <string_view>
+#include <string>
+#include <filesystem>
+#include <vector>
+#include <unordered_map>
+#include <fstream>
