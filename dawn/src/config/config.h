@@ -37,7 +37,7 @@ namespace dwn::config
 				return save_to_file();
 			}
 
-			return true;
+			return load_from_file();
 		}
 
 		bool save_to_file()
@@ -50,6 +50,7 @@ namespace dwn::config
 
 			nlohmann::json json = to_json();
 			file << json.dump(4); // Pretty print with 4 spaces
+			m_json = json;
 			return true;
 		}
 
