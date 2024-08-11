@@ -25,7 +25,7 @@ namespace dwn::commands
 
 		cmd_data<cmd_functions>* get_cmd_at(u64 index)
 		{
-			if (index >= num_commands())
+			if (index >= get_num_commands())
 			{
 				return nullptr;
 			}
@@ -134,7 +134,7 @@ namespace dwn::commands
 				json["options"] = nlohmann::json::array();
 				for (auto& cmd : m_commands)
 				{
-					if (!cmd->is_once_of<group_command>())
+					if (!cmd->is_once_of<group_command>() && !cmd->m_does_once_act_as_init)
 					{
 						json["options"].push_back(cmd->to_json());
 					}
@@ -225,7 +225,7 @@ namespace dwn::commands
 			return i;
 		}
 
-		u64 num_commands()
+		u64 get_num_commands()
 		{
 			return m_commands.size();
 		}

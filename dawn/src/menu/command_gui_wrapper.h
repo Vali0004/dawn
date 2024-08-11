@@ -44,7 +44,7 @@ namespace dwn::commands
 			{
 				case 0:
 				{
-					if (num_commands())
+					if (get_num_commands())
 					{
 						auto cmd{ get_cmd_at(m_current) };
 						if (!cmd->is_once_of<cmd_functions>() && cmd->is_enabled())
@@ -75,11 +75,11 @@ namespace dwn::commands
 					if (m_current > 0)
 						m_current--;
 					else
-						m_current = num_commands() - 1;
+						m_current = get_num_usable_commands() - 1;
 				} break;
 				case 2:
 				{
-					if (m_current < num_commands() - 1)
+					if (m_current < get_num_usable_commands() - 1)
 						m_current++;
 					else
 						m_current = 0;
@@ -88,7 +88,7 @@ namespace dwn::commands
 		}
 		void handle()
 		{
-			for (size_t i{}; i != num_commands(); ++i)
+			for (size_t i{}; i != get_num_commands(); ++i)
 			{
 				auto cmd{ get_cmd_at(i) };
 				if (!cmd->m_does_once_act_as_init)
@@ -149,7 +149,7 @@ namespace dwn::commands
 	{
 		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
 		get()->draw_text(arialbd_23, sub.get_name().data(), { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
-		std::string pos{ std::format("{}/{}", sub.m_current + 1, sub.num_commands()) };
+		std::string pos{ std::format("{}/{}", sub.m_current + 1, sub.get_num_usable_commands()) };
 		get()->draw_text(arialbd_23, pos.data(), { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
