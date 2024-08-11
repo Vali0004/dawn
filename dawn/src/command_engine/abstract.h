@@ -152,6 +152,11 @@ namespace dwn::commands
 			return container;
 		}
 
+		const std::string& get_id()
+		{
+			return m_id;
+		}
+
 		std::string& get_name()
 		{
 			return m_name;
@@ -165,8 +170,8 @@ namespace dwn::commands
 		nlohmann::json to_json()
 		{
 			nlohmann::json json{
-				{ "label", m_name },
 				{ "id", m_id }, // If a user changes this, we will just override it. : )
+				{ "label", m_name },
 				{ "enabled", m_enabled },
 				{ "order_id", number_to_word(m_order_id, true) },
 				{ "values", nullptr },
@@ -180,10 +185,23 @@ namespace dwn::commands
 
 		void from_json(nlohmann::json& json)
 		{
-			m_name = json.value("label", m_name);
 			json["id"] = m_id;
-			m_enabled = json.value("enabled", m_enabled);
-			m_order_id = json.value("enabled", m_order_id);
+
+			if (json["label"].is_string())
+			{
+				m_name = json["label"].get<std::string>();
+			}
+
+			if (json["enabled"].is_boolean())
+			{
+				m_enabled = json["enabled"].get<bool>();
+			}
+
+			if (json["order_id"].is_string())
+			{
+				m_order_id = word_to_number(json["order_id"].get<std::string>());
+			}
+
 			m_containers;
 		}
 

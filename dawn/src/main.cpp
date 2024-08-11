@@ -8,7 +8,6 @@
 #include "command_engine/manager.h"
 #include "thread_manager/thread_manager.h"
 #include "config/hotkey_config.h"
-#include "config/command_config.h"
 using namespace rage;
 
 void game_speedup()
@@ -133,11 +132,7 @@ void routine(dwn::thread* thr)
 		LOG_TO_STREAM("WARNING: Exception filter not attached!");
 	}
 
-	dwn::config::g_command_config.handle_init();
-
 	dwn::renderer::menu::init();
-	
-	dwn::config::g_command_config.handle_init();
 
 	LOG_TO_STREAM("Init finished");
 

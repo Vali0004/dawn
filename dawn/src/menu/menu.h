@@ -5,6 +5,7 @@
 #include "util.h"
 #include "features/features.h"
 #include "command_gui_wrapper.h"
+#include "config/command_config.h"
 
 inline void print_sc_data()
 {
@@ -65,6 +66,7 @@ namespace dwn::renderer
 	{
 		inline void init()
 		{
+			dwn::config::g_command_config.handle_init();
 			commands::sub_manager settings_command_tests_sub{ "settings_command_tests" };
 			settings_command_tests_sub.add_cmd("change_player_model", [](commands::single_command* command) {
 				u32 hash{ "player_zero"_j };
@@ -174,7 +176,9 @@ namespace dwn::renderer
 			}, nullptr, true);
 			home_sub.check_if_init();
 			commands::g_manager.push_back(home_sub);
-			push(home_sub);
+			dwn::config::g_command_config.handle_init();
+			commands::sub_manager* sub{ commands::g_manager.get_sub_at(0) };
+			push(sub);
 			commands::create_fonts();
 			commands::gui::flip_bit(true);
 		}

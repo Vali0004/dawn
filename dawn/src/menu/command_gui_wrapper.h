@@ -59,8 +59,8 @@ namespace dwn::commands
 							else
 							{
 								cmd->get_once()->call(cmd);
-								// This actually isn't type mutting, or anything stupid. We do this properly : )
-								submenu* sub = reinterpret_cast<submenu*>(get_sub(cmd->get_name()));
+								// This actually isn't type punting, or anything stupid. We do this properly : )
+								submenu* sub = reinterpret_cast<submenu*>(get_sub(cmd->get_id()));
 								if (sub && sub->is_enabled())
 								{
 									g_submenu = sub;
@@ -95,7 +95,7 @@ namespace dwn::commands
 				{
 					if (cmd->is_once_of<group_command>())
 					{
-						if (get_sub(cmd->get_name())->is_enabled())
+						if (get_sub(cmd->get_id())->is_enabled())
 						{
 							cmd->get_render()->call(cmd, m_current == i);
 						}
@@ -122,9 +122,20 @@ namespace dwn::commands
 		g_submenus.push(*g_submenu);
 	}
 
+	inline void push(submenu* sub)
+	{
+		g_submenu = sub;
+		g_submenus.push(*g_submenu);
+	}
+
 	inline void push(sub_manager sub)
 	{
 		push(submenu(sub));
+	}
+
+	inline void push(sub_manager* sub)
+	{
+		push(submenu(*sub));
 	}
 
 	inline void pop()

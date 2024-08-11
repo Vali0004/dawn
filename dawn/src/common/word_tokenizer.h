@@ -125,7 +125,7 @@ namespace dwn
 	{
 		if (number == 0)
 		{
-			return ordinal ? "zeroth" : "zero";
+			return ordinal ? "first" : "zero";
 		}
 
 		std::string result{};

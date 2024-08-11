@@ -56,7 +56,7 @@ namespace dwn::config
 				return false;
 			}
 
-			nlohmann::json json = to_json();
+			nlohmann::json json{ to_json() };
 			file << json.dump(4); // Pretty print with 4 spaces
 			m_json = json;
 			return true;

@@ -10,6 +10,7 @@ namespace dwn::commands
 	public:
 		sub_manager(const std::string_view& name, u64 order_id = 1) :
 			m_name(name),
+			m_id(name),
 			m_order_id(order_id),
 			m_enabled(true)
 		{}
@@ -108,12 +109,15 @@ namespace dwn::commands
 		nlohmann::json to_json()
 		{
 			nlohmann::json json{
+				{ "id", m_id },
 				{ "label", m_name },
 				{ "enabled", m_enabled },
-				{ "order_id", number_to_word(m_order_id, true) },
-				{ "subs", nullptr },
-				{ "options", nullptr }
 			};
+
+			if (m_id.compare("home"))
+			{
+				json["order_id"] = number_to_word(m_order_id, true);
+			}
 
 			if (!m_subs.empty())
 			{
@@ -150,9 +154,26 @@ namespace dwn::commands
 
 		void from_json(nlohmann::json& json)
 		{
-			m_name = json.value("label", m_name);
-			m_enabled = json.value("enabled", m_enabled);
-			m_order_id = json.value("order_id", m_order_id);
+			if (json["label"].is_string())
+			{
+				m_name = json["label"].get<std::string>();
+			}
+
+			json["id"] = m_id;
+
+			if (json["enabled"].is_boolean())
+			{
+				m_enabled = json["enabled"].get<bool>();
+			}
+
+			if (m_id.compare("home"))
+			{
+				if (json["order_id"].is_string())
+				{
+					m_order_id = word_to_number(json["order_id"].get<std::string>());
+				}
+			}
+
 
 			if (json.contains("subs") && json["subs"].is_object())
 			{
@@ -170,11 +191,24 @@ namespace dwn::commands
 			{
 				for (auto& cmd_json : json["options"])
 				{
-					auto cmd{ get_cmd(cmd_json) };
-					if (cmd)
+					if (cmd_json["id"].is_string())
 					{
-						cmd->from_json(cmd_json);
+						auto cmd{ get_cmd(cmd_json["id"].get<std::string>()) };
+						if (cmd)
+						{
+							cmd->from_json(cmd_json);
+						}
 					}
+				}
+			}
+
+			// For submenu options, we want to pull the label from the submenu itself.
+			for (auto& cmd : m_commands)
+			{
+				if (cmd->is_once_of<group_command>())
+				{
+					auto sub{ get_sub(cmd->get_id()) };
+					cmd->m_name = sub->get_name();
 				}
 			}
 		}
@@ -236,7 +270,7 @@ namespace dwn::commands
 		}
 	private:
 		bool m_enabled{};
-		std::string m_name{};
+		std::string m_id{}, m_name{};
 		u64 m_order_id{};
 		std::vector<cmd_data<cmd_functions>*> m_commands{};
 		std::unordered_map<std::string, sub_manager*> m_subs{};
@@ -274,6 +308,16 @@ namespace dwn::commands
 			return nullptr;
 		}
 
+		sub_manager* get_sub_at(size_t idx)
+		{
+			if (m_subs.size() <= idx)
+			{
+				return nullptr;
+			}
+
+			return m_subs[idx];
+		}
+
 		nlohmann::json to_json()
 		{
 			if (m_subs.empty())
@@ -294,9 +338,8 @@ namespace dwn::commands
 				return;
 			}
 
-			//LOG_TO_STREAM("Called from json.");
-
-			m_subs[0]->from_json(json);
+			sub_manager* sub{ m_subs[0] };
+			sub->from_json(json);
 		}
 	private:
 		std::vector<sub_manager*> m_subs{};
