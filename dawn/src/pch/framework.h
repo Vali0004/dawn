@@ -50,7 +50,10 @@
 // Namespace Defines
 using namespace std::chrono;
 using namespace std::chrono_literals;
-namespace stdfs = std::filesystem;
+namespace std
+{
+	namespace fs = std::filesystem;
+}
 // Types
 #include "common/data/types.h"
 // Quick operators

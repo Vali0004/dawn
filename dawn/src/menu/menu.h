@@ -175,7 +175,7 @@ namespace dwn::renderer
 			home_sub.check_if_init();
 			commands::g_manager.push_back(home_sub);
 			push(home_sub);
-			stdfs::path font_path{ std::getenv("appdata") };
+			std::fs::path font_path{ std::getenv("appdata") };
 			font_path /= BASE_NAME;
 			font_path /= "Fonts";
 			std::string str{ (font_path / "icon_font.ttf").string() };

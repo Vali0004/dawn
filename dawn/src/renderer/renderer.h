@@ -61,10 +61,10 @@ namespace dwn::renderer
 			m_blend.create(m_device);
 			m_rasterizer.create(m_device, D3D11_FILL_SOLID);
 			m_depth_stencil.create(m_device, true, true, D3D11_COMPARISON_ALWAYS);
-			stdfs::path path{ stdfs::path(std::getenv("appdata")) / "Dawn" / "Shaders" };
-			if (!m_vertex_shader.precompiled(stdfs::path(path) / "vertex_shader.fxc"))
+			std::fs::path path{ std::fs::path(std::getenv("appdata")) / "Dawn" / "Shaders" };
+			if (!m_vertex_shader.precompiled(std::fs::path(path) / "vertex_shader.fxc"))
 				LOG_TO_STREAM("Failed to compile");
-			if (!m_pixel_shader.precompiled(stdfs::path(path) / "pixel_shader.fxc"))
+			if (!m_pixel_shader.precompiled(std::fs::path(path) / "pixel_shader.fxc"))
 				LOG_TO_STREAM("Failed to compile");
 			m_vertex_shader.create(m_device);
 			m_pixel_shader.create(m_device);

@@ -21,7 +21,7 @@ namespace dwn
 
 	inline void open_remote_console()
 	{
-		stdfs::path p{};
+		std::fs::path p{};
 		p = p.append(std::getenv("appdata")).append(BASE_NAME).append("ConsoleHost.exe");
 		STARTUPINFOA start_info{ sizeof(STARTUPINFOA) };
 		BOOL success = CreateProcessA(NULL, const_cast<char*>(p.string().data()), nullptr, nullptr, TRUE, NULL, nullptr, nullptr, &start_info, &g_proc_info);
@@ -94,11 +94,11 @@ namespace dwn
 		}
 		void init_filestream(const std::string& file_out)
 		{
-			stdfs::path path(stdfs::path().append(std::getenv("appdata")).append(BASE_NAME));
+			std::fs::path path(std::fs::path().append(std::getenv("appdata")).append(BASE_NAME));
 
-			if (!stdfs::exists(path))
+			if (!std::fs::exists(path))
 			{
-				stdfs::create_directories(path);
+				std::fs::create_directories(path);
 			}
 
 			m_filestream.open((path).append(file_out), std::ios_base::out);

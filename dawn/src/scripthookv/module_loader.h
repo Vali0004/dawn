@@ -8,7 +8,7 @@ namespace dwn::shv
 	{
 	public:
 		shv_module(const std::string& path_append = "ScriptHookV") :
-			m_path(stdfs::path(std::getenv("appdata")) / "Dawn")
+			m_path(std::fs::path(std::getenv("appdata")) / "Dawn")
 		{
 			if (!path_append.empty())
 			{
@@ -44,7 +44,7 @@ namespace dwn::shv
 		}
 	private:
 		std::string m_name{};
-		stdfs::path m_path{};
+		std::fs::path m_path{};
 		HMODULE m_handle{};
 	};
 

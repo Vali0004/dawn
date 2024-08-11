@@ -13,8 +13,7 @@ namespace dwn::config
 	{
 	public:
 		hotkey_config() :
-			m_path(std::getenv("appdata")),
-			generic_config(m_path / "Dawn", "command_config.json")
+			generic_config(std::fs::path(std::getenv("appdata")) / "Dawn", "command_config.json")
 		{
 			add_hotkey("unload", VK_F12);
 			add_hotkey("game_exit", VK_F4);
@@ -142,7 +141,6 @@ namespace dwn::config
 			return true;
 		}
 	private:
-		stdfs::path m_path{};
 		std::unordered_map<std::string, hotkey> m_hotkeys{};
 	};
 	inline hotkey_config g_hotkey_config{};

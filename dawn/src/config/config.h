@@ -8,15 +8,14 @@ namespace dwn::config
 	{
 	public:
 
-        generic_config(const stdfs::path& path, const std::string& filename) :
+        generic_config(const std::fs::path& path, const std::string& filename) :
             m_config_path(path)
         {
-            LOG_TO_STREAM("Config path: " << m_config_path.string());
             bool existed{ true };
-            if (!stdfs::exists(m_config_path))
+            if (!std::fs::exists(m_config_path))
             {
                 existed = false;
-                stdfs::create_directories(m_config_path);
+                std::fs::create_directories(m_config_path);
             }
 
             m_config_path /= filename;
@@ -64,6 +63,6 @@ namespace dwn::config
         }
 	private:
 		nlohmann::json m_json{};
-		stdfs::path m_config_path{};
+		std::fs::path m_config_path{};
 	};
 }
