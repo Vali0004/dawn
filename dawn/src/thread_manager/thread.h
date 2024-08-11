@@ -69,6 +69,11 @@ namespace dwn
             m_keepalive.sleep_time = time;
         }
 
+        nodisc void kill() noexcept
+        {
+            set_id(0);
+        }
+
         nodisc void start(bool join = {})
         {
             if (m_data.id == nil)
@@ -118,7 +123,7 @@ namespace dwn
                 fptr<u32(void*)> function{ _this->m_data.callback.fn };
                 void* function_arg{ _this->m_data.callback.arg };
                 keepalive_data* keepalive{ reinterpret_cast<keepalive_data*>(&_this->m_keepalive) };
-                if (!function)
+                if (!function || _this->get_id() == nil)
                 {
                     _endthreadex(0);
                     return 0;

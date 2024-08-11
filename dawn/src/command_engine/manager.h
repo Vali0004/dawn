@@ -270,6 +270,19 @@ namespace dwn::commands
 
 			return nullptr;
 		}
+
+		nlohmann::json to_json()
+		{
+			if (m_subs.empty())
+			{
+				return {};
+			}
+
+			// There will always be just one submenu, everything else is handled under the recursive sub manager.
+			nlohmann::json json{ m_subs[0]->to_json() };
+
+			return json;
+		}
 	private:
 		std::vector<sub_manager*> m_subs{};
 	};

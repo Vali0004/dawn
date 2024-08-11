@@ -2,6 +2,7 @@
 #include "pch/framework.h"
 #include "memory/pointers.h"
 #include "commands/invoker.h"
+#include "thread_manager/thread_manager.h"
 using KeyboardFunctionT = fptr<void(ul32 key, u16 repeats, u8 scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow)>;
 using PresentCallbackT = fptr<void(void*)>;
 
@@ -35,25 +36,44 @@ namespace dwn::shv
 	inline std::vector<u64> g_args{};
 	inline std::unordered_map<KeyboardFunctionT, KeyboardFunctionT> g_keyboard_functions{};
 	inline std::unordered_map<PresentCallbackT, PresentCallbackT> g_present_callbacks{};
+	struct thread_identifier
+	{
+		thread* m_thread{};
+		void* m_handle{};
+		void* m_function{};
+	};
+	inline std::unordered_map<void*, thread_identifier> g_threads{};
 
 	inline void scriptRegister(HMODULE module, void(*LP_SCRIPT_MAIN)())
 	{
-
+		thread_identifier thread_id{ g_thread_manager.create_thread(LP_SCRIPT_MAIN) };
+		thread_id.m_handle = module;
+		thread_id.m_function = LP_SCRIPT_MAIN;
+		g_threads.insert(std::make_pair(reinterpret_cast<void*>(module), thread_id));
 	}
 
 	inline void scriptRegisterAdditionalThread(HMODULE module, void(*LP_SCRIPT_MAIN)())
 	{
-
+		thread_identifier thread_id{ g_thread_manager.create_thread(LP_SCRIPT_MAIN) };
+		thread_id.m_handle = module;
+		thread_id.m_function = LP_SCRIPT_MAIN;
+		g_threads.insert(std::make_pair(reinterpret_cast<void*>(module), thread_id));
 	}
 
 	inline void scriptUnregister(HMODULE module)
 	{
-
+		auto& id{ g_threads[reinterpret_cast<void*>(module)] };
+		id.m_thread->kill();
+		g_thread_manager.update_thread_status();
+		g_threads.erase(reinterpret_cast<void*>(module));
 	}
 
 	inline void scriptUnregisterDepricated(void(*LP_SCRIPT_MAIN)())
 	{
-
+		auto& id{ g_threads[reinterpret_cast<void*>(LP_SCRIPT_MAIN)] };
+		id.m_thread->kill();
+		g_thread_manager.update_thread_status();
+		g_threads.erase(reinterpret_cast<void*>(LP_SCRIPT_MAIN));
 	}
 
 	inline void nativeInit(u64 hash)
