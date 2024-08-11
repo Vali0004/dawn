@@ -38,8 +38,8 @@ namespace dwn::commands
 		}
 		void render(bool selected)
 		{
-			get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, selected ? directx::Color{ 255, 255, 255, 255 } : directx::Color{ 0, 0, 0, 130 });
-			get()->draw_text(arial_22, m_name.data(), { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 });
+			get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.02f }, selected ? directx::Color{ 255, 255, 255, 255 } : directx::Color{ 0, 0, 0, 130 });
+			get()->draw_text(arial_22, m_name.data(), { g_pos_x + 0.001f, g_drawbase + (0.02f / 2.f) }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 });
 			g_drawbase += 0.02f;
 		}
 	private:
@@ -66,9 +66,9 @@ namespace dwn::commands
 		}
 		void render(bool selected)
 		{
-			get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, selected ? directx::Color{ 255, 255, 255, 255 } : directx::Color{ 0, 0, 0, 130 });
-			get()->draw_text(arial_22, m_name.data(), { 0.01f + 0.001f, g_drawbase + (0.02f / 2.f) }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 });
-			get()->draw_text(iconfont_24, "r", { 0.01f + (0.131f - 0.0005f), g_drawbase + (0.02f / 2.f) + 0.006f }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 }, eJustify::Right);
+			get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.02f }, selected ? directx::Color{ 255, 255, 255, 255 } : directx::Color{ 0, 0, 0, 130 });
+			get()->draw_text(arial_22, m_name.data(), { g_pos_x + 0.001f, g_drawbase + (0.02f / 2.f) }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 });
+			get()->draw_text(iconfont_24, "r", { g_pos_x + (0.131f - 0.0005f), g_drawbase + (0.02f / 2.f) + 0.006f }, selected ? directx::Color{ 0, 0, 0, 255 } : directx::Color{ 255, 255, 255, 255 }, eJustify::Right);
 			g_drawbase += 0.02f;
 		}
 	private:
