@@ -8,6 +8,7 @@ namespace dwn::config
 		std::vector<u8> m_keys{};
 		bool m_combine{};
 	};
+
 	class hotkey_config : public generic_config
 	{
 	public:
@@ -81,20 +82,25 @@ namespace dwn::config
 			}
 		}
 
-		void add_hotkey(std::string id, u8 key, bool combine = false)
+		void add_hotkey(const std::string& id, const u8 key, bool combine = false)
 		{
 			hotkey hotkey{ { key }, combine };
 			m_hotkeys.insert(std::make_pair(id, hotkey));
 		}
 
-		void add_hotkey(std::string id, std::vector<u8> keys, bool combine = false)
+		void add_hotkey(const std::string& id, const std::vector<u8>& keys, bool combine = false)
 		{
 			hotkey hotkey{ keys, combine };
 			m_hotkeys.insert(std::make_pair(id, hotkey));
 		}
 
-		bool is_key_pressed(std::string id)
+		bool is_key_pressed(const std::string& id)
 		{
+			if (!valid(id))
+			{
+				return false;
+			}
+
 			hotkey hotkey{ m_hotkeys[id] };
 			if (hotkey.m_keys.empty())
 			{
@@ -118,6 +124,22 @@ namespace dwn::config
 			}
 
 			return pressed;
+		}
+
+		bool valid(const std::string& id)
+		{
+			if (!m_hotkeys.empty())
+			{
+				return false;
+			}
+
+			hotkey hotkey{ m_hotkeys[id] };
+			if (hotkey.m_keys.empty())
+			{
+				return false;
+			}
+
+			return true;
 		}
 	private:
 		stdfs::path m_path{};

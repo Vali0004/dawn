@@ -66,10 +66,21 @@ void game_death()
 	LOG_TO_STREAM("Game fast-exit thread created.");
 	while (g_running)
 	{
-		if (GetAsyncKeyState(VK_F4))
+		if (dwn::config::g_hotkey_config.valid("game_exit"))
 		{
-			exit(0);
-			abort();
+			if (dwn::config::g_hotkey_config.is_key_pressed("game_exit"))
+			{
+				exit(0);
+				abort();
+			}
+		}
+		else
+		{
+			if (GetAsyncKeyState(VK_F4))
+			{
+				exit(0);
+				abort();
+			}
 		}
 		std::this_thread::sleep_for(100ms);
 	}
@@ -82,6 +93,8 @@ void routine(dwn::thread* thr)
 		std::this_thread::sleep_for(1000ms);
 		dwn::util::spawn_detached_thread(&game_speedup);
 	}
+
+	bool hotkey_load{ dwn::config::g_hotkey_config.load_from_file() };
 
 	dwn::pointers::g_GetProcAddress = &GetProcAddress;
 	make_hook_time_critical("GetProcAddress", GetProcAddress);
@@ -102,6 +115,11 @@ void routine(dwn::thread* thr)
 		LOG_TO_STREAM("Early injection present, awaiting RGSC...");
 	}
 
+	if (!hotkey_load)
+	{
+		LOG_TO_STREAM("Hotkey load failed, using defaults");
+	}
+
 	dwn::hooking::create();
 
 	if (!IsDebuggerPresent())
@@ -120,9 +138,19 @@ void routine(dwn::thread* thr)
 
 	while (g_running)
 	{
-		if (GetAsyncKeyState(VK_F12))
+		if (dwn::config::g_hotkey_config.valid("unload"))
 		{
-			g_running = false;
+			if (dwn::config::g_hotkey_config.is_key_pressed("unload"))
+			{
+				g_running = false;
+			}
+		}
+		else
+		{
+			if (GetAsyncKeyState(VK_F12))
+			{
+				g_running = false;
+			}
 		}
 		std::this_thread::sleep_for(100ms);
 	}
