@@ -162,6 +162,7 @@
     <ClInclude Include="src\config\config.h" />
     <ClInclude Include="src\config\hotkey_config.h" />
     <ClInclude Include="src\config\command_config.h" />
+    <ClInclude Include="src\menu\timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">

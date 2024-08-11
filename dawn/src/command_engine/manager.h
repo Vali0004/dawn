@@ -134,7 +134,10 @@ namespace dwn::commands
 				json["options"] = nlohmann::json::array();
 				for (auto& cmd : m_commands)
 				{
-					json["options"].push_back(cmd->to_json());
+					if (!cmd->is_once_of<group_command>())
+					{
+						json["options"].push_back(cmd->to_json());
+					}
 				}
 			}
 			else

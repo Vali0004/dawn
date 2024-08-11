@@ -4,6 +4,7 @@
 #include "hooking/hooks.h"
 #include "renderer/input.h"
 #include "command_engine/manager.h"
+#include "menu/timer.h"
 
 namespace dwn::commands
 {
@@ -23,6 +24,7 @@ namespace dwn::commands
 			}
 		}
 	}
+
 	class submenu;
 	inline submenu* g_submenu;
 	extern void push(submenu sub);
@@ -111,16 +113,20 @@ namespace dwn::commands
 		}
 		u64 m_current{};
 	};
+
 	inline std::stack<submenu> g_submenus{};
+
 	inline void push(submenu sub)
 	{
 		g_submenu = &sub;
 		g_submenus.push(*g_submenu);
 	}
+
 	inline void push(sub_manager sub)
 	{
 		push(submenu(sub));
 	}
+
 	inline void pop()
 	{
 		if (g_submenus.size() > 1 && g_submenus.top().get_name() != "home")
@@ -132,11 +138,13 @@ namespace dwn::commands
 			gui::flip_bit(true);
 		}
 	}
+
 	inline void draw_header()
 	{
 		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.0694f }, { 0, 186, 255, 255 });
 		g_drawbase += 0.0694f;
 	}
+
 	inline void draw_subtitle(submenu sub)
 	{
 		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
@@ -145,6 +153,7 @@ namespace dwn::commands
 		get()->draw_text(arialbd_23, pos.data(), { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
+
 	inline void draw_footer()
 	{
 		get()->draw_rect({ 0.01f, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
@@ -153,29 +162,7 @@ namespace dwn::commands
 		get()->draw_text(arial_22, "v0.01", { 0.01f + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
-	class simple_timer
-	{
-	public:
-		void start(uint64_t ticks)
-		{
-			if (m_tick)
-			{
-				m_ready_at = GetTickCount64() + ticks;
-				m_tick = false;
-			}
-		}
-		bool is_ready()
-		{
-			return GetTickCount64() > m_ready_at;
-		}
-		void reset()
-		{
-			m_tick = true;
-		}
-	public:
-		u64 m_ready_at{};
-		bool m_tick{};
-	};
+
 	inline void on_press(int key, size_t delay, fptr<void()> callback)
 	{
 		if (GetForegroundWindow() == pointers::g_hwnd)
@@ -209,6 +196,7 @@ namespace dwn::commands
 			}
 		}
 	}
+
 	inline void handle_input()
 	{
 		on_press(VK_RETURN, 20, [] {
@@ -225,6 +213,7 @@ namespace dwn::commands
 		});
 		input::g_input.update();
 	}
+
 	inline void draw_menu()
 	{
 		handle_input();
@@ -233,5 +222,38 @@ namespace dwn::commands
 		draw_subtitle(g_submenus.top());
 		g_submenus.top().handle();
 		draw_footer();
+	}
+
+	inline void create_fonts()
+	{
+		std::fs::path font_path{ std::getenv("appdata") };
+		font_path /= BASE_NAME;
+		font_path /= "Fonts";
+		std::string str{ (font_path / "icon_font.ttf").string() };
+		float width = get()->m_display_size.x;
+		iconfont_22 = directx::load_font(str.data(), (22.f / 3160.f) * width, get()->m_device);
+		iconfont_24 = directx::load_font(str.data(), (24.f / 3160.f) * width, get()->m_device);
+		arial_22 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", (22.f / 3160.f) * width, get()->m_device);
+		arial_23 = directx::load_font("C:\\Windows\\Fonts\\arial.ttf", 23.f, get()->m_device);
+		arialbd_22 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (22.f / 3160.f) * width, get()->m_device);
+		arialbd_23 = directx::load_font("C:\\Windows\\Fonts\\arialbd.ttf", (23.f / 3160.f) * width, get()->m_device);
+		ariali_22 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (22.f / 3160.f) * width, get()->m_device);
+		ariali_23 = directx::load_font("C:\\Windows\\Fonts\\ariali.ttf", (23.f / 3160.f) * width, get()->m_device);
+		arialbi_22 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (22.f / 3160.f) * width, get()->m_device);
+		arialbi_23 = directx::load_font("C:\\Windows\\Fonts\\arialbi.ttf", (23.f / 3160.f) * width, get()->m_device);
+	}
+
+	inline void destroy_fonts()
+	{
+		directx::destroy_font(iconfont_22);
+		directx::destroy_font(iconfont_24);
+		directx::destroy_font(arial_22);
+		directx::destroy_font(arial_23);
+		directx::destroy_font(arialbd_22);
+		directx::destroy_font(arialbd_23);
+		directx::destroy_font(ariali_22);
+		directx::destroy_font(ariali_23);
+		directx::destroy_font(arialbi_22);
+		directx::destroy_font(arialbi_23);
 	}
 }

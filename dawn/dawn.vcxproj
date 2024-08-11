@@ -164,6 +164,7 @@
     <ClInclude Include="src\memory\types.h" />
     <ClInclude Include="src\menu\menu.h" />
     <ClInclude Include="src\menu\command_gui_wrapper.h" />
+    <ClInclude Include="src\menu\timer.h" />
     <ClInclude Include="src\minhook\buffer.h" />
     <ClInclude Include="src\minhook\hde\hde32.h" />
     <ClInclude Include="src\minhook\hde\hde64.h" />
