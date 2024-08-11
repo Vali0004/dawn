@@ -94,8 +94,6 @@ void routine(dwn::thread* thr)
 		dwn::util::spawn_detached_thread(&game_speedup);
 	}
 
-	bool hotkey_load{ dwn::config::g_hotkey_config.load_from_file() };
-
 	dwn::pointers::g_GetProcAddress = &GetProcAddress;
 	make_hook_time_critical("GetProcAddress", GetProcAddress);
 
@@ -107,6 +105,8 @@ void routine(dwn::thread* thr)
 	dwn::konsole::create(dwn::g_console, BASE_NAME " | " BASE_CANDIDATE " " BUILD, "log.txt");
 	LOG_TO_STREAM("Console created.");
 	LOG_TO_STREAM("Base address: " << HEX(dwn::memory::hmodule().begin().as<u64>()));
+
+	bool hotkey_load{ dwn::config::g_hotkey_config.load_from_file() };
 
 	dwn::util::spawn_detached_thread(&game_death);
 

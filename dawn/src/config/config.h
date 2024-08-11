@@ -8,18 +8,18 @@ namespace dwn::config
 	{
 	public:
 
-        generic_config(stdfs::path path, const std::string& filename) :
+        generic_config(const stdfs::path& path, const std::string& filename) :
             m_config_path(path)
         {
+            LOG_TO_STREAM("Config path: " << m_config_path.string());
             bool existed{ true };
-            if (!stdfs::exists(path))
+            if (!stdfs::exists(m_config_path))
             {
                 existed = false;
-                stdfs::create_directories(path);
+                stdfs::create_directories(m_config_path);
             }
 
-            path /= filename;
-            m_config_path = path;
+            m_config_path /= filename;
 
             if (!existed)
             {

@@ -47,6 +47,7 @@ namespace dwn::shv
 		stdfs::path m_path{};
 		HMODULE m_handle{};
 	};
+
 	class module_loader
 	{
 	public:

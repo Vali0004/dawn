@@ -62,14 +62,14 @@ namespace dwn::input
                 case WM_KEYDOWN:
                 case WM_SYSKEYDOWN:
                 {
-                    set_key(wparam, true);
+                    set_key(static_cast<u16>(wparam & 0xFFFF), true);
                     update();
                 } break;
 
                 case WM_KEYUP:
                 case WM_SYSKEYUP:
                 {
-                    set_key(wparam, false);
+                    set_key(static_cast<u16>(wparam & 0xFFFF), false);
                     update();
                 } break;
             }

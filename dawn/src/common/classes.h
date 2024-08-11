@@ -22,10 +22,6 @@
 #include "rgsc/public_interface/cloudsave_interface.h"
 #include "rgsc/public_interface/gamerpics_interface.h"
 #include "data/bitbuffer.h"
-#define UNUSED_PARAM(x) // I am NOT about to remove this off every virtual function
-#define TrapGE(...) 
-#define Assert(x)
-#define AssertMsg(x, m)
 using namespace rage;
 
 enum LoadingScreenMovieContext : std::uint32_t

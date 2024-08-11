@@ -102,7 +102,9 @@ namespace dwn::shv
 		cmd(&inf);
 		inf.CopyReferencedParametersOut();
 
-		return reinterpret_cast<u64*>(&result);
+		auto resultPtr{ std::make_unique<scrValue>(result) };
+
+		return reinterpret_cast<u64*>(resultPtr.get());
 	}
 
 	inline u64* getGlobalPtr(int index)

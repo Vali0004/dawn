@@ -24,6 +24,7 @@
 #define Assert(...) ;
 #define Verifyf(...) true
 #define Warningf(...) ;
+#define TrapGE(...) 
 #define I64FMT PRIi64
 #define formatf snprintf
 #define sysMemCpy memcpy

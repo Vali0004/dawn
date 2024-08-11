@@ -53,7 +53,7 @@ namespace dwn
 		return std::nullopt;
 	}
 
-	inline std::optional<token> get_token_by_value(uint32_t input, bool ordinal = false)
+	inline std::optional<token> get_token_by_value(u64 input, bool ordinal = false)
 	{
 		const auto& tokens = ordinal ? g_ordinal_tokens : g_tokens;
 		for (const auto& token : tokens)
@@ -121,39 +121,39 @@ namespace dwn
 		return result;
 	}
 
-	inline std::string number_to_word(uint64_t number, bool ordinal = false)
+	inline std::string number_to_word(u64 number, bool ordinal = false)
 	{
 		if (number == 0)
 		{
 			return ordinal ? "zeroth" : "zero";
 		}
 
-		std::string result;
+		std::string result{};
 
 		if (number >= 1000000)
 		{
-			uint64_t millions = number / 1000000;
+			u64 millions{ number / 1000000 };
 			result += number_to_word(millions) + " million ";
 			number %= 1000000;
 		}
 
 		if (number >= 1000)
 		{
-			uint64_t thousands = number / 1000;
+			u64 thousands{ number / 1000 };
 			result += number_to_word(thousands) + " thousand ";
 			number %= 1000;
 		}
 
 		if (number >= 100)
 		{
-			uint64_t hundreds = number / 100;
+			u64 hundreds{ number / 100 };
 			result += number_to_word(hundreds) + " hundred ";
 			number %= 100;
 		}
 
 		if (number >= 20)
 		{
-			uint64_t tens = (number / 10) * 10;
+			u64 tens{ (number / 10) * 10 };
 			auto token = get_token_by_value(tens);
 			if (token.has_value())
 			{
