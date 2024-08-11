@@ -294,6 +294,8 @@ namespace dwn::commands
 				return;
 			}
 
+			//LOG_TO_STREAM("Called from json.");
+
 			m_subs[0]->from_json(json);
 		}
 	private:

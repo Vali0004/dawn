@@ -41,7 +41,8 @@ namespace dwn::config
 		{
 			if (m_mark_as_create)
 			{
-				return save_to_file();
+				m_mark_as_create = save_to_file();
+				return m_mark_as_create;
 			}
 
 			return load_from_file();

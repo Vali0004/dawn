@@ -133,12 +133,13 @@ void routine(dwn::thread* thr)
 		LOG_TO_STREAM("WARNING: Exception filter not attached!");
 	}
 
-	dwn::config::g_command_config.handle_init(); // Get config if it exists.
+	dwn::config::g_command_config.handle_init();
 
 	dwn::renderer::menu::init();
 	
-	// Recall it to create it if it doesn't :3
 	dwn::config::g_command_config.handle_init();
+
+	LOG_TO_STREAM("Init finished");
 
 	while (g_running)
 	{
