@@ -50,12 +50,12 @@ namespace dwn::shv
 		void create(fptr<void()> callback)
 		{
 			m_handle = CreateThread(nilptr, nil, [](void* cb) -> ul32 WINAPI {
-				if (cb && g_running)
-				{
-					rage::run_as_thread("main_persistent"_j, [&] {
+				rage::run_as_thread("main_persistent"_j, [&] {
+					if (cb && g_running)
+					{
 						reinterpret_cast<fptr<void()>>(cb)();
-					});
-				}
+					}
+				});
 				return 0;
 			}, callback, nil, nilptr);
 		}
@@ -156,10 +156,6 @@ namespace dwn::shv
 		if (waitTime)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
-		}
-		else
-		{
-			std::this_thread::yield();
 		}
 	}
 

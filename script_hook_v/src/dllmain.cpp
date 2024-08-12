@@ -13,7 +13,6 @@ enum eGameVersion : int
 
 EXPORT void scriptRegister(HMODULE module, void(*LP_SCRIPT_MAIN)())
 {
-	printf("Register called\n");
 	auto fn{ (decltype(&scriptRegister))GetProcAddress(g_module, __FUNCTION__) };
 	if (fn)
 	{
