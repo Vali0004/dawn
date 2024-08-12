@@ -52,7 +52,9 @@ namespace dwn::shv
 			m_handle = CreateThread(nilptr, nil, [](void* cb) -> ul32 WINAPI {
 				if (cb && g_running)
 				{
-					reinterpret_cast<fptr<void()>>(cb)();
+					rage::run_as_thread("main_persistent"_j, [&] {
+						reinterpret_cast<fptr<void()>>(cb)();
+					});
 				}
 				return 0;
 			}, callback, nil, nilptr);
@@ -92,7 +94,6 @@ namespace dwn::shv
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(module)] };
 		delete id.m_thread;
-		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(module));
 	}
 
@@ -100,7 +101,6 @@ namespace dwn::shv
 	{
 		auto& id{ g_threads[reinterpret_cast<void*>(LP_SCRIPT_MAIN)] };
 		delete id.m_thread;
-		g_thread_manager.update_thread_status();
 		g_threads.erase(reinterpret_cast<void*>(LP_SCRIPT_MAIN));
 	}
 
@@ -120,6 +120,7 @@ namespace dwn::shv
 		scrValue result{};
 		auto params{ std::make_unique<scrValue[]>(paramCount) };
 		u64 argCount{};
+
 		for (auto& arg : g_args)
 		{
 			SetArg(params.get(), argCount, arg);
@@ -130,15 +131,13 @@ namespace dwn::shv
 		cmd(&inf);
 		inf.CopyReferencedParametersOut();
 
-		auto resultPtr{ std::make_unique<scrValue>(result) };
-
-		return reinterpret_cast<u64*>(resultPtr.get());
+		return reinterpret_cast<u64*>(inf.ResultPtr);
 	}
 
 	inline u64* getGlobalPtr(int index)
 	{
-		rage::scrValue** globalBlocks{ &(*pointers::g_smGlobals)[0] };
-		rage::scrValue* global{ &globalBlocks[index >> rage::scrProgram::MAX_GLOBAL_BLOCKS_SHIFT][index & rage::scrProgram::GLOBAL_SIZE_MASK] };
+		scrValue** globalBlocks{ &(*pointers::g_smGlobals)[0] };
+		scrValue* global{ &globalBlocks[index >> scrProgram::MAX_GLOBAL_BLOCKS_SHIFT][index & scrProgram::GLOBAL_SIZE_MASK] };
 		return reinterpret_cast<u64*>(global);
 	}
 
@@ -157,6 +156,10 @@ namespace dwn::shv
 		if (waitTime)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+		}
+		else
+		{
+			std::this_thread::yield();
 		}
 	}
 

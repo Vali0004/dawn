@@ -134,6 +134,8 @@ void routine(dwn::thread* thr)
 
 	dwn::renderer::menu::init();
 
+	dwn::shv::g_module_loader.load("NativeTrainer.asi");
+
 	while (g_running)
 	{
 		if (dwn::config::g_hotkey_config.valid("unload"))
