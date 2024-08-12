@@ -123,6 +123,7 @@ namespace dwn::shv
 
 		for (auto& arg : g_args)
 		{
+			//LOG_TO_STREAM("Arg: " << arg);
 			SetArg(params.get(), argCount, arg);
 		}
 
