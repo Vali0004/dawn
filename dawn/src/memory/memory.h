@@ -140,7 +140,7 @@ namespace dwn::memory
 
 		nodisc const bool exists()
 		{
-			return !size();
+			return size();
 		}
 
 		const std::string& name()

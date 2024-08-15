@@ -33,7 +33,7 @@ namespace dwn::shv
 		VER_UNK = -1
 	};
 	inline u64 g_hash{};
-	inline std::vector<u64> g_args{};
+	inline std::vector<scrValue> g_args{};
 	inline std::unordered_map<KeyboardFunctionT, KeyboardFunctionT> g_keyboard_functions{};
 	inline std::unordered_map<PresentCallbackT, PresentCallbackT> g_present_callbacks{};
 	class shv_thread
@@ -111,23 +111,18 @@ namespace dwn::shv
 
 	inline void nativePush64(u64 val)
 	{
-		g_args.push_back(val);
+		rage::scrValue data{};
+		// Type punting hurts...
+		//data.Any = val;
+		*reinterpret_cast<u64*>(&data) = std::forward<u64&&>(val);
+		g_args.push_back(data);
 	}
 
 	inline u64* nativeCall()
 	{
-		int paramCount{ static_cast<int>(g_args.size()) };
 		scrValue result{};
-		auto params{ std::make_unique<scrValue[]>(paramCount) };
-		u64 argCount{};
 
-		for (auto& arg : g_args)
-		{
-			//LOG_TO_STREAM("Arg: " << arg);
-			SetArg(params.get(), argCount, arg);
-		}
-
-		scrThread::Info inf{ &result, paramCount, params.get() };
+		scrThread::Info inf{ &result, static_cast<int>(g_args.size()), g_args.data() };
 		scrCmd cmd{ dwn::pointers::g_sCommandHash->Lookup(CorrectHash(g_hash)) };
 		cmd(&inf);
 		inf.CopyReferencedParametersOut();

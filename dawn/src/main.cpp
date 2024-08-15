@@ -87,7 +87,7 @@ void game_death()
 }
 void routine(dwn::thread* thr)
 {
-	g_was_injected_early = dwn::memory::hmodule("socialclub.dll").exists(); //TODO: Fix
+	g_was_injected_early = !dwn::memory::hmodule("socialclub.dll").exists();
 	if (g_was_injected_early)
 	{
 		std::this_thread::sleep_for(1000ms);
