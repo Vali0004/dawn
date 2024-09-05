@@ -5,6 +5,8 @@
 
 namespace dwn::commands
 {
+	inline u64 g_sub_order_id{};
+	inline u64 g_option_order_id{};
 	class sub_manager
 	{
 	public:
@@ -21,7 +23,15 @@ namespace dwn::commands
 		template <typename T = single_command, typename ...A>
 		void add_cmd(A&&... args)
 		{
-			m_commands.push_back(reinterpret_cast<cmd_data<cmd_functions>*>(new T(args...)));
+			g_option_order_id++;
+			auto cmd{ reinterpret_cast<cmd_data<cmd_functions>*>(new T(args...)) };
+			if (m_order_id != g_sub_order_id)
+			{
+				g_sub_order_id = m_order_id;
+				g_option_order_id = 1;
+			}
+			cmd->m_order_id = g_option_order_id;
+			m_commands.push_back(cmd);
 		}
 
 		cmd_data<cmd_functions>* get_cmd_at(u64 index)
@@ -257,6 +267,36 @@ namespace dwn::commands
 				}
 			}
 			return i;
+		}
+
+		std::string get_cmd_from_order_id(u64 id)
+		{
+			for (auto& cmd : m_commands)
+			{
+				if (!cmd->m_does_once_act_as_init && cmd->m_enabled)
+				{
+					if (!cmd->is_once_of<cmd_functions>() && id == cmd->m_order_id)
+					{
+						return cmd->get_id();
+					}
+				}
+			}
+			return {};
+		}
+
+		u64 get_order_id(const std::string& id)
+		{
+			for (auto& cmd : m_commands)
+			{
+				if (!cmd->m_does_once_act_as_init && cmd->m_enabled)
+				{
+					if (!cmd->is_once_of<cmd_functions>() && !cmd->get_id().compare(id.data()))
+					{
+						return cmd->m_order_id;
+					}
+				}
+			}
+			return 0;
 		}
 
 		u64 get_num_commands()

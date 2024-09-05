@@ -187,13 +187,15 @@ namespace rage {
 		Sizes Virtual;
 		Sizes Physical;
 	};
-	struct datResourceChunk {
+	struct datResourceChunk
+	{
 		static constexpr u32 MAX_CHUNKS = 128;
-		void *SrcAddr;
-		void *DestAddr;
+		void* SrcAddr;
+		void* DestAddr;
 		u64 Size;
 	};
-	struct datResourceMap {
+	struct datResourceMap
+	{
 		u8 VirtualCount, PhysicalCount;
 		u8 RootVirtualChunk, DisableMerge;
 		u8 HeaderType;
@@ -202,37 +204,72 @@ namespace rage {
 		int LastSrc, LastDest;
 	};
 	template <class _T>
-	struct datRef {
-		datRef(_T* p) : ptr(p) {}
-		_T& operator*() const { return *ptr; }
-		_T* operator->() const { return ptr; }
-		operator _T* () const { return ptr; }
-		_T*& operator=(_T* that) { return ptr = that; }
+	struct datRef
+	{
+		datRef(_T* p) : ptr(p)
+		{}
+		_T& operator*() const
+		{
+			return *ptr;
+		}
+		_T* operator->() const
+		{
+			return ptr;
+		}
+		operator _T* () const
+		{
+			return ptr;
+		}
+		_T*& operator=(_T* that)
+		{
+			return ptr = that;
+		}
 		_T* ptr;
 	};
 	template <class _T>
-	struct datOwner {
-		datOwner(_T* p) : ptr(p) {}
-		_T& operator*() const { return *ptr; }
-		_T* operator->() const { return ptr; }
-		operator _T* () const { return ptr; }
-		_T*& operator=(_T* that) { return ptr = that; }
+	struct datOwner
+	{
+		datOwner(_T* p) : ptr(p)
+		{}
+		_T& operator*() const
+		{
+			return *ptr;
+		}
+		_T* operator->() const
+		{
+			return ptr;
+		}
+		operator _T* () const
+		{
+			return ptr;
+		}
+		_T*& operator=(_T* that)
+		{
+			return ptr = that;
+		}
 		_T* ptr;
 	};
-	class datBase {
+	class datBase
+	{
 	public:
-		virtual ~datBase();
+		virtual ~datBase() = default;
 	};
-	template <u32 _Count, typename _T = u8> struct datPadding {
+	template <u32 _Count, typename _T = u8> struct datPadding
+	{
 	public:
-		bool operator==(int n) { return (n == 0); }
+		bool operator==(int n)
+		{
+			return (n == 0);
+		}
 	private:
 		_T m[_Count];
 	};
 	typedef void *fiHandle;
-	class datGrowBuffer {
+	class datGrowBuffer
+	{
 	public:
-		void* GetBuffer() {
+		void* GetBuffer()
+		{
 			return m_Len ? m_Buf : NULL;
 		}
 		u8* m_Buf;
@@ -257,12 +294,20 @@ namespace rage {
 //atXXXXXXX
 namespace rage {
 	template <u64 X>
-	struct CompileTimeLog2Floor {
-		enum { value = 1+CompileTimeLog2Floor<(X>>1)>::value };
+	struct CompileTimeLog2Floor
+	{
+		enum
+		{
+			value = 1 + CompileTimeLog2Floor<(X >> 1)>::value
+		};
 	};
 	template<>
-	struct CompileTimeLog2Floor<1> {
-		enum { value = 0 };
+	struct CompileTimeLog2Floor<1>
+	{
+		enum
+		{
+			value = 0
+		};
 	};
 	class atHashValue
 	{
@@ -292,7 +337,8 @@ namespace rage {
 	};
 	template<int, typename> class atFixedBitSetIterator;
 	template <int Size, typename Type = u32>
-	class atFixedBitSetBase {
+	class atFixedBitSetBase
+	{
 		template<int X, typename Y> friend class atFixedBitSetIterator;
 	protected:
 		static constexpr int BlockSize = sizeof(Type);
@@ -300,7 +346,8 @@ namespace rage {
 		static constexpr int BlockBitShift = CompileTimeLog2Floor<BitsPerBlock>::value;
 		static constexpr int NumBlocks = (((Size)+(BitsPerBlock - 1)) >> BlockBitShift);
 	public:
-		enum {
+		enum
+		{
 			NUM_BITS = Size,
 			NUM_BLOCKS = NumBlocks,
 			BLOCK_SIZE = BlockSize
@@ -308,18 +355,29 @@ namespace rage {
 		typedef atFixedBitSetBase<Size, Type> myType;
 	protected:
 		Type m_Bits[NumBlocks];
-		__forceinline void ClearUndefinedBits() {
+		__forceinline void ClearUndefinedBits()
+		{
 			const int numOnes = ((Size - 1) % BitsPerBlock) + 1; // numOnes is 1..32
 			const Type ones = (Type)~(Type)0x0u; // ones = 0xFFFFFFFF
 			const Type mask = ones >> (BitsPerBlock - numOnes); // Shift by (32 - (1..32)) = (31..0)
 			m_Bits[NumBlocks - 1] &= mask;
 		}
-		__forceinline Type& Block(u32 i) { return m_Bits[i >> BlockBitShift]; }
-		__forceinline const Type& Block(u32 i) const { return m_Bits[i >> BlockBitShift]; }
-		__forceinline Type BitInBlock(u32 i) const { return (Type)1 << (i & (BitsPerBlock - 1)); }
+		__forceinline Type& Block(u32 i)
+		{
+			return m_Bits[i >> BlockBitShift];
+		}
+		__forceinline const Type& Block(u32 i) const
+		{
+			return m_Bits[i >> BlockBitShift];
+		}
+		__forceinline Type BitInBlock(u32 i) const
+		{
+			return (Type)1 << (i & (BitsPerBlock - 1));
+		}
 	};
 	template <int Size, typename Type = u32>
-	class atFixedBitSet : public atFixedBitSetBase<Size, Type> {
+	class atFixedBitSet : public atFixedBitSetBase<Size, Type>
+	{
 	public:
 		typedef atFixedBitSetBase<Size, Type> myBaseType;
 		typedef atFixedBitSet<Size, Type> myType;
@@ -328,42 +386,55 @@ namespace rage {
 	typedef atFixedBitSet<8, u8> atFixedBitSet8;
 	typedef atFixedBitSet<16, u16> atFixedBitSet16;
 	typedef atFixedBitSet<32, u32> atFixedBitSet32;
-	class ConstStringBase {
+	class ConstStringBase
+	{
 	public:
-		operator const char*() const {
+		operator const char* () const
+		{
 			return c_str();
 		}
-		const char* c_str() const {
+		const char* c_str() const
+		{
 			return m_String;
 		}
 		const char* m_String;
 	};
-	class ConstString : public ConstStringBase {
+	class ConstString : public ConstStringBase
+	{
 	public:
 
 	};
-	class atStringBuilder {
+	class atStringBuilder
+	{
 	public:
-		const char* ToString() {
+		const char* ToString()
+		{
 			char* str = (char*)m_DBuf.GetBuffer();
 			return str ? str : "";
 		}
-		char* ToData() {
+		char* ToData()
+		{
 			return (char*)m_DBuf.GetBuffer();
 		}
 		datGrowBuffer m_DBuf;
 	};
-	class atHashString {
+	class atHashString
+	{
 	public:
-		atHashString(u32 hash) : m_hash(hash) {}
-		atHashString(const char* hashKey) : m_hash(atStringHash(hashKey)) {}
-		atHashString() {}
+		atHashString(u32 hash) : m_hash(hash)
+		{}
+		atHashString(const char* hashKey) : m_hash(atStringHash(hashKey))
+		{}
+		atHashString()
+		{}
 		u32 m_hash;
 	};
 	typedef atHashString atFinalHashString;
-	class atString {
+	class atString
+	{
 	public:
-		const char* c_str() const {
+		const char* c_str() const
+		{
 			return m_Length ? m_Data : "";
 		}
 
@@ -371,34 +442,68 @@ namespace rage {
 		u16 m_Length, m_Allocated;
 	};
 	template <typename DataT, typename CountT = u16>
-	class atArray {
+	class atArray
+	{
 	public:
-		DataT* begin() { return m_Elements; }
-		DataT* end() { return m_Elements + m_Count; }
-		const DataT* begin() const { return m_Elements; }
-		const DataT* end() const { return m_Elements + m_Count; }
-		DataT* data() { return m_Elements; }
-		const DataT* data() const { return m_Elements; }
-		CountT size() const { return m_Count; }
-		CountT capacity() const { return m_Capacity; }
-		DataT& operator[](CountT index) { return m_Elements[index]; }
-		const DataT& operator[](CountT index) const { return m_Elements[index]; }
-		DataT& push_back(int beforeIndex) {
+		DataT* begin()
+		{
+			return m_Elements;
+		}
+		DataT* end()
+		{
+			return m_Elements + m_Count;
+		}
+		const DataT* begin() const
+		{
+			return m_Elements;
+		}
+		const DataT* end() const
+		{
+			return m_Elements + m_Count;
+		}
+		DataT* data()
+		{
+			return m_Elements;
+		}
+		const DataT* data() const
+		{
+			return m_Elements;
+		}
+		CountT size() const
+		{
+			return m_Count;
+		}
+		CountT capacity() const
+		{
+			return m_Capacity;
+		}
+		DataT& operator[](CountT index)
+		{
+			return m_Elements[index];
+		}
+		const DataT& operator[](CountT index) const
+		{
+			return m_Elements[index];
+		}
+		DataT& push_back(int beforeIndex)
+		{
 			for (int i = m_Count; i > beforeIndex; i--)
 				m_Elements[i] = m_Elements[i - 1];
 			++m_Count;
 			return m_Elements[beforeIndex]; //lint !e797
 		}
-		int binary_search(const CountT& t) const {
-			int low = 0, high = m_Count-1;
-			while (low <= high) {
+		int binary_search(const CountT& t) const
+		{
+			int low = 0, high = m_Count - 1;
+			while (low <= high)
+			{
 				int mid = (low + high) >> 1;
 				if (t == m_Elements[mid])
 					return mid;
 				else if (t < m_Elements[mid])
-					high = mid-1;
+					high = mid - 1;
 				else
-					low = mid+1;
+					low = mid + 1;
 			}
 			return -1;
 		}
@@ -407,147 +512,257 @@ namespace rage {
 		CountT m_Count, m_Capacity;
 	};
 	template <typename DataT, s32 Capacity>
-	class atFixedArray {
+	class atFixedArray
+	{
 	public:
-		DataT* begin() { return m_Elements; }
-		DataT* end() { return m_Elements + m_Count; }
-		const DataT* begin() const { return m_Elements; }
-		const DataT* end() const { return m_Elements + m_Count; }
-		DataT* data() { return m_Elements; }
-		const DataT* data() const { return m_Elements; }
-		s32 size() const { return m_Count; }
-		s32 capacity() const { return Capacity; }
-		DataT& operator[](s32 index) { return m_Elements[index]; }
-		const DataT& operator[](s32 index) const { return m_Elements[index]; }
+		DataT* begin()
+		{
+			return m_Elements;
+		}
+		DataT* end()
+		{
+			return m_Elements + m_Count;
+		}
+		const DataT* begin() const
+		{
+			return m_Elements;
+		}
+		const DataT* end() const
+		{
+			return m_Elements + m_Count;
+		}
+		DataT* data()
+		{
+			return m_Elements;
+		}
+		const DataT* data() const
+		{
+			return m_Elements;
+		}
+		s32 size() const
+		{
+			return m_Count;
+		}
+		s32 capacity() const
+		{
+			return Capacity;
+		}
+		DataT& operator[](s32 index)
+		{
+			return m_Elements[index];
+		}
+		const DataT& operator[](s32 index) const
+		{
+			return m_Elements[index];
+		}
 	private:
 		DataT* m_Elements;
 		s32 m_Count = Capacity;
 	};
 	template <typename DataT, s32 MaxCount>
-	class atRangeArray {
+	class atRangeArray
+	{
 	public:
-		DataT* begin() { return m_Elements; }
-		DataT* end() { return m_Elements + MaxCount; }
-		const DataT* begin() const { return m_Elements; }
-		const DataT* end() const { return m_Elements + MaxCount; }
-		DataT* data() { return m_Elements; }
-		const DataT* data() const { return m_Elements; }
-		s32 size() const { return MaxCount; }
-		s32 capacity() const { return size(); }
-		DataT& operator[](s32 index) { return m_Elements[index]; }
-		const DataT& operator[](s32 index) const { return m_Elements[index]; }
+		DataT* begin()
+		{
+			return m_Elements;
+		}
+		DataT* end()
+		{
+			return m_Elements + MaxCount;
+		}
+		const DataT* begin() const
+		{
+			return m_Elements;
+		}
+		const DataT* end() const
+		{
+			return m_Elements + MaxCount;
+		}
+		DataT* data()
+		{
+			return m_Elements;
+		}
+		const DataT* data() const
+		{
+			return m_Elements;
+		}
+		s32 size() const
+		{
+			return MaxCount;
+		}
+		s32 capacity() const
+		{
+			return size();
+		}
+		DataT& operator[](s32 index)
+		{
+			return m_Elements[index];
+		}
+		const DataT& operator[](s32 index) const
+		{
+			return m_Elements[index];
+		}
 	private:
 		DataT m_Elements[MaxCount];
 	};
 	template <typename _T, typename _KeyType>
-	class atBinaryMap {
+	class atBinaryMap
+	{
 	public:
-		class Iterator {
+		class Iterator
+		{
 		public:
-			Iterator() : Map(NULL), CurIdx(0) {}
-			explicit Iterator(atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0) {}
-			Iterator& operator++() {
+			Iterator() : Map(NULL), CurIdx(0)
+			{}
+			explicit Iterator(atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0)
+			{}
+			Iterator& operator++()
+			{
 				if (++CurIdx >= Map->Data.GetCount())
 					*this = Map->End();
 				return *this;
 			}
-			Iterator operator++(const int) {
+			Iterator operator++(const int)
+			{
 				Iterator result(*this);
 				++(*this);
 				return result;
 			}
-			_T& operator*() const {
+			_T& operator*() const
+			{
 				return Map->Data[CurIdx].data;
 			}
-			_T* operator->() const {
+			_T* operator->() const
+			{
 				return &Map->Data[CurIdx].data;
 			}
-			bool operator==(const Iterator& comp) const {
+			bool operator==(const Iterator& comp) const
+			{
 				return (CurIdx == comp.CurIdx) && (Map == comp.Map);
 			}
-			bool operator!=(const Iterator& comp) const {
+			bool operator!=(const Iterator& comp) const
+			{
 				return !((CurIdx == comp.CurIdx) && (Map == comp.Map));
 			}
-			Iterator& operator=(const Iterator& rhs) {
+			Iterator& operator=(const Iterator& rhs)
+			{
 				Map = rhs.Map;
 				CurIdx = rhs.CurIdx;
 				return *this;
 			}
-			const _KeyType& GetKey() { return Map->Data[CurIdx].key; }
+			const _KeyType& GetKey()
+			{
+				return Map->Data[CurIdx].key;
+			}
 		private:
 			atBinaryMap<_T, _KeyType>* Map;
 			int CurIdx;
 		};
-		class ConstIterator {
+		class ConstIterator
+		{
 		public:
-			ConstIterator() : Map(NULL), CurIdx(0) {}
-			explicit ConstIterator(const atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0) {}
-			ConstIterator& operator++() {
+			ConstIterator() : Map(NULL), CurIdx(0)
+			{}
+			explicit ConstIterator(const atBinaryMap<_T, _KeyType>& themap) :Map(&themap), CurIdx(0)
+			{}
+			ConstIterator& operator++()
+			{
 				if (++CurIdx >= Map->Data.GetCount())
 					*this = Map->end();
 				return *this;
 			}
-			ConstIterator operator++(const int) {
+			ConstIterator operator++(const int)
+			{
 				ConstIterator result(*this);
 				++(*this);
 				return result;
 			}
-			const _T& operator*() const {
+			const _T& operator*() const
+			{
 				return Map->Data[CurIdx].data;
 			}
-			const _T* operator->() const {
+			const _T* operator->() const
+			{
 				return &Map->Data[CurIdx].data;
 			}
-			bool operator==(const ConstIterator& comp) const {
+			bool operator==(const ConstIterator& comp) const
+			{
 				return (CurIdx == comp.CurIdx) && (Map == comp.Map);
 			}
-			bool operator!=(const ConstIterator& comp) const {
+			bool operator!=(const ConstIterator& comp) const
+			{
 				return !((CurIdx == comp.CurIdx) && (Map == comp.Map));
 			}
-			ConstIterator& operator=(const ConstIterator& rhs) {
+			ConstIterator& operator=(const ConstIterator& rhs)
+			{
 				Map = rhs.Map;
 				CurIdx = rhs.CurIdx;
 				return *this;
 			}
-			const _KeyType& GetKey() { return Map->Data[CurIdx].key; }
+			const _KeyType& GetKey()
+			{
+				return Map->Data[CurIdx].key;
+			}
 		private:
 			const atBinaryMap<_T, _KeyType>* Map;
 			int CurIdx;
 		};
 		friend class Iterator;
 		friend class ConstIterator;
-		Iterator begin() {
+		Iterator begin()
+		{
 			if (Data.size() > 0)
 				return Iterator(*this);
 			else
 				return end();
 		}
-		Iterator end() {
+		Iterator end()
+		{
 			return Iterator();
 		}
-		ConstIterator end() const {
+		ConstIterator end() const
+		{
 			return ConstIterator();
 		}
-		enum ePlaceNoneInitializer { PLACE_NONE };
-		enum ePlaceKeyInitializer { PLACE_KEY };
-		enum ePlaceDataInitializer { PLACE_DATA };
-		enum ePlaceKeyDataInitializer { PLACE_KEY_AND_DATA };
-		int GetCount() const {
+		enum ePlaceNoneInitializer
+		{
+			PLACE_NONE
+		};
+		enum ePlaceKeyInitializer
+		{
+			PLACE_KEY
+		};
+		enum ePlaceDataInitializer
+		{
+			PLACE_DATA
+		};
+		enum ePlaceKeyDataInitializer
+		{
+			PLACE_KEY_AND_DATA
+		};
+		int GetCount() const
+		{
 			return Data.size();
 		}
-		_T* GetItem(int i) {
+		_T* GetItem(int i)
+		{
 			return &Data[i].data;
 		}
-		const _T* GetItem(int i) const {
+		const _T* GetItem(int i) const
+		{
 			return &Data[i].data;
 		}
-		_KeyType* GetKey(int i) {
+		_KeyType* GetKey(int i)
+		{
 			return &Data[i].key;
 		}
-		const _KeyType* GetKey(int i) const {
+		const _KeyType* GetKey(int i) const
+		{
 			return &Data[i].key;
 		}
-		struct DataPair {
+		struct DataPair
+		{
 			_KeyType key;
 			_T data;
 		};
@@ -556,56 +771,73 @@ namespace rage {
 		char Pad[3];
 		atArray<DataPair> Data;
 	};
-	inline u32 atHash(unsigned x) { return x; }
-	inline u32 atHash(const void *x) { return (u32)(u64)x; }
-	inline u32 atHash_const_char(const char* s) {
+	inline u32 atHash(unsigned x)
+	{
+		return x;
+	}
+	inline u32 atHash(const void* x)
+	{
+		return (u32)(u64)x;
+	}
+	inline u32 atHash_const_char(const char* s)
+	{
 		u32 h = 0, g;
 		if (!s)
 			return 0;
 		// stolen from data/hash, presumably whoever wrote
 		// this knew what they were doing.
-		while (*s) {
+		while (*s)
+		{
 			h = (h << 4) + (*s++);
-			if (((g = h & 0xf0000000)) != 0) {
+			if (((g = h & 0xf0000000)) != 0)
+			{
 				h = h ^ (g >> 24);
 				h = h ^ g;
 			}
 		}
 		return h;
 	}
-	inline u32 atHash_const_charU(const char* s) {
+	inline u32 atHash_const_charU(const char* s)
+	{
 		u32 h = 0, g;
-		while (*s) {
+		while (*s)
+		{
 			char c = *s++;
 			if (c >= 'a' && c <= 'z')
 				c -= 0x20;
 			h = (h << 4) + c;
-			if (((g = h & 0xf0000000)) != 0) {
+			if (((g = h & 0xf0000000)) != 0)
+			{
 				h = h ^ (g >> 24);
 				h = h ^ g;
 			}
 		}
 		return h;
 	}
-	inline u16 atHash16(const char* s) {
+	inline u16 atHash16(const char* s)
+	{
 		u32 hash = atHash_const_char(s);
 		u32 prime = 65167;
 		return u16((hash % prime) + (0xffff - prime));
 	}
-	inline u16 atHash16U(const char* s) {
+	inline u16 atHash16U(const char* s)
+	{
 		u32 hash = atHash_const_charU(s);
 		u32 prime = 65167;
 		return u16((hash % prime) + (0xffff - prime));
 	}
-	inline u32 atHash64(u64 key) {
+	inline u32 atHash64(u64 key)
+	{
 		u32 h = 0, g;
 		u32 count = 8;
-		while (--count) {
+		while (--count)
+		{
 			char s = (char)key; // take the bottom 8 bits
 			key = key >> 8;
 
 			h = (h << 4) + s;
-			if (((g = h & 0xf0000000)) != 0) {
+			if (((g = h & 0xf0000000)) != 0)
+			{
 				h = h ^ (g >> 24);
 				h = h ^ g;
 			}
@@ -614,157 +846,291 @@ namespace rage {
 		return h;
 	}
 	template <typename T>
-	struct atMapHashFn {
-		u32 operator()(const T& key) const { return atHash(key); }
+	struct atMapHashFn
+	{
+		u32 operator()(const T& key) const
+		{
+			return atHash(key);
+		}
 	};
 	template <>
-	struct atMapHashFn<const char*> {
-		u32 operator ()(const char* key) const { return atHash_const_char(key); }
+	struct atMapHashFn<const char*>
+	{
+		u32 operator ()(const char* key) const
+		{
+			return atHash_const_char(key);
+		}
 	};
-	template <> struct atMapHashFn<atString> : public atMapHashFn<const char*> {};
-	template <> struct atMapHashFn<ConstString> : public atMapHashFn<const char*> {};
-	struct atMapCaseInsensitiveHashFn {
-		u32 operator ()(const char* key) const { return atHash_const_charU(key); }
+	template <> struct atMapHashFn<atString> : public atMapHashFn<const char*>
+	{};
+	template <> struct atMapHashFn<ConstString> : public atMapHashFn<const char*>
+	{};
+	struct atMapCaseInsensitiveHashFn
+	{
+		u32 operator ()(const char* key) const
+		{
+			return atHash_const_charU(key);
+		}
 	};
 	template <>
-	struct atMapHashFn<u64> {
-		u32 operator ()(u64 key) const { return (atHash64(key)); }
+	struct atMapHashFn<u64>
+	{
+		u32 operator ()(u64 key) const
+		{
+			return (atHash64(key));
+		}
 	};
 	template <typename _T>
-	struct atMapEquals {
-		bool operator ()(const _T& left, const _T& right) const { return left == right; }
+	struct atMapEquals
+	{
+		bool operator ()(const _T& left, const _T& right) const
+		{
+			return left == right;
+		}
 	};
 	template <>
-	struct atMapEquals<const char*> {
-		bool operator ()(const char* left, const char* right) const { return strcmp(left, right) == 0; }
+	struct atMapEquals<const char*>
+	{
+		bool operator ()(const char* left, const char* right) const
+		{
+			return strcmp(left, right) == 0;
+		}
 	};
-	template <> struct atMapEquals<atString> : public atMapEquals<const char*> {};
-	template <> struct atMapEquals<ConstString> : public atMapEquals<const char*> {};
+	template <> struct atMapEquals<atString> : public atMapEquals<const char*>
+	{};
+	template <> struct atMapEquals<ConstString> : public atMapEquals<const char*>
+	{};
 	template <>
-	struct atMapEquals<u64> {
-		bool operator ()(const u64 left, const u64 right) const { return (left == right); }
+	struct atMapEquals<u64>
+	{
+		bool operator ()(const u64 left, const u64 right) const
+		{
+			return (left == right);
+		}
 	};
 	template <typename _Key, typename _Data>
-	struct atMapEntry {
-		atMapEntry(const _Key& k, atMapEntry* n) : key(k), data(), next(n) {}
-		atMapEntry(const _Key& k, const _Data& d, atMapEntry* n) : key(k), data(d), next(n) {}
+	struct atMapEntry
+	{
+		atMapEntry(const _Key& k, atMapEntry* n) : key(k), data(), next(n)
+		{}
+		atMapEntry(const _Key& k, const _Data& d, atMapEntry* n) : key(k), data(d), next(n)
+		{}
 		_Key key;
 		_Data data;
 		atMapEntry* next;
 		typedef atMapEntry<_Key, _Data> _ThisType;
 
-		enum ePlaceNoneInitializer { PLACE_NONE };
-		enum ePlaceKeyInitializer { PLACE_KEY };
-		enum ePlaceDataInitializer { PLACE_DATA };
-		enum ePlaceKeyDataInitializer { PLACE_KEY_AND_DATA };
+		enum ePlaceNoneInitializer
+		{
+			PLACE_NONE
+		};
+		enum ePlaceKeyInitializer
+		{
+			PLACE_KEY
+		};
+		enum ePlaceDataInitializer
+		{
+			PLACE_DATA
+		};
+		enum ePlaceKeyDataInitializer
+		{
+			PLACE_KEY_AND_DATA
+		};
 	};
 	template <typename _Key, typename _Data>
-	class atMapMemory {
+	class atMapMemory
+	{
 		typedef atMapEntry<_Key, _Data> _EntryType;
 	public:
-		_EntryType* Allocate(const _Key& k, _EntryType* n) {
+		_EntryType* Allocate(const _Key& k, _EntryType* n)
+		{
 			return rage_new _EntryType(k, n);
 		}
-		_EntryType* Allocate(const _Key& k, const _Data& d, _EntryType* n) {
+		_EntryType* Allocate(const _Key& k, const _Data& d, _EntryType* n)
+		{
 			return rage_new _EntryType(k, d, n);
 		}
-		void DeAllocate(_EntryType* ptr) {
+		void DeAllocate(_EntryType* ptr)
+		{
 			delete ptr;
 		}
-		void AllocateHash(int slotCount, _EntryType**& hash) {
+		void AllocateHash(int slotCount, _EntryType**& hash)
+		{
 			hash = rage_new _EntryType * [slotCount];
 		}
-		void DeAllocateHash(_EntryType** hash) {
+		void DeAllocateHash(_EntryType** hash)
+		{
 			delete[] hash;
 		}
 	};
-	struct atMapCaseInsensitiveEquals {
-		bool operator ()(const char* left, const char* right) const { return _stricmp(left, right) == 0; }
+	struct atMapCaseInsensitiveEquals
+	{
+		bool operator ()(const char* left, const char* right) const
+		{
+			return _stricmp(left, right) == 0;
+		}
 	};
 	template <class _Key,class _Data,class _Hash = atMapHashFn<_Key>,class _Equals = atMapEquals<_Key>, class _MemoryPolicy = atMapMemory< _Key, _Data> >
-	class atMap {
+	class atMap
+	{
 	public:
 		typedef atMapEntry<_Key, _Data> Entry;
 		typedef _Key KeyType;
 		typedef _Data DataType;
 
-		int GetNumSlots() const { return m_Slots; }
-		int GetNumUsed() const { return m_Used; }
-		Entry* GetEntry(int i) { return m_Hash[i]; }
-		const Entry* GetEntry(int i) const { return m_Hash[i]; }
+		int GetNumSlots() const
+		{
+			return m_Slots;
+		}
+		int GetNumUsed() const
+		{
+			return m_Used;
+		}
+		Entry* GetEntry(int i)
+		{
+			return m_Hash[i];
+		}
+		const Entry* GetEntry(int i) const
+		{
+			return m_Hash[i];
+		}
 
-		class Iterator {
+		class Iterator
+		{
 		private:
 			friend class atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>;
 			int hashpos;
 			Entry* n;
 			atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>* map;
-			Iterator(atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), n(0), map(&m) { Start(); }
+			Iterator(atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), n(0), map(&m)
+			{
+				Start();
+			}
 		public:
-			void Start() {
+			void Start()
+			{
 				int localHashPos;
 				int slotCount = map->GetNumSlots();
-				for (localHashPos = 0; localHashPos < slotCount; localHashPos++) {
+				for (localHashPos = 0; localHashPos < slotCount; localHashPos++)
+				{
 					n = map->GetEntry(localHashPos);
 					if (n)
 						break;
 				}
 				hashpos = localHashPos;
 			}
-			void Next() {
+			void Next()
+			{
 				if (AtEnd())
 					return;
 				n = n->next;
 				int localHashPos = hashpos;
 				const int numSlots = map->GetNumSlots();
-				while (!n && (localHashPos + 1) < numSlots) {
+				while (!n && (localHashPos + 1) < numSlots)
+				{
 					localHashPos++;
 					n = map->GetEntry(localHashPos);
 				}
 				hashpos = localHashPos;
 			}
-			bool AtEnd() const { return !n; }
-			_Key& GetKey() const { FastAssert(n); return n->key; }
-			_Data& GetData() const { FastAssert(n); return n->data; }
-			_Data* GetDataPtr() const { FastAssert(n); return &n->data; }
-			_Data& operator*() const { return GetData(); }
-			_Data* operator->() const { FastAssert(n); return &n->data; }
-			Iterator& operator++() { Next(); return *this; }
-			operator bool() const { return !AtEnd(); }
+			bool AtEnd() const
+			{
+				return !n;
+			}
+			_Key& GetKey() const
+			{
+				FastAssert(n); return n->key;
+			}
+			_Data& GetData() const
+			{
+				FastAssert(n); return n->data;
+			}
+			_Data* GetDataPtr() const
+			{
+				FastAssert(n); return &n->data;
+			}
+			_Data& operator*() const
+			{
+				return GetData();
+			}
+			_Data* operator->() const
+			{
+				FastAssert(n); return &n->data;
+			}
+			Iterator& operator++()
+			{
+				Next(); return *this;
+			}
+			operator bool() const
+			{
+				return !AtEnd();
+			}
 		};
 
 		// PURPOSE: Class to encapsulate linear iteration through all inserted items in map, and to maintain const-only access to the items
-		class ConstIterator {
+		class ConstIterator
+		{
 		private:
 			friend class atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>;
 			int hashpos;
 			const Entry* cn;
 			const atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>* cmap;
-			ConstIterator(const atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), cn(0), cmap(&m) { Start(); }
+			ConstIterator(const atMap<_Key, _Data, _Hash, _Equals, _MemoryPolicy>& m) : hashpos(0), cn(0), cmap(&m)
+			{
+				Start();
+			}
 		public:
-			void Start() {
-				for (hashpos = 0; hashpos < cmap->GetNumSlots(); hashpos++) {
+			void Start()
+			{
+				for (hashpos = 0; hashpos < cmap->GetNumSlots(); hashpos++)
+				{
 					cn = cmap->GetEntry(hashpos);
 					if (cn) break;
 				}
 			}
-			void Next() {
+			void Next()
+			{
 				if (AtEnd()) return;
 				cn = cn->next;
 				const int numSlots = cmap->GetNumSlots();
-				while (!cn && (hashpos + 1) < numSlots) {
+				while (!cn && (hashpos + 1) < numSlots)
+				{
 					hashpos++;
 					cn = cmap->GetEntry(hashpos);
 				}
 			}
-			bool AtEnd() const { return !cn; }
-			const _Key& GetKey() const { return cn->key; }
-			const _Data& GetData() const { return cn->data; }
-			const _Data* GetDataPtr() const { return &cn->data; }
-			const _Data& operator*() const { return GetData(); }
-			const _Data* operator->() const { return &cn->data; }
-			ConstIterator& operator ++ () { Next(); return *this; }
-			operator bool() const { return !AtEnd(); }
+			bool AtEnd() const
+			{
+				return !cn;
+			}
+			const _Key& GetKey() const
+			{
+				return cn->key;
+			}
+			const _Data& GetData() const
+			{
+				return cn->data;
+			}
+			const _Data* GetDataPtr() const
+			{
+				return &cn->data;
+			}
+			const _Data& operator*() const
+			{
+				return GetData();
+			}
+			const _Data* operator->() const
+			{
+				return &cn->data;
+			}
+			ConstIterator& operator ++ ()
+			{
+				Next(); return *this;
+			}
+			operator bool() const
+			{
+				return !AtEnd();
+			}
 		};
 		Entry** m_Hash; // Storage for toplevel hash array
 		u16 m_Slots; // Number of slots in toplevel hash
@@ -775,7 +1141,8 @@ namespace rage {
 		u8 m_AllowReCompute; //Make sure we can't do dynamic memory allocation (good for resourced maps and general dynamic memory use removal)
 	};
 	template <typename K, typename T>
-	class inmap_node {
+	class inmap_node
+	{
 	public:
 		inmap_node()
 			: m_right(0)
@@ -789,7 +1156,8 @@ namespace rage {
 			, m_left(0), m_parent(0)
 		{}
 		//Assigment operator intentionally left empty.
-		inmap_node<K, T>& operator=( const inmap_node<K, T>& ) {
+		inmap_node<K, T>& operator=(const inmap_node<K, T>&)
+		{
 			return *this;
 		}
 		// WARNING!!!! Be careful when changing the size of inmap_nodes
@@ -802,165 +1170,238 @@ namespace rage {
 		K m_key;
 	};
 	template <typename K, typename T, inmap_node<K, T> T::*NODE>
-	struct inmap_detail {
+	struct inmap_detail
+	{
 		//Store the node color as the LSB of one of the pointers.
 		//Use TProxy and CProxy (color proxy) to proxy a T* that has might
 		//have its LSB set.
-		struct TProxy {
+		struct TProxy
+		{
 			explicit TProxy(T*& t)
 				: m_T(t)
 			{}
-			operator T* () {
+			operator T* ()
+			{
 				return (T*)(u64(m_T) & ~u64(0x01));
 			}
-			TProxy& operator=(T* t) {
+			TProxy& operator=(T* t)
+			{
 				m_T = (T*)(u64(t) | (u64(m_T) & u64(0x01)));
 				return *this;
 			}
-			TProxy& operator=(TProxy& that) {
-				if (this != &that) {
+			TProxy& operator=(TProxy& that)
+			{
+				if (this != &that)
+				{
 					m_T = that.m_T;
 				}
 				return *this;
 			}
 			T*& m_T;
 		};
-		struct CProxy {
+		struct CProxy
+		{
 			explicit CProxy(T*& t)
 				: m_T(t)
 			{}
-			operator bool() {
+			operator bool()
+			{
 				return bool(u64(m_T) & 0x01);
 			}
-			CProxy& operator=(const bool color) {
+			CProxy& operator=(const bool color)
+			{
 				m_T = (T*)(u64(color) | (u64(m_T) & ~u64(0x01)));
 				return *this;
 			}
-			CProxy& operator=(CProxy& that) {
-				if (this != &that) {
+			CProxy& operator=(CProxy& that)
+			{
+				if (this != &that)
+				{
 					m_T = that.m_T;
 				}
 				return *this;
 			}
 			T*& m_T;
 		};
-		static TProxy right(T* t) { return TProxy((t->*NODE).m_right); }
+		static TProxy right(T* t)
+		{
+			return TProxy((t->*NODE).m_right);
+		}
 		//static T*& right( T* t ) { return ( t->*NODE ).m_right; }
 		//static constexpr T* right( const T* t ) { return ( t->*NODE ).m_right; }
-		static T*& left(T* t) { return (t->*NODE).m_left; }
+		static T*& left(T* t)
+		{
+			return (t->*NODE).m_left;
+		}
 		//static constexpr T* left( const T* t ) { return ( t->*NODE ).m_left; }
-		static T*& parent(T* t) { return (t->*NODE).m_parent; }
+		static T*& parent(T* t)
+		{
+			return (t->*NODE).m_parent;
+		}
 		//static constexpr T* parent( const T* t ) { return ( t->*NODE ).m_parent; }
-		static T*& grandparent(T* t) { return parent(parent(t)); }
+		static T*& grandparent(T* t)
+		{
+			return parent(parent(t));
+		}
 		//static constexpr T* grandparent( const T* t ) { return parent( parent( t ) ); }
-		static T*& uncle(T* t) {
+		static T*& uncle(T* t)
+		{
 			T* p = parent(t);
 			T* gp = parent(p);
 			T* lu = left(gp);
 			return p == lu ? right(gp) : lu;
 		}
 		//static constexpr T* uncle( const T* t ) { return uncle( const_cast< T* >( t ) ); }
-		static CProxy color(T* t) { return CProxy((t->*NODE).m_right); }
+		static CProxy color(T* t)
+		{
+			return CProxy((t->*NODE).m_right);
+		}
 		//static bool& color( T* t ) { return ( t->*NODE ).m_color; }
 		//static bool color( const T* t ) { return ( t->*NODE ).m_color; }
-		static K& key(T* t) { return (t->*NODE).m_key; }
-		static K key(const T* t) { return (t->*NODE).m_key; }
-		static T* minimum(T* t) {
-			for (T* l = left(t); l; t = l, l = left(t)) {}
+		static K& key(T* t)
+		{
+			return (t->*NODE).m_key;
+		}
+		static K key(const T* t)
+		{
+			return (t->*NODE).m_key;
+		}
+		static T* minimum(T* t)
+		{
+			for (T* l = left(t); l; t = l, l = left(t))
+			{
+			}
 			return t;
 		}
-		static constexpr T* minimum(const T* t) { return minimum(const_cast<T*>(t)); }
-		static T* maximum(T* t) {
-			for (T* r = right(t); r; t = r, r = right(t)) {}
+		static constexpr T* minimum(const T* t)
+		{
+			return minimum(const_cast<T*>(t));
+		}
+		static T* maximum(T* t)
+		{
+			for (T* r = right(t); r; t = r, r = right(t))
+			{
+			}
 			return t;
 		}
-		static constexpr T* maximum(const T* t) { return maximum(const_cast<T*>(t)); }
-		static T* predecessor(T* t) {
+		static constexpr T* maximum(const T* t)
+		{
+			return maximum(const_cast<T*>(t));
+		}
+		static T* predecessor(T* t)
+		{
 			T* p = left(t);
-			if (p) {
+			if (p)
+			{
 				p = maximum(p);
 			}
-			else {
+			else
+			{
 				T* s = t;
 				p = parent(s);
-				while (p && s == left(p)) {
+				while (p && s == left(p))
+				{
 					s = p;
 					p = parent(p);
 				}
 			}
 			return p;
 		}
-		static constexpr T* predecessor(const T* t) { return predecessor(const_cast<T*>(t)); }
-		static T* successor(T* t) {
+		static constexpr T* predecessor(const T* t)
+		{
+			return predecessor(const_cast<T*>(t));
+		}
+		static T* successor(T* t)
+		{
 			T* s = right(t);
-			if (s) {
+			if (s)
+			{
 				s = minimum(s);
 			}
-			else {
+			else
+			{
 				T* p = t;
 				s = parent(p);
-				while (s && p == right(s)) {
+				while (s && p == right(s))
+				{
 					p = s;
 					s = parent(s);
 				}
 			}
 			return s;
 		}
-		static constexpr T* successor(const T* t) { return successor(const_cast<T*>(t)); }
+		static constexpr T* successor(const T* t)
+		{
+			return successor(const_cast<T*>(t));
+		}
 		//PURPOSE
 		//  Template we'll use to create reverse_iterators from iterators
 		template <typename ITER>
-		class reverse_iterator {
+		class reverse_iterator
+		{
 		public:
 			typedef typename ITER::iterator_category iterator_category;
 			typedef typename ITER::value_type value_type;
 			typedef typename ITER::difference_type difference_type;
 			typedef typename ITER::pointer pointer;
 			typedef typename ITER::reference reference;
-			reverse_iterator() {}
+			reverse_iterator()
+			{}
 			explicit reverse_iterator(const ITER& it)
-				: m_It(it) {}
+				: m_It(it)
+			{}
 			template< typename OTHER >
 			reverse_iterator(const reverse_iterator< OTHER >& that)
-				: m_It(that.base()) {}
+				: m_It(that.base())
+			{}
 			template< typename OTHER >
-			reverse_iterator< ITER >& operator=(const reverse_iterator< OTHER >& that) {
+			reverse_iterator< ITER >& operator=(const reverse_iterator< OTHER >& that)
+			{
 				m_It = that.base();
 				return *this;
 			}
-			ITER base() const {
+			ITER base() const
+			{
 				return m_It;
 			}
-			reverse_iterator operator++() {
+			reverse_iterator operator++()
+			{
 				--m_It;
 				return *this;
 			}
-			reverse_iterator operator--() {
+			reverse_iterator operator--()
+			{
 				++m_It;
 				return *this;
 			}
-			reverse_iterator operator++(const int) {
+			reverse_iterator operator++(const int)
+			{
 				reverse_iterator tmp = *this;
 				--m_It;
 				return tmp;
 			}
-			reverse_iterator operator--(const int) {
+			reverse_iterator operator--(const int)
+			{
 				reverse_iterator tmp = *this;
 				++m_It;
 				return tmp;
 			}
-			pointer operator->() const {
+			pointer operator->() const
+			{
 				ITER tmp = m_It;
 				return (--tmp).operator->();
 			}
-			reference operator*() const {
+			reference operator*() const
+			{
 				ITER tmp = m_It;
 				return (--tmp).operator*();
 			}
-			bool operator==(const reverse_iterator& rhs) const {
+			bool operator==(const reverse_iterator& rhs) const
+			{
 				return m_It == rhs.m_It;
 			}
-			bool operator!=(const reverse_iterator& rhs) const {
+			bool operator!=(const reverse_iterator& rhs) const
+			{
 				return m_It != rhs.m_It;
 			}
 		private:

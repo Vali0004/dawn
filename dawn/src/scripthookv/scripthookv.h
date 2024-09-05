@@ -92,16 +92,28 @@ namespace dwn::shv
 
 	inline void scriptUnregister(HMODULE module)
 	{
-		auto& id{ g_threads[reinterpret_cast<void*>(module)] };
-		delete id.m_thread;
-		g_threads.erase(reinterpret_cast<void*>(module));
+		for (auto& id : g_threads)
+		{
+			if (id.second.m_handle == module)
+			{
+				delete id.second.m_thread;
+				g_threads.erase(id.first);
+				return;
+			}
+		}
 	}
 
 	inline void scriptUnregisterDepricated(void(*LP_SCRIPT_MAIN)())
 	{
-		auto& id{ g_threads[reinterpret_cast<void*>(LP_SCRIPT_MAIN)] };
-		delete id.m_thread;
-		g_threads.erase(reinterpret_cast<void*>(LP_SCRIPT_MAIN));
+		for (auto& id : g_threads)
+		{
+			if (id.second.m_function == LP_SCRIPT_MAIN)
+			{
+				delete id.second.m_thread;
+				g_threads.erase(id.first);
+				return;
+			}
+		}
 	}
 
 	inline void nativeInit(u64 hash)

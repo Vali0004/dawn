@@ -82,6 +82,14 @@ EXPORT void drawTexture(int id, int index, int level, int time, float sizeX, flo
 		fn(id, index, level, time, sizeX, sizeY, centerX, centerY, posX, posY, rotation, screenHeightScaleFactor, r, g, b, a);
 	}
 }
+EXPORT void registerRawStreamingFile(const std::string& fileName, const std::string& registerAs)
+{
+	auto fn{ (decltype(&registerRawStreamingFile))GetProcAddress(g_module, __FUNCTION__) };
+	if (fn)
+	{
+		fn(fileName, registerAs);
+	}
+}
 EXPORT void scriptWait(unsigned long waitTime)
 {
 	auto fn{ (decltype(&scriptWait))GetProcAddress(g_module, __FUNCTION__) };

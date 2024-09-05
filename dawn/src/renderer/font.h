@@ -66,13 +66,13 @@ namespace dwn::directx
 	};
 
 	template <typename TOut = uint32_t, typename TIn = uint8_t>
-	inline void rebake_as_rgba(TOut*& outPixels, TIn* inPixels, size_t display_size, uint8_t& bpp)
+	inline void rebake_as_rgba(TOut*& outPixels, TIn* inPixels, size_t displaySize, uint8_t& bpp)
 	{
 		bpp = sizeof(TOut);
-		outPixels = reinterpret_cast<TOut*>(malloc(display_size * sizeof(TOut)));
+		outPixels = reinterpret_cast<TOut*>(malloc(displaySize * sizeof(TOut)));
 		if (outPixels)
 		{
-			for (size_t i{ display_size }; i; --i)
+			for (size_t i{ displaySize }; i; --i)
 			{
 				Color c{ 255, 255, 255, inPixels[i] };
 				outPixels[i] = c.pack();

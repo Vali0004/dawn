@@ -46,7 +46,7 @@ namespace dwn::commands
 				{
 					if (get_num_commands())
 					{
-						auto cmd{ get_cmd_at(m_current) };
+						auto cmd{ get_cmd(m_current) };
 						if (!cmd->is_once_of<cmd_functions>() && cmd->is_enabled())
 						{
 							if (cmd->is_once_of<single_command>())
@@ -72,17 +72,17 @@ namespace dwn::commands
 				} break;
 				case 1:
 				{
-					if (m_current > 0)
-						m_current--;
+					if (get_order_id(m_current) > 0)
+						m_current = get_cmd_from_order_id(get_order_id(m_current) - 1);
 					else
-						m_current = get_num_usable_commands() - 1;
+						m_current = get_cmd_from_order_id(get_num_usable_commands() - 1);
 				} break;
 				case 2:
 				{
-					if (m_current < get_num_usable_commands() - 1)
-						m_current++;
+					if (get_order_id(m_current) < get_num_usable_commands() - 1)
+						m_current = get_cmd_from_order_id(get_order_id(m_current) + 1);
 					else
-						m_current = 0;
+						m_current = get_cmd_from_order_id(0);
 				} break;
 			}
 		}
@@ -90,28 +90,28 @@ namespace dwn::commands
 		{
 			for (size_t i{}; i != get_num_commands(); ++i)
 			{
-				auto cmd{ get_cmd_at(i) };
+				auto cmd{ get_cmd(get_cmd_from_order_id(i)) };
 				if (!cmd->m_does_once_act_as_init)
 				{
 					if (cmd->is_once_of<group_command>())
 					{
 						if (get_sub(cmd->get_id())->is_enabled())
 						{
-							cmd->get_render()->call(cmd, m_current == i);
+							cmd->get_render()->call(cmd, !cmd->get_id().compare(m_current.data()));
 						}
 					}
 					else if (cmd->is_enabled())
 					{
-						cmd->get_render()->call(cmd, m_current == i);
+						cmd->get_render()->call(cmd, !cmd->get_id().compare(m_current.data()));
 					}
 				}
 			}
-			if (m_current >= get_num_usable_commands())
+			if (get_order_id(m_current) >= get_num_usable_commands())
 			{
-				m_current = 0;
+				m_current = get_cmd_from_order_id(0);
 			}
 		}
-		u64 m_current{};
+		std::string m_current{};
 	};
 
 	inline std::stack<submenu> g_submenus{};
@@ -160,7 +160,7 @@ namespace dwn::commands
 	{
 		get()->draw_rect({ g_pos_x, g_drawbase }, { 0.13f, 0.02f }, { 0, 0, 0, 190 });
 		get()->draw_text(arialbd_23, sub.get_name().data(), { g_pos_x + 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 });
-		std::string pos{ std::format("{}/{}", sub.m_current + 1, sub.get_num_usable_commands()) };
+		std::string pos{ std::format("{}/{}", sub.get_order_id(sub.m_current) + 1, sub.get_num_usable_commands()) };
 		get()->draw_text(arialbd_23, pos.data(), { g_pos_x + 0.13f - 0.001f, g_drawbase + (0.02f / 2.f) }, { 255, 255, 255, 255 }, eJustify::Right);
 		g_drawbase += 0.02f;
 	}
