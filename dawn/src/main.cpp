@@ -85,8 +85,10 @@ void game_death()
 		std::this_thread::sleep_for(100ms);
 	}
 }
+stopwatch module_injection{};
 void routine(dwn::thread* thr)
 {
+	stopwatch stop_watch{};
 	g_was_injected_early = !dwn::memory::hmodule("socialclub.dll").exists();
 	if (g_was_injected_early)
 	{
@@ -118,7 +120,11 @@ void routine(dwn::thread* thr)
 		LOG_TO_STREAM("Hotkey load failed, using defaults");
 	}
 
+	float module_injection_ms{ module_injection.get<float>() };
+
 	dwn::hooking::create();
+
+	float render_time_ms{ stop_watch.get<float>() };
 
 	if (!IsDebuggerPresent())
 	{
@@ -134,7 +140,10 @@ void routine(dwn::thread* thr)
 
 	dwn::renderer::menu::init();
 
-	dwn::shv::g_module_loader.load("NativeTrainer.asi");
+	LOG_TO_STREAM("Time to inject was " << module_injection_ms << "ms");
+	LOG_TO_STREAM("Time to render was " << render_time_ms << "ms");
+	LOG_TO_STREAM("Overall time spent: " << stop_watch.get<float>() << "ms");
+	LOG_TO_STREAM("Welcome to " BASE_NAME ". You are using the " BASE_BRANCH " branch as a " BASE_CANDIDATE " candidate");
 
 	while (g_running)
 	{

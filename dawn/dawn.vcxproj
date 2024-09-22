@@ -147,14 +147,10 @@
     <ClInclude Include="src\hooking\etc\vmt.h" />
     <ClInclude Include="src\hooking\hooks.h" />
     <ClInclude Include="src\hooking\hooks\aes.h" />
-    <ClInclude Include="src\hooking\hooks\build_url.h" />
+    <ClInclude Include="src\hooking\hooks\battleye.h" />
     <ClInclude Include="src\hooking\hooks\game_skeleton.h" />
-    <ClInclude Include="src\hooking\hooks\helpers\http_hk_util.h" />
     <ClInclude Include="src\hooking\hooks\helpers\ragesec.h" />
     <ClInclude Include="src\hooking\hooks\hooks_base.h" />
-    <ClInclude Include="src\hooking\hooks\http_process_response.h" />
-    <ClInclude Include="src\hooking\hooks\net_http_request.h" />
-    <ClInclude Include="src\hooking\hooks\rgsc.h" />
     <ClInclude Include="src\hooking\hooks\swapchain.h" />
     <ClInclude Include="src\commands\invoker.h" />
     <ClInclude Include="src\commands\list.h" />

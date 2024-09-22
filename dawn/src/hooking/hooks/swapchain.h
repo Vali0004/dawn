@@ -60,14 +60,14 @@ namespace dwn::hooking
 		{
 			shv::loop_callbacks(current);
 		}
-		if (g_running && renderer::get())
+		if (g_running && renderer::get() && !renderer::get()->m_no_render)
 		{
-			renderer::get()->begin_frame();
 			if (commands::gui::is_open())
 			{
+				renderer::get()->begin_frame();
 				commands::draw_menu();
+				renderer::get()->end_frame();
 			}
-			renderer::get()->end_frame();
 		}
 		return g_grcSwapChain->original<pointers::types::grcSwapChainPresentT>(8)(current, syncInterval, flags);
 	}
@@ -75,8 +75,11 @@ namespace dwn::hooking
 	inline HRESULT grcSwapChainResizeBuffers(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags)
 	{
 		HRESULT result{};
+
 		renderer::destroy(true);
+
 		result = g_grcSwapChain->original<pointers::types::grcSwapChainResizeBuffersT>(13)(current, bufferCount, width, height, newFormat, swapChainFlags);
+
 		if (SUCCEEDED(result))
 		{
 			renderer::create();

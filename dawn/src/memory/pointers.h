@@ -10,17 +10,6 @@ namespace dwn::pointers
 	inline types::CLoadingScreensSetMovieContextT g_CLoadingScreensSetMovieContext{};
 	inline types::CLoadingScreensShutdownT g_CLoadingScreensShutdown{};
 	inline types::scrThreadRunT g_scrThreadRun{};
-	inline types::RgscRetailLogRgscRetailMsgT g_RgscRetailLogRgscRetailMsg{};
-	inline types::RgscInitT g_RgscInit{};
-	inline types::rlHttpTaskBuildUrlT g_rlHttpTaskBuildUrl{};
-	inline types::rlHttpTaskBuildUrlScT g_rlHttpTaskBuildUrlSc{};
-	inline types::CreateTicketTaskBuildUrlScT g_CreateTicketTaskBuildUrlSc{};
-	inline types::netHttpRequestStartRequestT g_netHttpRequestStartRequest{};
-	inline types::netHttpRequestUpdateT g_netHttpRequestUpdate{};
-	inline types::netHttpRequestBeginT g_netHttpRequestBegin{};
-	inline types::rlRosHttpTaskProcessResponseT g_rlRosHttpTaskProcessResponse{};
-	inline types::rlRosHttpTaskProcessResponseScT g_rlRosHttpTaskProcessResponseSc{};
-	inline types::rlProfileStatsFlushTaskConfigureT g_rlProfileStatsFlushTaskConfigure{};
 	inline types::CExtraContentManagerLoadContentT g_CExtraContentManagerLoadContent{};
 	inline types::CExtraContentManagerEndEnumerateContentT g_CExtraContentManagerEndEnumerateContent{};
 	inline types::CExtraContentManagerAddContentFolderT g_CExtraContentManagerAddContentFolder{};
@@ -30,6 +19,9 @@ namespace dwn::pointers
 	inline types::AESisTransformITKeyT g_AESisTransformITKey{};
 	inline types::AESTransformITDecryptT g_AESTransformITDecrypt{};
 	inline types::AESDecryptT g_AESDecrypt{};
+	inline types::rlSysBattlEyeInitT g_rlSysBattlEyeInit{};
+	inline types::CNetworkCheckNetworkAccessT g_CNetworkCheckNetworkAccess{};
+	inline types::CNetworkBailT g_CNetworkBail{};
 	inline types::CommandShouldWarnOfSimpleModCheckT g_CommandShouldWarnOfSimpleModCheck{};
 	inline types::GetProcAddressT g_GetProcAddress{};
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
@@ -80,7 +72,7 @@ namespace dwn::pointers
 	{
 		ptr_mgr.run();
 		while (!ptr_mgr.finished())
-			std::this_thread::sleep_for(1ns);
+			;
 
 		ptr_mgr.get_all();
 		ptr_mgr.print();
@@ -119,24 +111,6 @@ namespace dwn::pointers
 		}
 	}
 
-	inline void rgsc_scan()
-	{
-		memory::pointer_manager ptr_mgr{};
-		ptr_mgr.add("rgsc::RgscRetailLog::RgscRetailMsg", g_RgscRetailLogRgscRetailMsg, "48 8B C4 48 89 58 ? 55 56 41 56", {}, { "socialclub.dll" });
-		ptr_mgr.add("rgsc::Rgsc::Init", g_RgscInit, "48 89 5C 24 ? 55 57 41 54 41 56", {}, { "socialclub.dll" });
-		ptr_mgr.add("rage::rlHttpTask::BuildUrl", g_rlHttpTaskBuildUrl, "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 48 81 EC ? ? ? ? 48 8B 01 48 8B FA");
-		ptr_mgr.add("rage::rlHttpTask::BuildUrlSc", g_rlHttpTaskBuildUrlSc, "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 48 81 EC", {}, { "socialclub.dll" });
-		ptr_mgr.add("rage::CreateTicketTask::BuildUrlSc", g_CreateTicketTaskBuildUrlSc, "48 89 5C 24 ? 57 48 81 EC ? ? ? ? 48 8B 01", {}, { "socialclub.dll" });
-		ptr_mgr.add("rage::netHttpRequest::StartRequest", g_netHttpRequestStartRequest, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B D9 48 81 C1 ? ? ? ? 48 8B F2 33 FF");
-		ptr_mgr.add("rage::netHttpRequest::Update", g_netHttpRequestUpdate, "40 55 57 41 54 41 55");
-		ptr_mgr.add("rage::netHttpRequest::Begin", g_netHttpRequestBegin, "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 83 EC ? 4D 8B F1 49 8B E8");
-		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponse", g_rlRosHttpTaskProcessResponse, "48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 33 FF 4D 8B E0");	
-		ptr_mgr.add("rage::rlRosHttpTask::ProcessResponseSc", g_rlRosHttpTaskProcessResponseSc, "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 48 83 64 24", {}, { "socialclub.dll" });
-		ptr_mgr.add("rage::rlProfileStatsFlushTask::Configure", g_rlProfileStatsFlushTaskConfigure, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 DB 49 8B F9 48 8B F1 4D 85 C9 74 ? 41 83 39 ? 74 ? 48 39 99");
-		ptr_mgr.add("rage::rlPc::g_rlPc", g_rlPc, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92", "qword");
-		trigger_scan(ptr_mgr);
-	}
-
 	inline bool g_game_speedup_scanned{};
 	inline void game_speedup_scan(memory::pointer_manager& ptr_mgr, bool scan = true)
 	{
@@ -154,6 +128,10 @@ namespace dwn::pointers
 	inline void early_scan()
 	{
 		memory::pointer_manager ptr_mgr{};
+		ptr_mgr.add("rage::rlSysBattlEye::Init", g_rlSysBattlEyeInit, "E9 ? ? ? ? CC 4A 68 E4 E8 A6 3F", "call");
+		ptr_mgr.add("CNetwork::CheckNetworkAccess", g_CNetworkCheckNetworkAccess, "E8 ? ? ? ? 90 E9 ? ? ? ? ? ? 48 83 C4 ? 48 8D 64 ? ? 48 8B 5C ? ? E9 ? ? ? ? EB", "call");
+		ptr_mgr.add("CNetwork::Bail", g_CNetworkBail, "E8 ? ? ? ? 32 C0 EB 11", "call");
+
 		if (!g_game_speedup_scanned)
 		{
 			// Just append onto early_scan, it'll make it faster by a good chunk.
@@ -176,7 +154,7 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::AES::Decrypt", g_AESDecrypt, "E8 ? ? ? ? 8B 55 F8 48 8B 43 10 48 03 D0 48 8B CB 48 89 53 18 66 44 89 22 33 D2 E8", "call");
 		ptr_mgr.add("CommandShouldWarnOfSimpleModCheck", g_CommandShouldWarnOfSimpleModCheck, "40 53 48 83 EC 30 48 8B 1D ? ? ? ? BA");
 		ptr_mgr.add("rage::fwScriptGuid::GetBaseFromGuid", g_fwScriptGuidGetBaseFromGuid, "83 F9 ? 74 ? 4C 8B 0D");
-		
+
 		ptr_mgr.add("rage::gameSkeleton::m_GameSkeleton", g_gameSkeleton, "48 8D 0D ? ? ? ? BA ? ? ? ? 74", "qword");
 		ptr_mgr.add("rage::s_CommandHash", g_sCommandHash, "48 8D 0D ? ? ? ? 48 8B 14 FA", "qword");
 		ptr_mgr.add("rage::scrThread::sm_Threads", g_smThreads, "48 8B 05 ? ? ? ? 8B CF 48 8B 1C C8 39 6B", "qword");
@@ -190,6 +168,7 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::grcTextureFactory::sm_Instance", g_TextureFactory, "48 8B 0D ? ? ? ? 45 33 C0 48 8B 01 33 D2 FF 90 ? ? ? ? 48 8B 0D ? ? ? ? 83 64 24", "qword");
 		ptr_mgr.add("CExtraContentManager::sm_Instance", g_CExtraContentManagersmInstance, "48 8B 1D ? ? ? ? 8B F9 83 F9", "qword");
 		ptr_mgr.add("rage::rlTitleId::g_rlTitleId", g_rlTitleId, "48 8B 0D ? ? ? ? 48 8B D8 E8 ? ? ? ? 41", "qword");
+		ptr_mgr.add("rage::rlPc::g_rlPc", g_rlPc, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92", "qword");
 		trigger_scan(ptr_mgr);
 
 		g_hwnd = FindWindowA("grcWindow", NULL);

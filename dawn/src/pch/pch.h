@@ -7,43 +7,56 @@
 #include "logger.h"
 
 inline constexpr std::array<char, 27> g_alphabet{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
-inline constexpr bool is_character_alphanumerical(char c) {
-	for (auto& a : g_alphabet) {
-		if (c == a) {
+inline constexpr bool is_character_alphanumerical(char c)
+{
+	for (auto& a : g_alphabet)
+	{
+		if (c == a)
+		{
 			return true;
 		}
 	}
 	return false;
 }
-inline constexpr bool is_string_alphanumerical(const std::string_view& str) {
-	for (auto& c : str) {
-		if (!is_character_alphanumerical(c)) {
+inline constexpr bool is_string_alphanumerical(const std::string_view& str)
+{
+	for (auto& c : str)
+	{
+		if (!is_character_alphanumerical(c))
+		{
 			return false;
 		}
 	}
 	return true;
 }
-inline constexpr bool fingerprint_hex(const std::string_view& str) {
+inline constexpr bool fingerprint_hex(const std::string_view& str)
+{
 	// Fingerprint the first bytes "0x"
-	if (str.at(0) == '0' && str.at(1) == 'x') {
+	if (str.at(0) == '0' && str.at(1) == 'x')
+	{
 		return true;
 	}
 	// Check if it contains alphanumerical characters
-	if (is_string_alphanumerical(str)) {
+	if (is_string_alphanumerical(str))
+	{
 		return true;
 	}
 	// Otherwise, asume decimal
 	return false;
 }
-inline std::vector<std::string> split_string(const std::string& str, char split) {
+inline std::vector<std::string> split_string(const std::string& str, char split)
+{
 	std::vector<std::string> strings{};
 	std::string string{};
-	for (s32 i{}; i != str.length(); ++i) {
-		if (str.at(i) == split) {
+	for (s32 i{}; i != str.length(); ++i)
+	{
+		if (str.at(i) == split)
+		{
 			strings.push_back(string);
 			string.erase();
 		}
-		else {
+		else
+		{
 			string += str.at(i);
 			if (i == str.length() - 1)
 				strings.push_back(string);
@@ -51,9 +64,29 @@ inline std::vector<std::string> split_string(const std::string& str, char split)
 	}
 	return strings;
 }
-inline void strip_character(std::string& str, char c) {
+inline void strip_character(std::string& str, char c)
+{
 	str.erase(std::remove(str.begin(), str.end(), c), str.end());
 }
+
+class stopwatch
+{
+public:
+	stopwatch() :
+		m_start_time(std::chrono::steady_clock::now()),
+		m_end_time(std::chrono::steady_clock::now())
+	{}
+public:
+	template <typename t>
+	t get()
+	{
+		m_end_time = std::chrono::steady_clock::now();
+		return t(std::chrono::duration_cast<std::chrono::milliseconds>(m_end_time - m_start_time).count());
+	}
+public:
+	std::chrono::steady_clock::time_point m_start_time;
+	std::chrono::steady_clock::time_point m_end_time;
+};
 
 inline HMODULE g_main{ GetModuleHandleA(NULL) };
 inline HMODULE g_entry{};

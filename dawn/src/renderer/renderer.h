@@ -63,20 +63,24 @@ namespace dwn::renderer
 			m_rasterizer.create(m_device, D3D11_FILL_SOLID);
 			m_depth_stencil.create(m_device, true, true, D3D11_COMPARISON_ALWAYS);
 			std::fs::path path{ std::fs::path(std::getenv("appdata")) / "Dawn" / "Shaders" };
-			if (!m_vertex_shader.precompiled(std::fs::path(path) / "vertex_shader.fxc"))
-				LOG_TO_STREAM("Failed to compile");
-			if (!m_pixel_shader.precompiled(std::fs::path(path) / "pixel_shader.fxc"))
-				LOG_TO_STREAM("Failed to compile");
-			m_vertex_shader.create(m_device);
-			m_pixel_shader.create(m_device);
-			m_sampler_state.create(m_device, {});
-			m_input_layout.create(m_device, m_vertex_shader.m_blob);
-			m_batch.create(m_device, m_context, 2048);
-			m_image_batch.create(m_device, m_context, 2048);
+			if (!m_vertex_shader.precompiled(std::fs::path(path) / "vertex_shader.fxc") || !m_pixel_shader.precompiled(std::fs::path(path) / "pixel_shader.fxc"))
+			{
+				m_no_render = true;
+				LOG_TO_STREAM("Failed to compile shaders! Rendering will be disabled.");
+			}
+			if (!m_no_render)
+			{
+				m_vertex_shader.create(m_device);
+				m_pixel_shader.create(m_device);
+				m_sampler_state.create(m_device, { 0.f, 0.f });
+				m_input_layout.create(m_device, m_vertex_shader.m_blob);
+				m_batch.create(m_device, m_context, 2048);
+				m_image_batch.create(m_device, m_context, 2048);
+				m_state_saver = std::make_unique<state_saver>(m_context.get());
+			}
 			RECT rect{};
 			GetClientRect(pointers::g_hwnd, &rect);
 			m_display_size = { static_cast<float>(rect.right - rect.left), static_cast<float>(rect.bottom - rect.top) };
-			m_state_saver = std::make_unique<state_saver>(m_context.get());
 		}
 
 		void destroy(bool resize = false)
@@ -219,7 +223,7 @@ namespace dwn::renderer
 
 		void end_frame()
 		{
-			if (!m_state_saved)
+			if (m_state_saved)
 				m_state_saver->restore();
 			m_frame_start_time = m_frame_end_time;
 			m_frame_time_accumulator += m_frame_duration.count();
@@ -234,6 +238,7 @@ namespace dwn::renderer
 
 		static LRESULT wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+		bool m_no_render{};
 		swapchain m_swapchain{};
 		device m_device{};
 		context m_context{};

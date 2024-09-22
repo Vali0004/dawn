@@ -11,17 +11,6 @@ namespace dwn::pointers::types
 	using CommandShouldWarnOfSimpleModCheckT = fptr<bool()>;
 	using grcSwapChainPresentT = fptr<HRESULT(rage::grcSwapChain* current, u32 syncInterval, u32 flags)>;
 	using grcSwapChainResizeBuffersT = fptr<HRESULT(rage::grcSwapChain* current, u32 bufferCount, u32 width, u32 height, DXGI_FORMAT newFormat, u32 swapChainFlags)>;
-	using RgscRetailLogRgscRetailMsgT = fptr<void(bool utf8, int severity, const char* fmt, char* args)>;
-	using RgscInitT = fptr<rgsc::RGSC_HRESULT(void* _this, rgsc::IConfiguration* config, rgsc::ITitleId* titleId, rgsc::RgscLanguage language, rgsc::IRgscDelegate* dlgt)>;
-	using rlHttpTaskBuildUrlT = fptr<const char* (rage::rlHttpTask* _this, char* url, const u32 sizeofUrl)>;
-	using rlHttpTaskBuildUrlScT = fptr<const char* (rage::rlHttpTask* _this, char* url, const u32 sizeofUrl)>;
-	using CreateTicketTaskBuildUrlScT = fptr<const char* (rage::rlHttpTask* _this, char* url, const u32 sizeofUrl)>;
-	using netHttpRequestStartRequestT = fptr<bool(rage::netHttpRequest* _this, const char* uri)>;
-	using netHttpRequestUpdateT = fptr<void(rage::netHttpRequest* _this)>;
-	using netHttpRequestBeginT = fptr<bool(rage::netHttpRequest* _this, const rage::netHttpVerb verb, const char* uri, const rage::netSocketAddress* proxyAddr, const u32 timeoutSecs, const rage::fiDevice* responseDevice, const rage::fiHandle responseHandle, const char* contextStr, rage::netHttpFilter* filter, rage::netStatus* status)>;
-	using rlRosHttpTaskProcessResponseT = fptr<bool(rage::rlRosHttpTask* _this, const char* response, int* resultCode)>;
-	using rlRosHttpTaskProcessResponseScT = fptr<bool(rage::rlRosHttpTask* _this, const char* response, int* resultCode)>;
-	using rlProfileStatsFlushTaskConfigureT = fptr<bool(rage::rlProfileStatsFlushTask* task, rage::rlProfileStatsClient* ctx, rage::rlProfileStatsDirtyIterator* flushIt, rage::netStatus* status)>;
 	using GetProcAddressT = fptr<FARPROC(HMODULE hModule, LPCSTR lpProcName)>;
 	using CExtraContentManagerLoadContentT = fptr<void(CExtraContentManager* _This, bool executeChangeSet, bool executeEarlyStartup)>;
 	using CExtraContentManagerEndEnumerateContentT = fptr<void(CExtraContentManager* _This, bool bWait, bool earlyStartup)>;
@@ -32,4 +21,7 @@ namespace dwn::pointers::types
 	using AESDecryptT = fptr<void(u32 keyId, u32 selector, void* data, u32 size)>;
 	using fiPackfileReInitT = fptr<bool(rage::fiPackfile* _This, const char* filename, bool readNameHeap, rage::fiPackEntry* headerData)>;
 	using fwScriptGuidGetBaseFromGuidT = fptr<rage::fwExtensibleBase*(int guid)>;
+	using rlSysBattlEyeInitT = fptr<bool()>;
+	using CNetworkCheckNetworkAccessT = fptr<eNetworkAccessCode(eNetworkAccessArea nAccessArea, uint64_t* endPosixTime)>;
+	using CNetworkBailT = fptr<bool(sBailParameters* bailParams, bool bSendScriptEvent)>;
 }

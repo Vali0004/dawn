@@ -490,6 +490,11 @@ namespace dwn::memory
 	class pointer_manager
 	{
 	public:
+		pointer_manager()
+		{
+			m_stopwatch = stopwatch();
+		}
+
 		void add(const std::string& name, const std::string& signature, const std::string& expression = {}, hmodule hmodule = {})
 		{
 			m_pointers.insert(std::make_pair(name, pointer(name, signature, expression, hmodule)));
@@ -556,6 +561,7 @@ namespace dwn::memory
 			{
 				LOG_TO_STREAM("Found " << p.second.name() << " at address " << HEX(p.second.address()));
 			}
+			LOG_TO_STREAM("Time spent scanning signatures for the curent batch (" << m_pointer_instances.size() << " pointers)" << " was " << m_stop_time << "ms");
 		}
 
 		void get_all()
@@ -564,10 +570,11 @@ namespace dwn::memory
 			{
 				if (auto& p{ m_pointers[p_instance.first] }; p.valid())
 				{
-					//LOG_TO_STREAM("Setting pointer " << p_instance.first << "(Pointer module address: " << HEX((u64)p_instance.second) << ") to " << HEX(p.address()));
+					//LOG_TO_STREAM("Setting pointer " << p_instance.first << " (Pointer module address: " << HEX((u64)p_instance.second) << ") to " << HEX(p.address()));
 					*p_instance.second = reinterpret_cast<void*>(p.address());
 				}
 			}
+			m_stop_time = m_stopwatch.get<float>();
 		}
 
 		void clear()
@@ -577,6 +584,8 @@ namespace dwn::memory
 		}
 	private:
 		bool m_intialised{};
+		stopwatch m_stopwatch{};
+		float m_stop_time{};
 		std::unordered_map<std::string, pointer> m_pointers{};
 		std::unordered_map<std::string, void**> m_pointer_instances{};
 	};

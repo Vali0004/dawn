@@ -211,7 +211,7 @@ namespace dwn::exception
 		{
 			case STATUS_OOB_POINTER_ADDITIVE:
 			{
-				LOG(Exception, "Exception caused by our module. Invalid pointer addtive (Out Of Bounds)");
+				LOG(Exception, "Exception caused by our module. Invalid pointer additive (Out Of Bounds)");
 				g_running = false;
 				return true;
 			} break;

@@ -47,6 +47,99 @@ enum LoadingScreenContext : std::uint32_t
 	LOADINGSCREEN_CONTEXT_MAPCHANGE,				// Load screen when loading from SP to MP and vice versa through CExtraContentManager
 	LOADINGSCREEN_CONTEXT_LAST_FRAME				// Use the last rendered frame as a background with a spinner as a loading screen
 };
+enum PM_COLUMNS
+{
+	PM_COLUMN_LEFT,
+	PM_COLUMN_MIDDLE,
+	PM_COLUMN_RIGHT,
+	PM_COLUMN_EXTRA3,    // some pages have extra columns
+	PM_COLUMN_EXTRA4,    // some pages have extra columns
+	PM_COLUMN_LEFT_MIDDLE,
+	PM_COLUMN_MIDDLE_RIGHT,
+	PM_COLUMN_MAX
+};
+// Match with PAUSE_MENU_SP_CONTENT.as
+enum PM_WARNING_IMG_ALIGNMENT
+{
+	IMG_ALIGN_NONE,
+	IMG_ALIGN_TOP,
+	IMG_ALIGN_RIGHT
+};
+enum eNetworkAccessCode
+{
+	Access_BankDefault = -2,
+	Access_Invalid = -1,
+	Access_Granted, 
+	Access_Deprecated_TunableNotFound,
+	Access_Deprecated_TunableFalse,
+	Access_Denied_MultiplayerLocked,
+	Access_Denied_InvalidProfileSettings,
+	Access_Denied_PrologueIncomplete,
+	Access_Denied_NotSignedIn,			/* Not signed into the Xbox profile */
+	Access_Denied_NotSignedOnline,		/* Not signed into PSN or Xbox Live */
+	Access_Denied_NoOnlinePrivilege,
+	Access_Denied_NoRosCredentials,
+	Access_Denied_NoRosPrivilege,
+	Access_Denied_MultiplayerDisabled,
+	Access_Denied_NoTunables,
+	Access_Denied_NoBackgroundScript,
+
+	// add new reasons for code after this
+	// script enumerate anything above and would need an update 
+
+	Access_Denied_NoNetworkAccess,		/* Ethernet or wifi is disconnected; only use by the landing page */
+	Access_Denied_RosBanned,
+	Access_Denied_RosSuspended,
+};
+enum eNetworkAccessArea
+{
+	AccessArea_Invalid,
+	AccessArea_First = 0,
+	AccessArea_Landing = AccessArea_First,
+	AccessArea_Multiplayer,
+	AccessArea_MultiplayerEnter,
+	AccessArea_Num,
+};
+enum eBailReason
+{
+	BAIL_INVALID = -1,
+	BAIL_FROM_SCRIPT,
+	BAIL_FROM_RAG,
+	BAIL_PROFILE_CHANGE,
+	BAIL_NEW_CONTENT_INSTALLED,
+	BAIL_SESSION_FIND_FAILED,
+	BAIL_SESSION_HOST_FAILED,
+	BAIL_SESSION_JOIN_FAILED,
+	BAIL_SESSION_START_FAILED,
+	BAIL_SESSION_ATTR_FAILED,
+	BAIL_SESSION_MIGRATE_FAILED,
+	BAIL_PARTY_HOST_FAILED,
+	BAIL_PARTY_JOIN_FAILED,
+	BAIL_JOINING_STATE_TIMED_OUT,
+	BAIL_NETWORK_ERROR,
+	BAIL_TRANSITION_LAUNCH_FAILED,
+	BAIL_END_TIMED_OUT,
+	BAIL_MATCHMAKING_TIMED_OUT,
+	BAIL_CLOUD_FAILED,
+	BAIL_COMPAT_PACK_CONFIG_INCORRECT,
+	BAIL_CONSOLE_BAN,
+	BAIL_MATCHMAKING_FAILED,
+	BAIL_ONLINE_PRIVILEGE_REVOKED,
+	BAIL_SYSTEM_SUSPENDED,
+	BAIL_EXIT_GAME,
+	BAIL_TOKEN_REFRESH_FAILED,
+	BAIL_CATALOG_REFRESH_FAILED,
+	BAIL_SESSION_REFRESH_FAILED,
+	BAIL_SESSION_RESTART_FAILED,
+	BAIL_GAME_SERVER_MAINTENANCE,
+	BAIL_GAME_SERVER_FORCE_BAIL,
+	BAIL_GAME_SERVER_HEART_BAIL,
+	BAIL_GAME_SERVER_GAME_VERSION,
+	BAIL_CATALOGVERSION_REFRESH_FAILED,
+	BAIL_CATALOG_BUFFER_TOO_SMALL,
+	BAIL_INVALIDATED_ROS_TICKET,
+	BAIL_NUM,
+};
 // Quick and diry WSSL ctx impl
 typedef struct DerBuffer
 {
@@ -429,6 +522,7 @@ namespace rage {
 		{}
 		u32 m_hash;
 	};
+	typedef atHashString atHashWithStringBank;
 	typedef atHashString atFinalHashString;
 	class atString
 	{
@@ -3310,7 +3404,8 @@ namespace rage {
 	};
 }
 //sysXXXXXXX
-namespace rage {
+namespace rage
+{
 	namespace sysObfuscatedTypes
 	{
 		extern u32 obfRand();
@@ -3405,6 +3500,22 @@ namespace rage {
 		operator T()
 		{
 			return Get();
+		}
+		bool operator==(sysObfuscated<T> data)
+		{
+			return Get() == data.Get();
+		}
+		bool operator!=(sysObfuscated<T> data)
+		{
+			return Get() != data.get();
+		}
+		bool operator==(T data)
+		{
+			return Get() == data;
+		}
+		bool operator!=(T data)
+		{
+			return Get() != data;
 		}
 	private:
 		u32 m_data[(mutate ? sizeof(T) * 2 : sizeof(T)) / sizeof(u32)];
@@ -8885,4 +8996,19 @@ public:
 	virtual void RemoveRef(strLocalIndex index, strRefKind kind) = 0;
 	virtual int GetNumRefs(strLocalIndex index) const = 0;
 	rage::strIndex m_BGScriptPackStreamIndex;
+};
+struct sBailParameters
+{
+	eBailReason m_BailReason;
+	int m_ErrorCode;
+	int m_ContextParam1;
+	int m_ContextParam2;
+	int m_ContextParam3;
+	uint64_t m_EndPosixTime;
+	const char* m_ErrorString;
+	const char* m_PassThroughString;
+	static const unsigned MAX_NUMBERS = 3;
+	int m_Numbers[MAX_NUMBERS];
+	unsigned m_nNumbers;
+	unsigned m_Flags;
 };

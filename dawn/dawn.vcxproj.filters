@@ -103,13 +103,8 @@
     <ClInclude Include="src\commands\crossmap.h" />
     <ClInclude Include="src\menu\menu.h" />
     <ClInclude Include="src\hooking\hooks\helpers\ragesec.h" />
-    <ClInclude Include="src\hooking\hooks\helpers\http_hk_util.h" />
     <ClInclude Include="src\hooking\hooks\game_skeleton.h" />
     <ClInclude Include="src\hooking\hooks\hooks_base.h" />
-    <ClInclude Include="src\hooking\hooks\rgsc.h" />
-    <ClInclude Include="src\hooking\hooks\build_url.h" />
-    <ClInclude Include="src\hooking\hooks\net_http_request.h" />
-    <ClInclude Include="src\hooking\hooks\http_process_response.h" />
     <ClInclude Include="src\hooking\hooks\aes.h" />
     <ClInclude Include="src\memory\types.h" />
     <ClInclude Include="src\nlohmann\json.h" />
@@ -162,6 +157,7 @@
     <ClInclude Include="src\config\hotkey_config.h" />
     <ClInclude Include="src\config\command_config.h" />
     <ClInclude Include="src\menu\timer.h" />
+    <ClInclude Include="src\hooking\hooks\battleye.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="data">
