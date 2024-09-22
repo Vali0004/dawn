@@ -20,7 +20,6 @@ namespace dwn::commands
 		{
 			if (trigger_flip)
 			{
-				LOG_TO_STREAM("Menu is " << (g_open ? "open" : "closed"));
 				g_open ^= 1;
 			}
 		}
