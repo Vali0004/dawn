@@ -22,7 +22,6 @@ namespace dwn::pointers
 	inline types::rlSysBattlEyeInitT g_rlSysBattlEyeInit{};
 	inline types::CNetworkCheckNetworkAccessT g_CNetworkCheckNetworkAccess{};
 	inline types::CNetworkBailT g_CNetworkBail{};
-	inline types::NetworkAssetEqualsT g_NetworkAssetEquals{};
 	inline types::CommandShouldWarnOfSimpleModCheckT g_CommandShouldWarnOfSimpleModCheck{};
 	inline types::GetProcAddressT g_GetProcAddress{};
 	inline types::grcSwapChainPresentT g_grcSwapChainPresent{};
@@ -132,7 +131,6 @@ namespace dwn::pointers
 		ptr_mgr.add("rage::rlSysBattlEye::Init", g_rlSysBattlEyeInit, "E9 ? ? ? ? CC 4A 68 E4 E8 A6 3F", "call");
 		ptr_mgr.add("CNetwork::CheckNetworkAccess", g_CNetworkCheckNetworkAccess, "E8 ? ? ? ? 90 E9 ? ? ? ? ? ? 48 83 C4 ? 48 8D 64 ? ? 48 8B 5C ? ? E9 ? ? ? ? EB", "call");
 		ptr_mgr.add("CNetwork::Bail", g_CNetworkBail, "E8 ? ? ? ? 32 C0 EB 11", "call");
-		ptr_mgr.add("CNetwork::NetworkAssetVerifier", g_NetworkAssetEquals, "E8 ? ? ? ? 84 C0 74 B8 E8", "call");
 
 		if (!g_game_speedup_scanned)
 		{

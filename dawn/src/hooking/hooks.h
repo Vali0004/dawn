@@ -39,12 +39,9 @@ namespace dwn::hooking
 	inline bool g_early_hook{};
 	inline void hook_ac()
 	{
-		//make_hook("rlSysBattlEye::Init", rlSysBattlEyeInit);
-		make_hook("CNetwork::CheckNetworkAccess", CNetworkCheckNetworkAccess);
-		make_hook("CNetwork::Bail", CNetworkBail);
-		make_hook("CNetwork::NetworkAssetVerifier", NetworkAssetEquals);
-
-		etc::persist_mh::apply_queued();
+		make_hook_time_critical("rlSysBattlEye::Init", rlSysBattlEyeInit);
+		make_hook_time_critical("CNetwork::CheckNetworkAccess", CNetworkCheckNetworkAccess);
+		make_hook_time_critical("CNetwork::Bail", CNetworkBail);
 	}
 
 	inline etc::hook<pointers::types::GetProcAddressT>* g_GetProcAddress{};
@@ -97,7 +94,7 @@ namespace dwn::hooking
 	inline void create()
 	{
 		pointers::early_scan();
-		//pointers::wait_for_rgsc();
+		pointers::wait_for_rgsc();
 
 		//pointers::remove_keyboard_hook();
 
@@ -108,37 +105,37 @@ namespace dwn::hooking
 			hook_ac();
 		}
 
-		//pointers::late_scan();
-		//LOG_TO_STREAM("Finished scanning pointers.");
+		pointers::late_scan();
+		LOG_TO_STREAM("Finished scanning pointers.");
 
-		//if (!g_early_hook)
-		//{
-		//	renderer::create();
-		//}
+		if (!g_early_hook)
+		{
+			renderer::create();
+		}
 
-		//make_hook_vtbl(grcSwapChain, *pointers::g_pSwapChain, 19,
-		//{
-		//	_this->set_func(8, grcSwapChainPresent);
-		//	_this->set_func(13, grcSwapChainResizeBuffers);
-		//});
+		make_hook_vtbl(grcSwapChain, *pointers::g_pSwapChain, 19,
+		{
+			_this->set_func(8, grcSwapChainPresent);
+			_this->set_func(13, grcSwapChainResizeBuffers);
+		});
 
-		//make_hook("scrThread::Run", scrThreadRun);
+		make_hook("scrThread::Run", scrThreadRun);
 
-		//make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);	
+		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);	
 
-		////make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
-		////make_hook("AES::isTransformITKey", AESisTransformITKey);
-		////make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
-		////make_hook("AES::Decrypt", AESDecrypt);
-		////make_hook("fiPackfile::ReInit", fiPackfileReInit);
+		//make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
+		//make_hook("AES::isTransformITKey", AESisTransformITKey);
+		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
+		//make_hook("AES::Decrypt", AESDecrypt);
+		//make_hook("fiPackfile::ReInit", fiPackfileReInit);
 
-		//etc::persist_mh::apply_queued();
+		etc::persist_mh::apply_queued();
 
-		//make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 4,
-		//{
-		//	_this->set_func(1, gameSkeletonInit);
-		//	_this->set_func(3, gameSkeletonUpdate);
-		//});
+		make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 4,
+		{
+			_this->set_func(1, gameSkeletonInit);
+			_this->set_func(3, gameSkeletonUpdate);
+		});
 	}
 
 	inline void remove()

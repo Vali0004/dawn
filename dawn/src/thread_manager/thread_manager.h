@@ -22,7 +22,7 @@ namespace dwn
         {
             if (task)
             {
-                m_threads.push_back(std::move(create_thread_wrapper(task)));
+                m_threads.push_back(create_thread_wrapper(task));
                 thread* t{ m_threads.back() };
                 t->start();
             }
@@ -45,7 +45,7 @@ namespace dwn
         thread* create_thread(std::function<void(thread*)> callback)
         {
             thread* thr{ create_thread_wrapper(callback) };
-            m_threads.push_back(std::move(thr));
+            m_threads.push_back(thr);
             thread* ret{ m_threads.back() };
             ret->start();
             return ret;
@@ -53,8 +53,8 @@ namespace dwn
 
         thread* create_thread(std::function<void()> callback)
         {
-            thread* thr{ create_thread_wrapper(callback) };
-            m_threads.push_back(std::move(thr));
+            thread* t{ create_thread_wrapper(callback) };
+            m_threads.push_back(t);
             thread* ret{ m_threads.back() };
             ret->start();
             return ret;

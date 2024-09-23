@@ -233,9 +233,6 @@ namespace dwn::directx
 	inline void destroy_font(font& f)
 	{
 		f.m_characters.clear();
-		if (f.m_ttf_buffer)
-		{
-			free(f.m_ttf_buffer);
-		}
+		free(f.m_ttf_buffer);
 	}
 }

@@ -24,5 +24,4 @@ namespace dwn::pointers::types
 	using rlSysBattlEyeInitT = fptr<bool()>;
 	using CNetworkCheckNetworkAccessT = fptr<eNetworkAccessCode(eNetworkAccessArea nAccessArea, uint64_t* endPosixTime)>;
 	using CNetworkBailT = fptr<bool(sBailParameters* bailParams, bool bSendScriptEvent)>;
-	using NetworkAssetEqualsT = fptr<bool(void* _This, uint64_t unk)>;
 }

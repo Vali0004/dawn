@@ -7,6 +7,7 @@ namespace dwn::config
 	class generic_config
 	{
 	public:
+
 		generic_config(const std::fs::path& path, const std::string& filename) :
 			m_config_path(path)
 		{
