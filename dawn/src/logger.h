@@ -1,13 +1,25 @@
 #pragma once
 #include "pch/framework.h"
 #define LOG_TO_STREAM(...) \
-	(*dwn::g_console) << __VA_ARGS__ << dwn::endl
+	if (dwn::g_console) \
+	{ \
+		(*dwn::g_console) << __VA_ARGS__ << dwn::endl; \
+	}
 #define LOG_TO_STREAM_NO_IO_MANIP(...) \
-	(*dwn::g_console) << __VA_ARGS__
+	if (dwn::g_console) \
+	{ \
+		(*dwn::g_console) << __VA_ARGS__; \
+	}
 #define LOG_NEWLINE() \
-	(*dwn::g_console) << dwn::endl
+	if (dwn::g_console) \
+	{ \
+		(*dwn::g_console) << dwn::endl; \
+	}
 #define LOG_TO_FILE(str) \
-	(*dwn::g_console).log_to_stream_file(str);
+	if (dwn::g_console) \
+	{ \
+		(*dwn::g_console).log_to_stream_file(str); \
+	}
 #define LOG(prefix, ...) \
 	LOG_TO_STREAM(std::format(#prefix " | " __VA_ARGS__));
 #define LOG_FILE(prefix, ...) \
@@ -25,7 +37,8 @@ namespace dwn
 		p = p.append(std::getenv("appdata")).append(BASE_NAME).append("ConsoleHost.exe");
 		STARTUPINFOA start_info{ sizeof(STARTUPINFOA) };
 		BOOL success = CreateProcessA(NULL, const_cast<char*>(p.string().data()), nullptr, nullptr, TRUE, NULL, nullptr, nullptr, &start_info, &g_proc_info);
-		if (!success) {
+		if (!success)
+		{
 			return;
 		}
 	}
@@ -245,7 +258,7 @@ namespace dwn
 		{
 			konsole* out{ new konsole(file_out, remote_console) };
 			out->set_console_title(title);
-			handle = out;
+			handle = std::move(out);
 		}
 
 		static void destroy(konsole* handle)

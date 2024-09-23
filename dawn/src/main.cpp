@@ -96,8 +96,8 @@ void routine(dwn::thread* thr)
 		dwn::util::spawn_detached_thread(&game_speedup);
 	}
 
-	dwn::pointers::g_GetProcAddress = &GetProcAddress;
-	make_hook_time_critical("GetProcAddress", GetProcAddress);
+	//dwn::pointers::g_GetProcAddress = &GetProcAddress;
+	//make_hook_time_critical("GetProcAddress", GetProcAddress);
 
 	if (g_was_injected_early)
 	{
@@ -138,7 +138,7 @@ void routine(dwn::thread* thr)
 		LOG_TO_STREAM("WARNING: Exception filter not attached!");
 	}
 
-	dwn::renderer::menu::init();
+	//dwn::renderer::menu::init();
 
 	LOG_TO_STREAM("Time to inject was " << module_injection_ms << "ms");
 	LOG_TO_STREAM("Time to render was " << render_time_ms << "ms");
