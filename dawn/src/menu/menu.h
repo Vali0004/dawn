@@ -7,54 +7,6 @@
 #include "config/command_config.h"
 #include "scripthookv/module_loader.h"
 
-inline void print_sc_data()
-{
-	rage::rlPc& pc{ *dwn::pointers::g_rlPc };
-	rage::rlTitleId& titleId{ *(*dwn::pointers::g_rlTitleId) };
-
-	LOG_TO_STREAM("SocialClub Version: " << pc.m_SocialClubVersion);
-	LOG_TO_STREAM("Additional Session Attribute: " << pc.m_AdditionalSessionAttr);
-	LOG_TO_STREAM("Additional Join Attribute: " << pc.m_AdditionalJoinAttr);
-	LOG_TO_STREAM("MetaData Path: " << pc.m_MetaDataPath);
-
-	rgsc::Profile profile{};
-	pc.m_ProfileManager->GetSignInInfo(&profile);
-
-	LOG_TO_STREAM("--------------------------------------------");
-
-	LOG_TO_STREAM("RGSC SignIn Info (rgsc::Profile)");
-
-	LOG_TO_STREAM("--------------------------------------------");
-
-	LOG_TO_STREAM("Nickname: " << profile.GetNickname());
-	LOG_TO_STREAM("Email: " << profile.GetSocialClubEmail());
-	LOG_TO_STREAM("Password: " << profile.GetSocialClubPassword());
-	LOG_TO_STREAM("Auth Token: " << profile.GetSocialClubAuthToken());
-	LOG_TO_STREAM("Profile ID: " << profile.GetProfileId());
-
-	LOG_TO_STREAM("--------------------------------------------");
-	LOG_TO_STREAM("ROS Title ID");
-	LOG_TO_STREAM("NOTE: Some data might be garbage due to the data not existing in process");
-
-	LOG_TO_STREAM("--------------------------------------------");
-	LOG_TO_STREAM("Title Name: " << titleId.m_RosTitleId.m_TitleName);
-	LOG_TO_STREAM("Title Version: " << titleId.m_RosTitleId.m_TitleVersion);
-	LOG_TO_STREAM("SC Version: " << titleId.m_RosTitleId.m_ScVersion);
-	LOG_TO_STREAM("Title Secrets: " << titleId.m_RosTitleId.m_TitleSecretsBase64);
-	LOG_TO_STREAM("Title Directory Name: " << titleId.m_RosTitleId.m_TitleDirectoryName);
-
-	LOG_NEWLINE();
-	LOG_TO_STREAM("const u8 rsa_key[" << titleId.m_RosTitleId.m_PublicRsaKeyLen << "] = {");
-	for (u32 i{}; i != titleId.m_RosTitleId.m_PublicRsaKeyLen; i += 4)
-	{
-		for (u32 j{}; j != 4; ++j)
-		{
-			LOG_TO_STREAM_NO_IO_MANIP(HEX(titleId.m_RosTitleId.m_PublicRsaKey[i+j]) << ", ");
-		}
-		LOG_NEWLINE();
-	}
-	LOG_TO_STREAM("};");
-}
 namespace dwn::renderer
 {
 	namespace menu

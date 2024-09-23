@@ -124,6 +124,8 @@ namespace dwn::hooking
 		make_hook("CommandShouldWarnOfSimpleModCheck", CommandShouldWarnOfSimpleModCheck);	
 
 		//make_hook("CExtraContentManager::GetCRC", CExtraContentManagerGetCRC);
+		
+		//Can this be removed as this isn't really working ? 
 		//make_hook("AES::isTransformITKey", AESisTransformITKey);
 		//make_hook("AES::TransformITDecrypt", AESTransformITDecrypt);
 		//make_hook("AES::Decrypt", AESDecrypt);
@@ -131,6 +133,7 @@ namespace dwn::hooking
 
 		etc::persist_mh::apply_queued();
 
+		//Is This Still needed ? 
 		make_hook_vtbl(gameSkeleton, pointers::g_gameSkeleton, 4,
 		{
 			_this->set_func(1, gameSkeletonInit);

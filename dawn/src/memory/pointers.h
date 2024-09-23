@@ -44,36 +44,10 @@ namespace dwn::pointers
 	inline rage::rlPc* g_rlPc{};
 	inline HWND g_hwnd{};
 
-	inline void defeat_arx()
-	{
-		LOG_TO_STREAM("Defeating GuardIT algorithms...");
-		s32 jumpception_count{},
-			healers_count{};
-
-		for (auto& h : memory::get_all_results("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45"))
-		{
-			++jumpception_count, ++healers_count;
-			memset((void*)(h + 8), 0x90, 7);
-		}
-
-		if (!jumpception_count)
-		{
-			LOG_TO_STREAM("There are no GuardIT algorithms to defeat!");
-		}
-		else
-		{
-			LOG_TO_STREAM("Defeated all algorithms!");
-			LOG_TO_STREAM("Number of times Jumpception was used: " << jumpception_count);
-			LOG_TO_STREAM("Number of times Jumpception (code healers) was used: " << (healers_count / 2) << " (t2, group_count:2)");
-		}
-	}
-
 	inline void trigger_scan(memory::pointer_manager& ptr_mgr)
 	{
 		ptr_mgr.run();
-		while (!ptr_mgr.finished())
-			;
-
+		while (!ptr_mgr.finished());
 		ptr_mgr.get_all();
 		ptr_mgr.print();
 	}
