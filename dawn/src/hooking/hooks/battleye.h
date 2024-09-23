@@ -23,4 +23,11 @@ namespace dwn::hooking
 		return false;
 		//return g_CNetworkBail->original()(bailParams, bSendScriptEvent);
 	}
+
+	inline etc::hook<pointers::types::NetworkAssetEqualsT>* g_NetworkAssetEquals{};
+	inline bool NetworkAssetEquals(void* _This, uint64_t unk)
+	{
+		return true;
+		//return g_NetworkAssetEquals->original()(_This, unk);
+	}
 }
